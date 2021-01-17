@@ -10,9 +10,8 @@ The backend code is written in TypeScript, so it needs to be compiled. Simply ru
 npm run build-server
 ```
 
-
 ### Frontend
-To compile the frontend using Webpack, simply run:
+To compile the frontend using Webpack, which will also take care of compiling the TypeScript code, simply run:
 
 ```
 npm run build-client
