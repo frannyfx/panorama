@@ -37,6 +37,11 @@ function verifySchemas(route: Route, request: any) {
 	// TODO: Verify the schemas.
 }
 
+/**
+ * Register a route to Fastify.
+ * @param fastify The Fastify instance to register the route to.
+ * @param route The route being registered.
+ */
 function registerRoute(fastify: any, route: Route) {
 	// Select the correct Fastify register function.
 	var register : Function | null;
@@ -105,6 +110,10 @@ function isRoute(route: any): route is Route {
 	return route; // TODO: Validate the routes.
 }
 
+/**
+ * Recursively load all valid routes in a directory.
+ * @param directory The directory to search.
+ */
 async function loadRoutes(directory: string) : Promise<Array<Route>> {
 	// Read the directory.
 	var entities;

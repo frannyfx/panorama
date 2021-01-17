@@ -8,6 +8,9 @@ import web from "./web";
 // Imports
 const logger = require("./utils/logger")("main");
 
+/**
+ * Initialise the backend.
+ */
 async function initialise() {
 	logger.info("Initialising...");
 	await web.start();

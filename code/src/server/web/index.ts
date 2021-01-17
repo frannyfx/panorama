@@ -17,7 +17,7 @@ const logger = require("../utils/logger")("web");
 var webServer : FastifyInstance;
 
 /**
- * 
+ * Start the web server.
  */
 async function start() {
 	// Create web server.
