@@ -140,7 +140,6 @@ async function loadRoutes(directory: string) : Promise<Array<Route>> {
 export default async function (fastify: any, options: Options, done: Function) {
 	// Load the routes.
 	let routes = (await Promise.all(options.directories.map(directory => loadRoutes(directory)))).flat();
-	console.log(routes);
 
 	// Register the routes.
 	routes.map(route => registerRoute(fastify, route));
