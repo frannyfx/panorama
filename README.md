@@ -1,6 +1,6 @@
 # 6CCS3PRJ Individual Project
 ## Description
-The *Code contribution assessment* project aims to shine light on the amount of work that contributors have carried out on a group project.
+The **Panorama** project aims to shine light on the amount of work that contributors have carried out on a group project.
 
 ## Compiling
 ### Backend
