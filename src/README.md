@@ -3,3 +3,4 @@
 - `public` contains static assets which will be made public by the web server.
 - `client` contains the uncompiled front-end code.
 - `server` contains the uncompiled back-end code.
+- `shared` contains shared code between the front-end and the back-end.
