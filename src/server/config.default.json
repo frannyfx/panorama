@@ -10,6 +10,10 @@
 		"address": "0.0.0.0",
 		"port": 8080
 	},
+	"github": {
+		"clientId": "",
+		"clientSecret": ""
+	},
 	"lexing": {
 		"langDirs": [
 			"lexing/langs"
