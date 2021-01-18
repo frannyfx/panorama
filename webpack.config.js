@@ -7,7 +7,7 @@ module.exports = {
 	entry: "./src/client/index.ts",
 	output: {
 		path: path.resolve(__dirname, "dist/public/js"),
-		filename: "build.js"
+		filename: "[name].bundle.js"
 	},
 	module: {
 		rules: [{

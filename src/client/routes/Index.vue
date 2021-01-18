@@ -1,13 +1,23 @@
 <template>
-	<div @click="change" class="wrapper">
+	<div class="wrapper">
 		<div class="container">
-			<h1>Panorama</h1>
+			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
+			<button @click="change" class="transparent">
+				<font-awesome-icon icon="code-branch"/>Sign in with GitHub
+			</button>
 		</div>
+		<p class="credits">Bottom text</p>
 	</div>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+// Imports
+import Vue from 'vue';
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
 export default Vue.extend({
+	components: {
+		FontAwesomeIcon
+	},
 	methods: {
 		change() {
 			this.$router.replace({name: "test"});
@@ -16,51 +26,55 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss">
-/* Global styles */
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
-html, body, #app {
-	margin: 0; padding: 0;
-	background-color: #222;
-	font-family: 'Open Sans', sans-serif;
-	width: 100vw; height: 100vh;
-}
-
-/* Transitions */
-.zoom-enter-active, .zoom-leave-active {
-	transition: transform 0.5s, opacity 0.5s;
-}
-
-.zoom-enter {
-	opacity: 0;
-	transform: scale(2);
-}
-
-.zoom-enter-to, .zoom-leave-from {
-	opacity: 1;
-	transform: scale(1);
-}
-
-.zoom-leave-to {
-	opacity: 0;
-	transform: scale(0.5);
-}
+@import "../stylesheets/globals.scss";
 </style>
 <style lang="scss" scoped>
-h1 {
-	color: white;
-}
-
+@import "../stylesheets/globals.scss";
 .wrapper {
 	width: 100%;
 	height: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	cursor: pointer;
+	flex-direction: column;
+
+	.credits {
+		position: absolute;
+		left: 0; right: 0; bottom: 0;
+		text-align: center;
+		font-size: 0.8em;
+	}
 
 	.container {
-		h1 {
-			margin: 0; padding: 0;
+		/* Dimensions 
+		width: 500px;
+		height: 400px;
+		padding: 40px;
+		box-sizing: border-box;*/
+
+		@include sm {
+			/*width: 100%;*/
+		}
+
+		/* Appearance 
+		background-color: rgba(white, 0.95);
+		border-radius: 16px;
+		box-shadow: 0 19px 38px rgba(black, 0.15), 0 15px 12px rgba(black, 0.11);*/
+
+		text-align: center;
+
+		/* Animations */
+		transition: width 0.5s, margin-left 0.5s, margin-right 0.5s;
+
+		/* Children */
+		.title {
+			svg {
+				margin-right: 10px;
+			}
+
+			color: white;
+			margin-bottom: 10px;
+			text-shadow: 0px 3px rgba(black, 0.2);
 		}
 	}
 }

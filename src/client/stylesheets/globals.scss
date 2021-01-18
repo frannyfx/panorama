@@ -1,0 +1,89 @@
+/* Colour scheme */
+$deep: #192B5D;
+$blue: #3960A1;
+/* Global styles */
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+html, body, #app {
+	margin: 0; padding: 0;
+	background-color: $deep;
+	font-family: 'Open Sans', sans-serif;
+	width: 100vw; height: 100vh;
+	color: white;
+}
+
+/* Media queries */
+$screen-sm-min: 576px;
+$screen-lg-min: 992px;
+@mixin sm {
+    @media (max-width: #{$screen-sm-min}) {
+        @content;
+    }
+}
+
+@mixin lg {
+    @media (min-width: #{$screen-lg-min}) {
+        @content;
+    }
+}
+
+/* Text styles */
+h1 {
+	font-weight: 400;
+	margin: 0; padding: 0;
+}
+
+/* Transitions */
+.zoom-enter-active, .zoom-leave-active {
+	transition: transform 0.5s, opacity 0.5s;
+}
+
+.zoom-enter {
+	opacity: 0;
+	transform: scale(2);
+}
+
+.zoom-enter-to, .zoom-leave-from {
+	opacity: 1;
+	transform: scale(1);
+}
+
+.zoom-leave-to {
+	opacity: 0;
+	transform: scale(0.5);
+}
+
+/* Buttons */
+button {
+	border: none;
+	padding: 12px 30px;
+	color: white;
+	background-color: $blue;
+	border-radius: 30px;
+	font-size: 0.8em;
+	cursor: pointer;
+	outline: none;
+
+	svg {
+		margin-right: 10px;
+		font-size: 1.2em;
+	}
+
+	&.transparent {
+		background-color: rgba(white, 0.2);
+		border: 2px solid transparent;
+		box-sizing: border-box;
+		transition: border-color 0.3s, transform 0.3s, background-color 0.3s;
+		
+
+		&:hover, &:focus {
+			border-color: rgba(white, 0.5);
+		}
+
+		&:active {
+			transition: border-color 0.15s, transform 0.15s, background-color 0.15s;
+			transform: scale(0.9);
+			background-color: rgba(black, 0.1);
+			border-color: rgba($blue, 0.5);
+		}
+	}
+}
