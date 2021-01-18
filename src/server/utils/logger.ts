@@ -1,6 +1,6 @@
 /**
  * @file Beautiful terminal logger.
- * @author Francesco Compagnoni <compfrancesco@gmail.com>
+ * @author Francesco Compagnoni
  */
 
 // Imports.

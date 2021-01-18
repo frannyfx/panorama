@@ -1,6 +1,6 @@
 /**
  * @file Export a function that returns the root of the project.
- * @author Francesco Compagnoni <compfrancesco@gmail.com>
+ * @author Francesco Compagnoni
  */
 
 // Imports

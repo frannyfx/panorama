@@ -15,6 +15,7 @@ export interface Config {
 			routeDirs: Array<string>
 		},
 		publicDir: string,
+		assetsDir: string,
 		address: string,
 		port: number
 	},

@@ -6,7 +6,7 @@
   "scripts": {
     "start": "tsc && node dist/index.js",
     "clean": "rm -rf dist/*",
-    "build-client": "webpack --mode development",
+    "build-client": "mkdir -p dist/assets dist/public &&cp -R src/assets/* dist/assets/ && cp -R src/public/* dist/public && webpack --mode development",
     "build-server": "tsc",
     "dev": "webpack --mode development --watch",
     "test": "echo \"Error: no test specified\" && exit 1"

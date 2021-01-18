@@ -1,6 +1,6 @@
 /**
  * @file Method enum.
- * @author Francesco Compagnoni <compfrancesco@gmail.com>
+ * @author Francesco Compagnoni
  */
 
 // Router method enum.

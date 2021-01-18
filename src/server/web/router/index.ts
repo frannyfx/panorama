@@ -1,6 +1,6 @@
 /**
  * @file Modular Fastify router.
- * @author Francesco Compagnoni <compfrancesco@gmail.com>
+ * @author Francesco Compagnoni
  */
 
 // Imports

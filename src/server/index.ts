@@ -1,6 +1,6 @@
 /**
  * @file Server entry point.
- * @author Francesco Compagnoni <compfrancesco@gmail.com>
+ * @author Francesco Compagnoni
  */
 
 import web from "./web";

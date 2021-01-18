@@ -1,6 +1,6 @@
 /**
  * @file The web server.
- * @author Francesco Compagnoni <compfrancesco@gmail.com>
+ * @author Francesco Compagnoni
  */
 
 // Imports
