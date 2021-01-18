@@ -5,9 +5,22 @@
 
 // Imports
 import Vue from "vue";
-import App from "./components/App.vue";
+import VueRouter from "vue-router";
 
-let app = new Vue({
-	el: "#app",
-	render: h => h(App)
-});
+// Routes
+import Index from "./routes/Index.vue";
+import Test from "./routes/Test.vue";
+
+// Set up the client-side routes.
+Vue.use(VueRouter);
+const routes = [
+	{ path: "/", component: Index, name: "home" },
+	{ path: "/test", component: Test, name: "test" }
+];
+
+const router = new VueRouter({ routes });
+
+// Set up the app.
+const app = new Vue({
+	router
+}).$mount("#app");

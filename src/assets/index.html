@@ -15,7 +15,11 @@
 		<link rel="preconnect" href="https://fonts.googleapis.com">
 	</head>
 	<body>
-		<div id="app"></div>
+		<div id="app">
+			<transition name="zoom" mode="out-in">
+				<router-view></router-view>
+			</transition>
+		</div>
 
 		<!-- Scripts -->
 		<script src="/js/build.js"></script>

@@ -12,7 +12,10 @@ module.exports = {
 	module: {
 		rules: [{
 			test: /\.vue$/,
-			include: path.resolve(__dirname, "src/client/components"),
+			include: [
+				path.resolve(__dirname, "src/client/components"),
+				path.resolve(__dirname, "src/client/routes")
+			],
 			use: "vue-loader"
 		}, {
 			test: /\.scss$/,
