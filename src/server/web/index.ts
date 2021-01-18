@@ -7,10 +7,12 @@
 import path from "path";
 import fastify, { FastifyInstance } from "fastify";
 
+// Config
+import loadConfig, { Config } from "../Config";
+const config : Config = loadConfig();
+
 // Modules
-import { Config } from "../Config";
 import getRoot from "../utils/root";
-const config : Config = require("../config.json");
 const logger = require("../utils/logger")("web");
 
 // Web-server

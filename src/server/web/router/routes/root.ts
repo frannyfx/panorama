@@ -7,10 +7,12 @@
 import fs from "fs";
 import path from "path";
 
+// Config
+import loadConfig, { Config } from "../../../Config";
+const config : Config = loadConfig();
+
 // Modules
-import { Config } from "../../../Config";
 import getRoot from "../../../utils/root";
-const config : Config = require("../../../config.json");
 import { Method } from "../Method";
 import { Route } from "../Route";
 

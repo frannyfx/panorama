@@ -2,6 +2,7 @@
 	<div class="wrapper">
 		<div class="container">
 			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
+			<p class="subtitle">Code contribution assessment</p>
 			<button @click="change" class="transparent">
 				<font-awesome-icon icon="code-branch"/>Sign in with GitHub
 			</button>
@@ -73,8 +74,13 @@ export default Vue.extend({
 			}
 
 			color: white;
-			margin-bottom: 10px;
 			text-shadow: 0px 3px rgba(black, 0.2);
+		}
+
+		.subtitle {
+			margin-top: 0;
+			margin-bottom: 20px;
+			font-size: 0.8em;
 		}
 	}
 }
