@@ -3,7 +3,7 @@
 		<div class="container">
 			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
 			<!--<p class="subtitle">Code contribution assessment</p>-->
-			<button @click="signIn" class="transparent">
+			<button @click="signIn" class="transparent" disabled>
 				<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
 			</button>
 		</div>
@@ -18,9 +18,10 @@ import Vue from 'vue';
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 // API imports
-import { send } from "../modules/API";
+import { send, loadAuthenticationData, AuthenticationData, saveAuthenticationData } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
+import { isResult } from '../../shared/Result';
 
 export default Vue.extend({
 	components: {
@@ -40,17 +41,55 @@ export default Vue.extend({
 		async signIn() {
 			this.popup.window = window.open(
 				`https://github.com/login/oauth/authorize?client_id=${this.clientId}`,
+				/*"http://localhost:8080/api/github/callback?code=123",*/
 				"GitHub Authentication",
 				"menubar=no,location=no,resizable=no,scrollbars=no,status=no," + 
 				`width=${this.popup.width},height=${this.popup.height},` +
 				`left=${((window.outerWidth - this.popup.width) / 2) + window.screenX},top=${((window.outerHeight - this.popup.height) / 2) + window.screenY}`
 			);
+		},
+		async setClientId() {
+			// Fetch GitHub client ID.
+			let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
+			if (clientIdResponse.status.ok) this.clientId = clientIdResponse.result?.clientId;
+		},
+		async fetchProfileData() {
+			console.log("Fetching profile data...");
 		}
 	},
 	mounted: async function() {
-		// Fetch GitHub client ID.
-		let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
-		if (clientIdResponse.status.ok) this.clientId = clientIdResponse.result?.clientId;
+		// Add event listener to receive data from pop-up.
+		window.addEventListener("message", async event => {
+			// Perform type check on the result.
+			var result;
+			if (isResult(event.data)) result = event.data;
+			if (result == undefined) return;
+
+			// If successful, save the data.
+			if (result.status.ok) {
+				saveAuthenticationData({
+					accessToken: result.result?.accessToken,
+					scope: result.result?.scope,
+					tokenType: result.result?.tokenType
+				});
+
+				// Fetch initial data.
+				await this.fetchProfileData();
+			}
+		});
+
+		// Check cached GitHub authentication info.
+		let authenticationData = loadAuthenticationData();
+		if (!authenticationData.accessToken)  {
+			await this.setClientId();
+		} else {
+			// Fetch initial data.
+			await this.fetchProfileData();
+		}
+
+		
+
+		
 	}
 });
 </script>

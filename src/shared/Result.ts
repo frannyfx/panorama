@@ -11,10 +11,28 @@ export interface Data {
 // Result interface.
 export interface Result {
 	status: {
-		ok: Boolean,
+		ok: boolean,
 		message?: string
 	},
 	result?: Data
+}
+
+/**
+ * Type guard for Result objects.
+ * @param obj The object to determine whether it is a Result.
+ */
+export function isResult(obj: any): obj is Result {
+	// Validate status.
+	if (!obj.status || typeof obj.status != "object") return false;
+
+	// Validate OK.
+	if (obj.status.ok === undefined || typeof obj.status.ok != "boolean") return false;
+
+	// Validate message.
+	if (obj.status.message && typeof obj.status.message != "string") return false;
+
+	// No need to validate the payload, hence return true.
+	return true;
 }
 
 /**

@@ -14,7 +14,7 @@
 		"src/server/*.json", 
 		"src/shared/**/*"
 	],
-	"exclude": [
-		"src/client/**/*"
+	"files": [
+		"src/client/vue-shim.d.ts"
 	]
 }

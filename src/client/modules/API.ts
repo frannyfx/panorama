@@ -12,6 +12,12 @@ interface Params {
 	[key: string]: string
 };
 
+export interface AuthenticationData {
+	accessToken : string | null,
+	scope : string | null,
+	tokenType: string | null
+};
+
 // Constants
 const defaultResponse : Response = {
 	status: {
@@ -22,6 +28,43 @@ const defaultResponse : Response = {
 		}
 	}
 };
+
+// Token data
+let authenticationData : AuthenticationData = {
+	accessToken: null, scope: null, tokenType: null
+};
+
+/**
+ * Load the saved authentication data from local storage.
+ */
+export function loadAuthenticationData() : AuthenticationData {
+	console.log("Loading authentication data...");
+	authenticationData.accessToken = window.localStorage.getItem("accessToken");
+	authenticationData.scope = window.localStorage.getItem("scope");
+	authenticationData.tokenType = window.localStorage.getItem("tokenType");
+
+	console.log(authenticationData);
+	return authenticationData;
+}
+
+/**
+ * Save the newly received authentication data to local storage.
+ * @param data The data being saved. 
+ */
+export function saveAuthenticationData(data: AuthenticationData) {
+	console.log("Saved authentication data.");
+	authenticationData = data;
+	window.localStorage.setItem("accessToken", data.accessToken!);
+	window.localStorage.setItem("scope", data.scope!);
+	window.localStorage.setItem("tokenType", data.tokenType!);
+}
+
+/**
+ * Get the current authentication data.
+ */
+export function getAuthenticationData() : AuthenticationData {
+	return authenticationData;
+}
 
 /**
  * Send an API request.

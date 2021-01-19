@@ -10,7 +10,9 @@ import { library } from "@fortawesome/fontawesome-svg-core";
 // Icons
 import { faEye } from "@fortawesome/free-solid-svg-icons/faEye";
 import { faCodeBranch } from "@fortawesome/free-solid-svg-icons/faCodeBranch";
+import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
+import { faCheckCircle } from "@fortawesome/free-solid-svg-icons/faCheckCircle";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 
 // Add the icons to the library.
-export default library.add(faEye, faCodeBranch, faGithub);
+export default library.add(faEye, faCodeBranch, faExclamationCircle, faCheckCircle, faGithub);

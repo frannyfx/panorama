@@ -4,7 +4,10 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 // Configuration
 module.exports = {
-	entry: "./src/client/index.ts",
+	entry: {
+		"main": "./src/client/entries/index.ts",
+		"callback": "./src/client/entries/callback.ts"
+	},
 	output: {
 		path: path.resolve(__dirname, "dist/public/js"),
 		filename: "[name].bundle.js"
@@ -13,8 +16,7 @@ module.exports = {
 		rules: [{
 			test: /\.vue$/,
 			include: [
-				path.resolve(__dirname, "src/client/components"),
-				path.resolve(__dirname, "src/client/routes")
+				path.resolve(__dirname, "src/client/"),
 			],
 			use: "vue-loader"
 		}, {

@@ -5,12 +5,15 @@
 
 // Imports
 import Joi from "joi";
+import fs from "fs";
+import path from "path";
 
 // Config
 import loadConfig, { Config } from "../../../../Config";
 const config : Config = loadConfig();
 
 // Modules
+import getRoot from "../../../../utils/root";
 import { Method } from "../../../../../shared/Method";
 import { Route } from "../../Route";
 import { Codes, send } from "../../API";
@@ -27,13 +30,22 @@ let route : Array<Route> = [{
 }, {
 	method: Method.GET,
 	url: "/api/github/callback",
+	handler: async (request: any, response: any) => {
+		// Create read stream for callback.html.
+		const callback = fs.createReadStream(path.join(getRoot(), config.web.assetsDir, "callback.html"));
+		response.type("text/html").send(callback);
+	}
+}, {
+	method: Method.GET,
+	url: "/api/github/access-token/:code",
 	schemas: {
-		query: Joi.object({
+		params: Joi.object({
 			code: Joi.string()
 		})
 	},
 	handler: async (request: any, response: any) => {
-		let result = await getAccessToken(request.query.code);
+		// Get access token and return it.
+		let result = await getAccessToken(request.params.code);
 		if (!result.status.ok) return send(response, Codes.GenericError);
 		send(response, Codes.OK, result.result);
 	}

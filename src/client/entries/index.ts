@@ -1,5 +1,5 @@
 /**
- * @file Vue app entry point.
+ * @file Main app entry point.
  * @author Francesco Compagnoni
  */
 
@@ -8,12 +8,12 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 // Force import icons
-import Icons from "./icons";
+import Icons from "../icons";
 Icons;
 
 // Routes
-import Index from "./routes/Index.vue";
-const Test = () => import("./routes/Test.vue");
+import Index from "../routes/Index.vue";
+const Test = () => import("../routes/Test.vue");
 
 // Set up the client-side routes.
 Vue.use(VueRouter);
