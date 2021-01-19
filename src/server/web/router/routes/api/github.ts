@@ -11,9 +11,10 @@ import loadConfig, { Config } from "../../../../Config";
 const config : Config = loadConfig();
 
 // Modules
-import { Method } from "../../Method";
+import { Method } from "../../../../../shared/Method";
 import { Route } from "../../Route";
 import { Codes, send } from "../../API";
+import Joi from "joi";
 
 let route : Array<Route> = [{
 	method: Method.GET,
@@ -26,8 +27,14 @@ let route : Array<Route> = [{
 }, {
 	method: Method.GET,
 	url: "/api/github/callback",
+	schemas: {
+		params: Joi.object({
+			code: Joi.string()
+		})
+	},
 	handler: (request: any, response: any) => {
-		
+		console.log("Request params:", request.params);
+		send(response, Codes.OK);
 	}
 }];
 

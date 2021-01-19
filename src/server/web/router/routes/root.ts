@@ -13,7 +13,7 @@ const config : Config = loadConfig();
 
 // Modules
 import getRoot from "../../../utils/root";
-import { Method } from "../Method";
+import { Method } from "../../../../shared/Method";
 import { Route } from "../Route";
 
 let route : Array<Route> = [{

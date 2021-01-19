@@ -11,7 +11,8 @@
 	},
 	"include": [
 		"src/server/**/*",
-		"src/server/*.json"
+		"src/server/*.json", 
+		"src/shared/**/*"
 	],
 	"exclude": [
 		"src/client/**/*"

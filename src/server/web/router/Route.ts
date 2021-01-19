@@ -8,7 +8,7 @@ import Joi from "joi";
 import { IncomingMessage } from "http";
 
 // Modules
-import { Method } from "./Method";
+import { Method } from "../../../shared/Method";
 
 /**
  * The interface for the route handler function.

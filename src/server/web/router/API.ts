@@ -3,24 +3,15 @@
  * @author Francesco Compagnoni
  */
 
+// Imports
+import { Response } from "../../../shared/Response";
+
 // API code interface.
 export interface Code {
 	ok: Boolean,
 	httpCode: number,
 	apiCode: number,
 	message: string
-};
-
-// API response interface.
-export interface Response {
-	status: {
-		ok: Boolean,
-		error?: {
-			code: number,
-			message: string,
-		}
-	},
-	result?: Object	
 };
 
 // API codes dictionary interface.
@@ -62,5 +53,5 @@ export function send(reply: any, code: Code, payload: Object | null = null) {
 	};
 
 	// Send the response.
-	reply.code(code.httpCode).send(response);
+	reply.code(code.httpCode).header("Content-Type", "application/json").send(response);
 }

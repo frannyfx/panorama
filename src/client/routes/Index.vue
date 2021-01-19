@@ -3,7 +3,7 @@
 		<div class="container">
 			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
 			<!--<p class="subtitle">Code contribution assessment</p>-->
-			<button @click="change" class="transparent">
+			<button @click="signIn" class="transparent">
 				<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
 			</button>
 		</div>
@@ -13,16 +13,44 @@
 <script lang="ts">
 // Imports
 import Vue from 'vue';
+
+// Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+// API imports
+import { send } from "../modules/API";
+import { Method } from "../../shared/Method";
+import { Response } from "../../shared/Response";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon
 	},
+	data() {
+		return {
+			clientId: "",
+			popup: {
+				window: null as Window | null,
+				width: 450,
+				height: 820
+			} 
+		};
+	},
 	methods: {
-		change() {
-			this.$router.replace({name: "test"});
+		async signIn() {
+			this.popup.window = window.open(
+				`https://github.com/login/oauth/authorize?client_id=${this.clientId}`,
+				"GitHub Authentication",
+				"menubar=no,location=no,resizable=no,scrollbars=no,status=no," + 
+				`width=${this.popup.width},height=${this.popup.height},` +
+				`left=${((window.outerWidth - this.popup.width) / 2) + window.screenX},top=${((window.outerHeight - this.popup.height) / 2) + window.screenY}`
+			);
 		}
+	},
+	mounted: async function() {
+		// Fetch GitHub client ID.
+		let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
+		if (clientIdResponse.status.ok) this.clientId = clientIdResponse.result?.clientId;
 	}
 });
 </script>

@@ -5,8 +5,8 @@
 				"web/router/routes"
 			]
 		},
-		"publicDir": "public/",
-		"assetsDir": "assets/",
+		"publicDir": "../public/",
+		"assetsDir": "../assets/",
 		"address": "0.0.0.0",
 		"port": 8080
 	},

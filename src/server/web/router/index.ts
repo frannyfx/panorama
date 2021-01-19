@@ -9,7 +9,7 @@ import path from "path";
 
 // Modules
 const logger = require("../../utils/logger")("router");
-import { Method } from "./Method";
+import { Method } from "../../../shared/Method";
 import { Handler, Route } from "./Route";
 
 // Constants
