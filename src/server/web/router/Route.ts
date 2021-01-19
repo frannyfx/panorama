@@ -27,6 +27,7 @@ export interface Route {
 	handler: Handler,
 	schemas?: {
 		params?: Joi.ObjectSchema,
-		body?: Joi.ObjectSchema
+		body?: Joi.ObjectSchema,
+		query?: Joi.ObjectSchema
 	}
 };

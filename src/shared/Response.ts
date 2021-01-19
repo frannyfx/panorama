@@ -3,10 +3,8 @@
  * @author Francesco Compagnoni
  */
 
-// API response interface.
-export interface Result {
-	[key: string]: any
-};
+// Imports
+import { Data } from "./Result";
 
 export interface Response {
 	status: {
@@ -14,9 +12,10 @@ export interface Response {
 		error?: {
 			code: number,
 			message: string,
+			description?: string
 		}
 	},
-	result?: Result	
+	result?: Data	
 };
 
 /**

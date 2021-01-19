@@ -5,12 +5,16 @@
 
 // Imports
 import { promises as fs } from "fs";
+import { ObjectSchema } from "joi";
 import path from "path";
 
 // Modules
 const logger = require("../../utils/logger")("router");
 import { Method } from "../../../shared/Method";
+import { buildResult, Data, Result } from "../../../shared/Result";
 import { Handler, Route } from "./Route";
+import route from "./routes/root";
+import { Codes, send } from "./API";
 
 // Constants
 const jsRegex = /([a-zA-Z0-9\s_\\.\-\(\):])+(.js)$/;
@@ -28,13 +32,47 @@ function verifyAuth(request : any) {
 	// TODO: Verify authentication.
 }
 
+async function verifySchema(schema: ObjectSchema, payload: Data) : Promise<Result> {
+	try {
+		let validated = await schema.validateAsync(payload);
+		return buildResult(true, validated);
+	} catch (e) {
+		return buildResult(false, undefined, e.details[0].message);
+	}
+}
+
 /**
  * Validate the schemas detailing the structure of the parameters and body in the route using Joi.
  * @param route The route being validated.
  * @param request The request containing the payload to be validated.
+ * @returns 
  */
-function verifySchemas(route: Route, request: any) {
-	// TODO: Verify the schemas.
+async function verifySchemas(route: Route, request: any) : Promise<Result> {
+	// Validate all schemas.
+	let query, params, body;
+	if (route.schemas?.query)
+		query = await verifySchema(route.schemas?.query, request.query);
+
+	if (route.schemas?.params)
+		params = await verifySchema(route.schemas?.params, request.params);
+	
+	if (route.schemas?.body)
+		body = await verifySchema(route.schemas?.body, request.body);
+
+	// Return errors.
+	if (query && !query.status.ok)
+		return query;
+
+	if (params && !params.status.ok)
+		return params;
+
+	if (body && !body.status.ok)
+		return body;
+
+	// Otherwise, return validated data.
+	return buildResult(true, {
+		query: query?.result, params: params?.result, body: body?.result
+	});
 }
 
 /**
@@ -91,7 +129,15 @@ function wrapRoute(route : Route) : Function {
 		// ...
 
 		// Verify schemas.
-		// ...
+		let schemasResult = await verifySchemas(route, request);
+		if (!schemasResult.status.ok) {
+			return send(response, Codes.BadRequest, undefined, schemasResult.status.message);
+		}
+
+		// - Set existing schemas to validated schemas.
+		request.query = schemasResult.result?.query;
+		request.params = schemasResult.result?.params;
+		request.body = schemasResult.result?.body;
 
 		// Call route handler.
 		try {

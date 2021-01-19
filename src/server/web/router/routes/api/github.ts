@@ -4,7 +4,7 @@
  */
 
 // Imports
-// ...
+import Joi from "joi";
 
 // Config
 import loadConfig, { Config } from "../../../../Config";
@@ -14,7 +14,7 @@ const config : Config = loadConfig();
 import { Method } from "../../../../../shared/Method";
 import { Route } from "../../Route";
 import { Codes, send } from "../../API";
-import Joi from "joi";
+import { getAccessToken } from "../../../../github";
 
 let route : Array<Route> = [{
 	method: Method.GET,
@@ -28,13 +28,14 @@ let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/github/callback",
 	schemas: {
-		params: Joi.object({
+		query: Joi.object({
 			code: Joi.string()
 		})
 	},
-	handler: (request: any, response: any) => {
-		console.log("Request params:", request.params);
-		send(response, Codes.OK);
+	handler: async (request: any, response: any) => {
+		let result = await getAccessToken(request.query.code);
+		if (!result.status.ok) return send(response, Codes.GenericError);
+		send(response, Codes.OK, result.result);
 	}
 }];
 

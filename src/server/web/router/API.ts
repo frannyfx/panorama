@@ -5,6 +5,7 @@
 
 // Imports
 import { Response } from "../../../shared/Response";
+import { Data } from "../../../shared/Result";
 
 // API code interface.
 export interface Code {
@@ -26,6 +27,18 @@ export const Codes : API = {
 		httpCode: 200,
 		apiCode: 1000,
 		message: ""
+	},
+	GenericError: {
+		ok: false,
+		httpCode: 200,
+		apiCode: 1001,
+		message: "An unknown error has occurred. Please try again later."
+	},
+	BadRequest: {
+		ok: false,
+		httpCode: 400,
+		apiCode: 1002,
+		message: "Invalid payload."
 	}
 };
 
@@ -35,7 +48,7 @@ export const Codes : API = {
  * @param code The API code to return.
  * @param payload The optional payload to send along with the response.
  */
-export function send(reply: any, code: Code, payload: Object | null = null) {
+export function send(reply: any, code: Code, payload: Data | undefined = undefined, errorDescription: string | undefined = undefined) {
 	// Build response.
 	let response : Response = {
 		status: {
@@ -51,6 +64,9 @@ export function send(reply: any, code: Code, payload: Object | null = null) {
 		code: code.apiCode,
 		message: code.message
 	};
+
+	// Add specific details if available.
+	if (response.status.error && errorDescription) response.status.error.description = errorDescription;
 
 	// Send the response.
 	reply.code(code.httpCode).header("Content-Type", "application/json").send(response);
