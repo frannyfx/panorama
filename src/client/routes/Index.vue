@@ -5,7 +5,7 @@
 			<div class="container">
 				<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
 				<!--<p class="subtitle">Code contribution assessment</p>-->
-				<button @click="signIn" class="transparent blur" disabled>
+				<button @click="signIn" class="transparent blur" :disabled="clientId == ''">
 					<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
 				</button>
 			</div>
