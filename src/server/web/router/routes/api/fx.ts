@@ -1,5 +1,5 @@
 /**
- * @file Routes handling GitHub requests.
+ * @file Routes handling aesthetics & FX requests.
  * @author Francesco Compagnoni
  */
 

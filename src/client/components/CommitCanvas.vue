@@ -19,7 +19,6 @@ class Particle {
 	desiredSpeed : number;
 	calculatedSize: TextMetrics;
 
-
 	constructor(size : number, text : string, x : number, y : number, speed : number, context: CanvasRenderingContext2D, maxFontSize : number) {
 		this.size = size;
 		this.text = text;
