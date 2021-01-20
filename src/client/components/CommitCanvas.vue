@@ -32,7 +32,7 @@ class Particle {
 	}
 
 	isVisible() {
-		return this.x + this.calculatedSize.width > 0;
+		return this.x + this.calculatedSize.width > -300;
 	}
 
 	flush(speed : number) {
