@@ -93,6 +93,8 @@ export default Vue.extend({
 	align-items: center;
 	flex-direction: column;
 
+	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
+
 	.container {
 		text-align: center;
 
@@ -103,8 +105,8 @@ export default Vue.extend({
 			}
 
 			color: white;
-			text-shadow: 0px 3px rgba(black, 0.2);
 			margin-bottom: 10px;
+			filter: drop-shadow(0px 4px 8px rgba(black, 0.3));
 		}
 
 		.subtitle {

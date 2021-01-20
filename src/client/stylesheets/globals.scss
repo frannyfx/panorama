@@ -91,6 +91,11 @@ button {
 			}
 		}
 
+		&.blur {
+			backdrop-filter: blur(10px);
+			-webkit-backdrop-filter: blur(10px);
+		}
+
 		&:disabled {
 			opacity: 0.5;
 		}

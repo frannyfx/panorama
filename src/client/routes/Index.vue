@@ -1,13 +1,16 @@
 <template>
-	<div class="wrapper">
-		<div class="container">
-			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
-			<!--<p class="subtitle">Code contribution assessment</p>-->
-			<button @click="signIn" class="transparent" disabled>
-				<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
-			</button>
+	<div class="page">
+		<commit-canvas/>
+		<div class="wrapper">
+			<div class="container">
+				<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
+				<!--<p class="subtitle">Code contribution assessment</p>-->
+				<button @click="signIn" class="transparent blur" disabled>
+					<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
+				</button>
+			</div>
+			<!--<p class="credits">Bottom text</p>-->
 		</div>
-		<!--<p class="credits">Bottom text</p>-->
 	</div>
 </template>
 <script lang="ts">
@@ -16,6 +19,7 @@ import Vue from 'vue';
 
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import CommitCanvas from "../components/CommitCanvas.vue";
 
 // API imports
 import { send, loadAuthenticationData, AuthenticationData, saveAuthenticationData } from "../modules/API";
@@ -25,7 +29,8 @@ import { isResult } from '../../shared/Result';
 
 export default Vue.extend({
 	components: {
-		FontAwesomeIcon
+		FontAwesomeIcon,
+		CommitCanvas
 	},
 	data() {
 		return {
@@ -86,10 +91,6 @@ export default Vue.extend({
 			// Fetch initial data.
 			await this.fetchProfileData();
 		}
-
-		
-
-		
 	}
 });
 </script>
@@ -101,10 +102,16 @@ export default Vue.extend({
 .wrapper {
 	width: 100%;
 	height: 100%;
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 1;
+
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-direction: column;
+
+	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
 
 	.credits {
 		position: absolute;
@@ -114,25 +121,7 @@ export default Vue.extend({
 	}
 
 	.container {
-		/* Dimensions 
-		width: 500px;
-		height: 400px;
-		padding: 40px;
-		box-sizing: border-box;*/
-
-		@include sm {
-			/*width: 100%;*/
-		}
-
-		/* Appearance 
-		background-color: rgba(white, 0.95);
-		border-radius: 16px;
-		box-shadow: 0 19px 38px rgba(black, 0.15), 0 15px 12px rgba(black, 0.11);*/
-
 		text-align: center;
-
-		/* Animations */
-		transition: width 0.5s, margin-left 0.5s, margin-right 0.5s;
 
 		/* Children */
 		.title {
@@ -141,8 +130,8 @@ export default Vue.extend({
 			}
 
 			color: white;
-			text-shadow: 0px 3px rgba(black, 0.2);
 			margin-bottom: 10px;
+			filter: drop-shadow(0px 4px 8px rgba(black, 0.3));
 		}
 
 		.subtitle {
