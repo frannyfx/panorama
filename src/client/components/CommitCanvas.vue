@@ -32,7 +32,7 @@ class Particle {
 	}
 
 	isVisible() {
-		return this.x + this.calculatedSize.width > -300;
+		return this.x + this.calculatedSize.width > -200;
 	}
 
 	flush(speed : number) {
@@ -48,7 +48,7 @@ export default Vue.extend({
 			lastTs: undefined as number | undefined,
 			particleTexts: [] as Array<string>,
 			particles: [] as Array<Particle>,
-			count: 10,
+			count: 13,
 			speed: 0.2,
 			maxFontSize: 40,
 			maxAlpha: 0.3,
