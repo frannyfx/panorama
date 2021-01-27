@@ -3,15 +3,6 @@
  * @author Francesco Compagnoni
  */
 
-// Imports
-import Joi from "joi";
-import fs from "fs";
-import path from "path";
-
-// Config
-import loadConfig, { Config } from "../../../../Config";
-const config : Config = loadConfig();
-
 // Modules
 import { Method } from "../../../../../shared/Method";
 import { Request, Route } from "../../Route";
