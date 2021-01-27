@@ -59,11 +59,8 @@ export default Vue.extend({
 		},
 		async fetchProfileData() {
 			console.log("Fetching profile data...");
-		}
-	},
-	mounted: async function() {
-		// Add event listener to receive data from pop-up.
-		window.addEventListener("message", async event => {
+		},
+		async onReceiveMessage(event: MessageEvent) {
 			// Perform type check on the result.
 			var result;
 			if (isResult(event.data)) result = event.data;
@@ -81,11 +78,16 @@ export default Vue.extend({
 				this.auth = true;
 				await this.fetchProfileData();
 			}
-		});
+		}
+	},
+	mounted: async function() {
+		// Add event listener to receive data from pop-up.
+		window.addEventListener("message", this.onReceiveMessage);
 
 		// Check cached GitHub authentication info.
 		let authenticationData = loadAuthenticationData();
-		if (!authenticationData.accessToken)  {
+		if (!authenticationData.accessToken) {
+			// TODO: Put authentication into Vuex store.
 			this.auth = false;
 			await this.setClientId();
 		} else {
@@ -94,7 +96,14 @@ export default Vue.extend({
 		}
 
 		this.$store.commit("setLoading", false);
-	}
+	}, /*
+	beforeRouteEnter (to, from, next) {
+		next(async vm => {
+			
+
+			
+		});
+	} */
 });
 </script>
 <style lang="scss" scoped>

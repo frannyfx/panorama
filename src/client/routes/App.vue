@@ -19,7 +19,7 @@
 					<span>&bull;</span>
 					<a href="https://github.com/frannyfx" target="_blank"><font-awesome-icon :icon="['fab', 'github']"/></a>
 					<span>&bull;</span>
-					<a href="">Privacy Policy</a>
+					<a href="/privacy-policy">Privacy Policy</a>
 				</p>
 			</div>
 		</transition>
