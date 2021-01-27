@@ -126,17 +126,10 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss" scoped>
-.background {
-	width: 100vw;
-	height: 100vh;
-	position: absolute;
-	pointer-events: none;
-	z-index: 0;
-
-	canvas {
-		width: 100%;
-		height: 100%;
-		filter: blur(2px);
-	}
+@import "../stylesheets/globals.scss";
+canvas {
+	width: 100%;
+	height: 100%;
+	filter: blur(2px);
 }
 </style>

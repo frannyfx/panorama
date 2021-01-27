@@ -6,25 +6,38 @@
 // Imports
 import Vue from "vue";
 import VueRouter from "vue-router";
+import Store from "../store";
+
+// Components
+import App from "../routes/App.vue";
 
 // Force import icons
 import Icons from "../icons";
 Icons;
 
 // Routes
-import Index from "../routes/Index.vue";
-const Test = () => import("../routes/Test.vue");
+const Login = () => import("../routes/Login.vue");
+const Dashboard = () => import("../routes/Dashboard.vue");
 
 // Set up the client-side routes.
 Vue.use(VueRouter);
-const routes = [
-	{ path: "/", component: Index, name: "home" },
-	{ path: "/test", component: Test, name: "test" }
-];
+
+const routes = [{
+	path: "/",
+	component: Login,
+	name: "login"
+}, {
+	path: "/dashboard",
+	component: Dashboard,
+	name: "dashboard"
+}];
 
 const router = new VueRouter({ routes });
 
 // Set up the app.
 const app = new Vue({
-	router
-}).$mount("#app");
+	el: "#app",
+	router,
+	store: Store,
+	render: h => h(App)
+});

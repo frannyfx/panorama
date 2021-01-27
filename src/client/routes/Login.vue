@@ -1,15 +1,13 @@
 <template>
 	<div class="page">
-		<commit-canvas/>
+		
 		<div class="wrapper">
 			<div class="container">
 				<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
-				<!--<p class="subtitle">Code contribution assessment</p>-->
-				<button @click="signIn" class="transparent blur" :disabled="auth == null || auth">
+				<button @click="signIn" class="transparent blur" :disabled="auth == null || auth || (!auth && clientId == '')">
 					<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
 				</button>
 			</div>
-			<!--<p class="credits">Bottom text</p>-->
 		</div>
 	</div>
 </template>
@@ -94,12 +92,11 @@ export default Vue.extend({
 			// Check whether cached auth info is valid.
 			this.auth = await testAuthentication();
 		}
+
+		this.$store.commit("setLoading", false);
 	}
 });
 </script>
-<style lang="scss">
-@import "../stylesheets/globals.scss";
-</style>
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
 .wrapper {
@@ -114,15 +111,6 @@ export default Vue.extend({
 	align-items: center;
 	flex-direction: column;
 
-	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
-
-	.credits {
-		position: absolute;
-		left: 0; right: 0; bottom: 0;
-		text-align: center;
-		font-size: 0.8em;
-	}
-
 	.container {
 		text-align: center;
 
@@ -135,12 +123,6 @@ export default Vue.extend({
 			color: white;
 			margin-bottom: 10px;
 			filter: drop-shadow(0px 4px 8px rgba(black, 0.3));
-		}
-
-		.subtitle {
-			margin-top: 0;
-			margin-bottom: 20px;
-			font-size: 0.8em;
 		}
 	}
 }

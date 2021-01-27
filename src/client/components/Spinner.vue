@@ -5,16 +5,9 @@
         </path>
     </svg>
 </template>
-
-<script>
-export default {
-
-}
-</script>
-
 <style lang="scss" scoped>
 svg path {
     fill: white;
-    transition: fill 1s;
+    transition: fill 1s;   
 }
 </style>
