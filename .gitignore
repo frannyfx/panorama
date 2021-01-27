@@ -2,6 +2,9 @@
 dist
 config.json
 
+# Redis
+*.rdb
+
 ## Node.js
 # Logs
 logs
