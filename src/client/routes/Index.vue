@@ -5,7 +5,7 @@
 			<div class="container">
 				<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
 				<!--<p class="subtitle">Code contribution assessment</p>-->
-				<button @click="signIn" class="transparent blur" :disabled="clientId == ''">
+				<button @click="signIn" class="transparent blur" :disabled="auth == null || auth">
 					<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
 				</button>
 			</div>
@@ -22,7 +22,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import CommitCanvas from "../components/CommitCanvas.vue";
 
 // API imports
-import { send, loadAuthenticationData, AuthenticationData, saveAuthenticationData } from "../modules/API";
+import { send, loadAuthenticationData, AuthenticationData, saveAuthenticationData, testAuthentication } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
@@ -35,6 +35,7 @@ export default Vue.extend({
 	data() {
 		return {
 			clientId: "",
+			auth: null as Boolean | null,
 			popup: {
 				window: null as Window | null,
 				width: 450,
@@ -79,6 +80,7 @@ export default Vue.extend({
 				});
 
 				// Fetch initial data.
+				this.auth = true;
 				await this.fetchProfileData();
 			}
 		});
@@ -86,10 +88,11 @@ export default Vue.extend({
 		// Check cached GitHub authentication info.
 		let authenticationData = loadAuthenticationData();
 		if (!authenticationData.accessToken)  {
+			this.auth = false;
 			await this.setClientId();
 		} else {
-			// Fetch initial data.
-			await this.fetchProfileData();
+			// Check whether cached auth info is valid.
+			this.auth = await testAuthentication();
 		}
 	}
 });

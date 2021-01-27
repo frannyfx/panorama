@@ -67,6 +67,37 @@ export function getAuthenticationData() : AuthenticationData {
 }
 
 /**
+ * Remove saved authentication data.
+ */
+export function clearAuthenticationData() {
+	console.log("Cleared authentication data.");
+
+	// Remove current authentication data.
+	authenticationData = {
+		accessToken: null, scope: null, tokenType: null
+	};
+
+	// Clear it from local storage.
+	window.localStorage.removeItem("accessToken");
+	window.localStorage.removeItem("scope");
+	window.localStorage.removeItem("tokenType");
+}
+
+/**
+ * 
+ */
+export async function testAuthentication() : Promise<Boolean> {
+	let response = await send(Method.GET, "auth");
+
+	// Remove authentication data if found to be invalid.
+	if (!response.status.ok) {
+		clearAuthenticationData();
+	}
+
+	return response.status.ok;
+}
+
+/**
  * Send an API request.
  * @param method The method of the request.
  * @param url The URL of the request, not including /api/.
@@ -74,9 +105,12 @@ export function getAuthenticationData() : AuthenticationData {
  */
 export async function send(method: Method, url: string, payload: Object | null = null) : Promise<Response> {
 	try {
-		// Create options dict.
+		// Create options object.
 		let options : any = {
-			method: Method[method]
+			method: Method[method],
+			headers: {
+				"Authorization": authenticationData.accessToken ? `Bearer ${authenticationData.accessToken}` : ""
+			} 
 		};
 
 		// Add payload if appropriate.
