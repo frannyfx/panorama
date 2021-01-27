@@ -32,6 +32,9 @@ export interface Config {
 	},
 	lexing: {
 		langDirs: Array<string>
+	},
+	redis: {
+		url: string
 	}
 };
 

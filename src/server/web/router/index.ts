@@ -112,7 +112,7 @@ function registerRoute(fastify: any, route: Route) {
 	if (!register) return;
 
 	// Register the route.
-	logger.success(`Route ${Method[route.method]} ${route.url} registered successfully.`);
+	logger.info(`Route ${Method[route.method]} ${route.url} registered.`);
 	register(route.url, wrapRoute(route));
 }
 

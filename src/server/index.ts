@@ -3,19 +3,39 @@
  * @author Francesco Compagnoni
  */
 
-import web from "./web";
-
 // Imports
+import figlet from "figlet";
+
+// Modules
 const logger = require("./utils/logger")("main");
+import web from "./web";
+import processing from "./processing";
 
 /**
  * Initialise the backend.
  */
 async function initialise() {
-	logger.info("Initialising...");
-	await web.start();
-	logger.success("Initialisation complete.");
+	writeHeader();
+	try {
+		logger.info("Initialising...");
+		await web.start();
+		await processing.start();
+		logger.success("Initialisation complete.");
+	} catch (e) {
+		logger.error("Unable to initialise Panorama.\nExiting.");
+		process.exit(0);
+	}
 }
+
+/**
+ * Output the Panorama header to STDOUT.
+ */
+function writeHeader() {
+	console.log(figlet.textSync("panorama", {
+		font: "Small"
+	}).trimEnd() + " version 1.0\n\n");
+}
+
 
 // Initialise the backend.
 initialise();
@@ -23,11 +43,11 @@ initialise();
 // Catch uncaught exceptions.
 process.on("uncaughtException", (err : Error) => {
 	logger.error(`Uncaught exception: ${err.stack}\nExiting.`);
-	process.exit(1);
+	process.exit(0);
 });
 
 // Catch unhandled promise rejections.
-process.on("unhandledRejection", (err : Error) => {
-	logger.error(`Unhandled promise rejection: ${err.stack}\nExiting.`);
-	process.exit(1);
+process.on("unhandledRejection", (err) => {
+	logger.error(`Unhandled promise rejection: ${err}\nExiting.`);
+	process.exit(0);
 });
