@@ -12,25 +12,16 @@ import path from "path";
 const logger = require("../../utils/logger")("router");
 import { Method } from "../../../shared/Method";
 import { buildResult, Data, Result } from "../../../shared/Result";
-import { Handler, Route } from "./Route";
-import route from "./routes/root";
+import { Auth, Handler, Request, Route } from "./Route";
 import { Codes, send } from "./API";
 
 // Constants
 const jsRegex = /([a-zA-Z0-9\s_\\.\-\(\):])+(.js)$/;
 
-// Interfaces
 export interface Options {
-	directories: Array<string>
+	directories: Array<string>,
+	verifyAuth?: (request: any) => Promise<Auth>
 };
-
-/**
- * Validate the authentication of a user with a request.
- * @param request The request containing the authentication details to be validated.
- */
-function verifyAuth(request : any) {
-	// TODO: Verify authentication.
-}
 
 async function verifySchema(schema: ObjectSchema, payload: Data) : Promise<Result> {
 	try {
@@ -80,7 +71,7 @@ async function verifySchemas(route: Route, request: any) : Promise<Result> {
  * @param fastify The Fastify instance to register the route to.
  * @param route The route being registered.
  */
-function registerRoute(fastify: any, route: Route) {
+function registerRoute(fastify: any, route: Route, options: Options) {
 	// Select the correct Fastify register function.
 	var register : Function | null;
 	
@@ -113,35 +104,51 @@ function registerRoute(fastify: any, route: Route) {
 
 	// Register the route.
 	logger.info(`Route ${Method[route.method]} ${route.url} registered.`);
-	register(route.url, wrapRoute(route));
+	register(route.url, wrapRoute(route, options));
 }
 
 /**
  * Wrap a route in a function that handles all verification specified.
  * @param route The route to wrap.
  */
-function wrapRoute(route : Route) : Function {
+function wrapRoute(route : Route, options: Options) : Function {
 	return async (request : any, response : any) => {
+		// Create a new request payload, setting the old payload as the original request.
+		let newRequest : Request = { request };
+
 		// Verify authentication.
-		// ...
+		if (options.verifyAuth && route.auth! === true) {
+			// Call the verify auth function specified in the options.
+			let auth = await options.verifyAuth(request);
+			if (!auth.ok) {
+				return send(response, Codes.NoAuth);
+			}
+
+			// Set the auth field in the request.
+			newRequest.auth = auth;
+		}
+			
 
 		// Verify rate limiting.
 		// ...
 
 		// Verify schemas.
-		let schemasResult = await verifySchemas(route, request);
-		if (!schemasResult.status.ok) {
-			return send(response, Codes.BadRequest, undefined, schemasResult.status.message);
+		if (route.schemas) {
+			// Call the verify schemas function.
+			let schemasResult = await verifySchemas(route, request);
+			if (!schemasResult.status.ok) {
+				return send(response, Codes.BadRequest, undefined, schemasResult.status.message);
+			}
+
+			// Set schemas in the new request to the results of the validated schemas.
+			newRequest.query = schemasResult.result?.query;
+			newRequest.params = schemasResult.result?.params;
+			newRequest.body = schemasResult.result?.body;
 		}
-
-		// - Set existing schemas to validated schemas.
-		request.query = schemasResult.result?.query;
-		request.params = schemasResult.result?.params;
-		request.body = schemasResult.result?.body;
-
+		
 		// Call route handler.
 		try {
-			route.handler(request, response);
+			route.handler(newRequest, response);
 		} catch (e) {
 			logger.error(`Unhandled error at route ${Method[route.method]} ${route.url} - ${e.message}.`);
 		}
@@ -197,6 +204,6 @@ export default async function (fastify: any, options: Options, done: Function) {
 	let routes = (await Promise.all(options.directories.map(directory => loadRoutes(directory)))).flat();
 
 	// Register the routes.
-	routes.map(route => registerRoute(fastify, route));
+	routes.map(route => registerRoute(fastify, route, options));
 	done();
 }

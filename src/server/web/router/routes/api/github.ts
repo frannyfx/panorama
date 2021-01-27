@@ -15,14 +15,14 @@ const config : Config = loadConfig();
 // Modules
 import getRoot from "../../../../utils/root";
 import { Method } from "../../../../../shared/Method";
-import { Route } from "../../Route";
+import { Request, Route } from "../../Route";
 import { Codes, send } from "../../API";
 import { getAccessToken } from "../../../../github";
 
 let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/github/client-id",
-	handler: (request: any, response: any) => {
+	handler: (request: Request, response: any) => {
 		send(response, Codes.OK, {
 			clientId: config.github?.clientId
 		});
@@ -30,7 +30,7 @@ let route : Array<Route> = [{
 }, {
 	method: Method.GET,
 	url: "/api/github/callback",
-	handler: async (request: any, response: any) => {
+	handler: async (request: Request, response: any) => {
 		// Create read stream for callback.html.
 		const callback = fs.createReadStream(path.join(getRoot(), config.web.assetsDir, "callback.html"));
 		response.type("text/html").send(callback);
@@ -43,9 +43,9 @@ let route : Array<Route> = [{
 			code: Joi.string()
 		})
 	},
-	handler: async (request: any, response: any) => {
+	handler: async (request: Request, response: any) => {
 		// Get access token and return it.
-		let result = await getAccessToken(request.params.code);
+		let result = await getAccessToken(request.params!.code);
 		if (!result.status.ok) return send(response, Codes.GenericError);
 		send(response, Codes.OK, result.result);
 	}

@@ -13,6 +13,8 @@ const config : Config = loadConfig();
 
 // Modules
 import getRoot from "../utils/root";
+import { Auth, Request } from "./router/Route";
+import { checkAuth } from "../github";
 const logger = require("../utils/logger")("web");
 
 // Web-server
@@ -35,11 +37,41 @@ async function start() {
 
 	// Load dynamic routes.
 	await webServer.register(require("./router"), {
-		directories: config.web.router.routeDirs.map(dir => path.join(getRoot(), dir))
+		directories: config.web.router.routeDirs.map(dir => path.join(getRoot(), dir)),
+		verifyAuth
 	});
 
 	let address = await webServer.listen(config.web.port, config.web.address);
 	logger.success(`Successfully started web server at ${address}.`);
+}
+
+/**
+ * Validate the authentication of a user with a request.
+ * @param request The request containing the authentication details to be validated.
+ */
+async function verifyAuth(request: any) : Promise<Auth> {
+	// Get the Authorization header and check it is formatted properly.
+	let header = request.headers.authorization;
+	if (!header || typeof header != "string" || header.trim().length == 0)
+		return { ok: false };
+
+	try {
+		// Extract the token.
+		let token = header.split("Bearer")[1].trim();
+
+		// Check whether GitHub recognises the token.
+		let authResponse = await checkAuth(token);
+		if (!authResponse.status.ok) throw new Error();
+
+		return {
+			ok: true,
+			payload: authResponse.result
+		};
+	} catch (e) {
+		return { ok: false };
+	}
+	
+	
 }
 
 /**

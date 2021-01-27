@@ -1,80 +1,37 @@
 /**
- * @file Central queue handler.
+ * @file Repository processing system.
  * @author Francesco Compagnoni
  */
 
 // Imports
-import Queue from "bee-queue";
-import redis, { RedisClient } from "redis";
+// ...
 
 // Modules
-const logger = require("../utils/logger")("queue");
+import BeeQueue from "bee-queue";
+import queue, { RepoJob, RepoJobResult } from "./queue";
 
-// Config
-import loadConfig, { Config } from "../Config";
-const config : Config = loadConfig();
+export async function start() {
+	// Initialise queue system.
+	await queue.start();
 
-// Connection and queue
-var redisClient : RedisClient | null = null;
-var repoQueue : Queue | null = null;
+	// Get queue.
+	let repoQueue = queue.getRepoQueue();
+	if (!repoQueue) throw new Error("Unable to get queue.");
 
-/**
- * Initialise the queueing system.
- */
-export function start() : Promise<void> {
-	return new Promise((resolve, reject) => {
-		// Connect to Redis.
-		redisClient = redis.createClient(config.redis.url);
+	// Set queue handlers.
+	repoQueue.process(handleRepoJob);
+}
 
-		// On Redis connected, create queue.
-		redisClient.on("ready", () => {
-			// Create repository queue.
-			createQueue();
-			resolve();
-		});
-
-		// On Redis connection error, reject.
-		redisClient.on("error", (e) => {
-			logger.warn(`Failed to connect to Redis server: ${e.code}.`);
-			reject();
-		});
+export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) {
+	// ...
+	console.log(`Processing job ${job.data.repoId}.`);
+	done(null, {
+		result: 12345
 	});
-	
 }
 
-/**
- * Create the queue.
- */
-function createQueue() {
-	// Create queue.
-	repoQueue = new Queue("REPO_QUEUE", {
-		redis: redisClient!
-	});
-
-	// Log status.
-	logger.success("Queue initialised successfully.");
-}
-
-/**
- * Cleanly stop the queueing system.
- */
-export async function stop() {
-	if (!redisClient || !repoQueue) return;
-	try {
-		await repoQueue.close();
-		redisClient.quit();
-		repoQueue = null;
-		redisClient = null;
-	} catch (e) {
-		logger.error("Failed to shut down queue gracefully.");
-	}
-}
-
-/**
- * Get the shared repo queue instance.
- */
-export function getRepoQueue() : Queue | null {
-	return repoQueue;
+export function stop() {
+	queue.stop();
 }
 
 export default {

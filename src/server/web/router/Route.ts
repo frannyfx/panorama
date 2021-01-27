@@ -5,21 +5,32 @@
 
 // Imports
 import Joi from "joi";
-import { IncomingMessage } from "http";
 
 // Modules
 import { Method } from "../../../shared/Method";
+import { Data } from "../../../shared/Result";
 
-/**
- * The interface for the route handler function.
- */
-export interface Handler {
-	(request: IncomingMessage, response: any): void
+// The interface for the processed request payload.
+export interface Request {
+	query?: Data,
+	params?: Data,
+	body?: Data,
+	auth?: Auth
+	request: any
 };
 
-/**
- * The interface for the route.
- */
+// The interface for authentication data.
+export interface Auth {
+	ok: boolean,
+	payload?: Data
+}
+
+// The interface for the route handler function.
+export interface Handler {
+	(request: Request, response: any): void
+};
+
+// The interface for the route.
 export interface Route {
 	method: Method,
 	url: string,

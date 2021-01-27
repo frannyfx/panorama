@@ -8,7 +8,7 @@
 
 // Modules
 import { Method } from "../../../../../shared/Method";
-import { Route } from "../../Route";
+import { Request, Route } from "../../Route";
 import { Codes, send } from "../../API";
 
 // Consts
@@ -147,7 +147,7 @@ const commits = [
 let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/fx/commits",
-	handler: (request: any, response: any) => {
+	handler: (request: Request, response: any) => {
 		send(response, Codes.OK, {
 			commits
 		});

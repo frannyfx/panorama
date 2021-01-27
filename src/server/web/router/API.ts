@@ -39,8 +39,16 @@ export const Codes : API = {
 		httpCode: 400,
 		apiCode: 1002,
 		message: "Invalid payload."
+	},
+	NoAuth: {
+		ok: false,
+		httpCode: 401,
+		apiCode: 1003,
+		message: "Authentication failed."
 	}
 };
+
+//export default Codes;
 
 /**
  * Send a formatted API response.
