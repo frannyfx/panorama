@@ -94,8 +94,7 @@ async function purgeCache() {
 		// TODO: Handle permissions.
 		await fs.rmdir(cacheDir, { recursive: true });
 	} catch (e) {
-		// ...
-		console.log(e);
+		logger.error("Unable to purge cache.");
 	}
 }
 

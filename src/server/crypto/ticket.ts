@@ -41,8 +41,7 @@ async function getPrivateKey() : Promise<string | null> {
 		privateKey = (await fs.readFile(path.join(getRoot(), config.crypto.keyDir))).toString("utf-8");
 		return privateKey;
 	} catch (e) {
-		console.log(e);
-		logger.error("Failed to load private key.");
+		logger.error(`Failed to load private key - ${e}`);
 		return null;
 	}
 }
@@ -65,8 +64,7 @@ async function getPublicKey() : Promise<string | null> {
 		}).export({format: "pem", type: "spki"}).toString("utf-8");
 		return publicKey;
 	} catch (e) {
-		console.log(e);
-		logger.error("Failed to extract public key from private key.");
+		logger.error(`Failed to extract public key from private key - ${e}`);
 		return null;
 	}
 }
