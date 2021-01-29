@@ -29,6 +29,10 @@ const manifestFilename = path.join(cacheDir, config.processing.cache.manifestFil
 // Variables
 var manifestConnection : knex | null = null;
 
+/**
+ * Return the existing manifest connection or create a new one and test it works correctly.
+ * @return The manifest connection or null if there is an error.
+ */
 export async function getManifestConnection() : Promise<knex | null> {
 	if (manifestConnection) return manifestConnection;
 	try {
@@ -49,6 +53,9 @@ export async function getManifestConnection() : Promise<knex | null> {
 	}
 }
 
+/**
+ * Destroy the connection to the manifest.
+ */
 export async function resetManifestConnection() {
 	// Don't destroy the connection if it already does not exist.
 	if (!manifestConnection) return;
@@ -67,7 +74,8 @@ export async function resetManifestConnection() {
 }
 
 /**
- * 
+ * Verify the cache exists and is valid.
+ * @return A CacheStatus object reflecting the status of the cache.
  */
 export async function verifyCacheIntegrity() : Promise<CacheStatus> {
 	// Attempt to read path.
@@ -89,7 +97,7 @@ export async function verifyCacheIntegrity() : Promise<CacheStatus> {
 }
 
 /**
- * 
+ * Delete all files and manifest within the cache directory.
  */
 export async function purgeCache() {
 	try {
@@ -100,7 +108,7 @@ export async function purgeCache() {
 }
 
 /**
- * 
+ * Initialise a brand new cache.
  */
 export async function initialiseCache() {
 	// Create cache directory.
@@ -112,7 +120,7 @@ export async function initialiseCache() {
 }
 
 /**
- * 
+ * Start the cache module.
  */
 export async function start() {
 	// Check cache integrity.
