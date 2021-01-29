@@ -12,10 +12,18 @@ const config : Config = loadConfig();
 
 // Modules
 import { Method } from "../../shared/Method";
-import { Result, buildResult } from "../../shared/Result";
+import { Result, buildResult, Data } from "../../shared/Result";
 
 // Constants
 // ...
+
+// Interfaces
+export interface Repository {
+	id: number,
+	name: string,
+	size: number,
+	updated_at: Date
+};
 
 /**
  * 
@@ -24,14 +32,20 @@ import { Result, buildResult } from "../../shared/Result";
  * @param payload 
  * @param auth 
  */
-export async function send(method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload: Object | undefined = undefined, auth: AxiosBasicCredentials | undefined = undefined) : Promise<Result> {
+export async function send(method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload: Object | undefined = undefined, access_token: string | undefined = undefined, auth: AxiosBasicCredentials | undefined = undefined) : Promise<Result> {
 	try {
+		// Build headers.
+		let headers : Data = {
+			Accept: "application/json"
+		};
+
+		if (!auth && access_token) headers.Authorization = `Bearer ${access_token}`;
+
+		// Send request.
 		let result = await axios({
 			method,
 			auth,
-			headers: {
-				"Accept": "application/json"
-			},
+			headers,
 			url,
 			data: payload,
 			responseType: "json"
@@ -51,7 +65,7 @@ export async function checkAuth(accessToken: string) : Promise<Result> {
 	// Get data associated with the access token from GitHub.
 	let response = await send("POST", `https://api.github.com/applications/${config.github!.clientId}/token`, {
 		access_token: accessToken
-	}, {
+	}, undefined, {
 		username: config.github!.clientId,
 		password: config.github!.clientSecret
 	});
@@ -78,7 +92,7 @@ export async function getAccessToken(code: string) : Promise<Result> {
 
 	// Check if an error has occurred.
 	if (!response.status.ok)
-		return response;
+		return buildResult(false);
 
 	// Check if GitHub returned an error.
 	if (response.result?.error)
@@ -92,4 +106,20 @@ export async function getAccessToken(code: string) : Promise<Result> {
 	};
 
 	return buildResult(true, result);
+}
+
+export async function getRepository(name: string, access_token: string) : Promise<Result> {
+	// Get response data.
+	let response = await send("GET", `https://api.github.com/repos/${name}`, undefined, access_token);
+
+	// Check if an error has occurred.
+	if (!response.status.ok)
+		return buildResult(false);
+
+	// Check if GitHub returned an error.
+	if (response.result?.message)
+		return buildResult(false, undefined, response.result?.message);
+
+	// Return the repository data.
+	return buildResult(true, response.result);
 }

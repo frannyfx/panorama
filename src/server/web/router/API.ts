@@ -45,6 +45,12 @@ export const Codes : API = {
 		httpCode: 401,
 		apiCode: 1003,
 		message: "Authentication failed."
+	},
+	ServerError: {
+		ok: false,
+		httpCode: 500,
+		apiCode: 1004,
+		message: "Something went wrong on our end. Please try again later."
 	}
 };
 

@@ -65,6 +65,7 @@ async function verifyAuth(request: any) : Promise<Auth> {
 
 		return {
 			ok: true,
+			token,
 			payload: authResponse.result
 		};
 	} catch (e) {

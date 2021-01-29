@@ -16,15 +16,6 @@ const config : Config = loadConfig();
 const logger = require("../../utils/logger")("cache_db");
 import getRoot from "../../utils/root";
 
-// Interfaces
-export interface CacheRepository {
-	id: number,
-	name: string,
-	path: string,
-	updated_at: string,
-	size: number
-};
-
 // Constants
 const cacheDir = path.join(getRoot(), config.processing.cache.dir);
 const manifestFilename = path.join(cacheDir, config.processing.cache.manifestFilename);
@@ -38,7 +29,7 @@ var manifestConnection : knex | null = null;
  * Return the existing manifest connection or create a new one and test it works correctly.
  * @return The manifest connection or null if there is an error.
  */
-export async function getManifestConnection() : Promise<knex | null> {
+export async function getConnection() : Promise<knex | null> {
 	if (manifestConnection) return manifestConnection;
 	try {
 		// Create connection.
@@ -62,7 +53,7 @@ export async function getManifestConnection() : Promise<knex | null> {
 /**
  * Destroy the connection to the manifest.
  */
-async function resetManifestConnection() {
+async function resetConnection() {
 	// Don't destroy the connection if it already does not exist.
 	if (!manifestConnection) return;
 
@@ -83,7 +74,7 @@ async function resetManifestConnection() {
  * Verify the manifest exists and is valid.
  * @return Whether the manifest is valid.
  */
-async function verifyManifestIntegrity() : Promise<boolean> {
+async function verifyIntegrity() : Promise<boolean> {
 	// Check manifest exists.
 	try {
 		await fs.stat(manifestFilename);
@@ -116,7 +107,7 @@ async function initialiseCache() {
 	await fs.mkdir(cacheDir, { recursive: true });
 	
 	// Create manifest.
-	let connection = await getManifestConnection();
+	let connection = await getConnection();
 	if (!connection) throw new Error("Unable to create cache manifest.");
 
 	// Create schema.
@@ -139,7 +130,7 @@ async function initialiseCache() {
  */
 export async function start() {
 	// Check cache integrity.
-	if (!(await verifyManifestIntegrity())) {
+	if (!(await verifyIntegrity())) {
 		logger.warn("Cache manifest is invalid.");
 		logger.info("Initialising new manifest...");
 
@@ -149,16 +140,25 @@ export async function start() {
 	}
 
 	// Connect to manifest.
-	await getManifestConnection();
+	let connection = await getConnection();
+	if (!connection) return;
+
+	/*await connection("Repository").insert({
+		id: 1,
+		name: "frannyfx/ether",
+		path: "test",
+		updated_at: Date.now(),
+		size: 103
+	});*/
 }
 
 /**
  * Stop the cache manifest module.
  */
 export async function stop() {
-	await resetManifestConnection();
+	await resetConnection();
 }
 
 export default {
-	start, stop, getManifestConnection
+	start, stop, getConnection
 };

@@ -19,6 +19,16 @@ import manifest from "./manifest";
 // Constants
 const cacheDir = path.join(getRoot(), config.processing.cache.dir);
 
+// Interfaces
+export interface CacheRepository {
+	id: number,
+	name: string,
+	path: string,
+	updated_at: string,
+	size: number
+};
+
+
 /**
  * Start cache module.
  */
@@ -46,6 +56,17 @@ export async function stop() {
 	logger.info("Stopped cache.");
 }
 
+export async function getRepository(id: number) : Promise<CacheRepository | null> {
+	// Get the manifest connection.
+	let connection = await manifest.getConnection();
+	if (!connection) return null;
+	
+	// Lookup item.
+	let result = await connection("Repository").select("*").where({ id });
+	if (result.length == 0) return null;
+	return result[0];
+}
+
 export default {
-	start, stop
+	start, stop, getRepository
 };

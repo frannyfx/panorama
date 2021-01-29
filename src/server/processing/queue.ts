@@ -9,6 +9,7 @@ import redis, { RedisClient } from "redis";
 
 // Config
 import loadConfig, { Config } from "../Config";
+import { Repository } from "../github";
 const config : Config = loadConfig();
 
 // Modules
@@ -16,7 +17,8 @@ const logger = require("../utils/logger")("queue");
 
 // Interfaces
 export interface RepoJob {
-	repoId: number
+	repository: Repository,
+	access_token: string
 }
 
 export interface RepoJobResult {
@@ -26,8 +28,6 @@ export interface RepoJobResult {
 // Connection and queue
 var redisClient : RedisClient | null = null;
 var repoQueue : Queue<RepoJob> | null = null;
-
-
 
 /**
  * Initialise the queueing system.

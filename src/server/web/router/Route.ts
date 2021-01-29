@@ -22,6 +22,7 @@ export interface Request {
 // The interface for authentication data.
 export interface Auth {
 	ok: boolean,
+	token?: string,
 	payload?: Data
 }
 
