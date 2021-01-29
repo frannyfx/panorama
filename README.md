@@ -1,12 +1,12 @@
 ![Panorama header](docs/img/panorama.jpg)
 # Panorama
-## Description
+## 🤔 Description
 The **Panorama** project aims to shine light on the amount of work that contributors have carried out on a group project.
 
-## Compiling
+## ⚙️ Compiling
 The following values need to be added to the `config.json` file before compilation:
-- A valid RSA key generated using OpenSSL to sign tickets.
-- GitHub client ID and secret.
+- 🔐 A valid RSA key generated using OpenSSL to sign tickets.
+- 🐙 A valid GitHub client ID and secret.
 
 You should build the frontend component first, as the script will also transfer the necessary files to the compilation directory.
 
@@ -24,13 +24,13 @@ The backend code is written in TypeScript, so it needs to be compiled. Simply ru
 npm run build-server
 ```
 
-## Running
+## 🏃‍♂️ Running
 The server can be executed by running:
 
 ```
 node dist/index.js
 ```
 
-## Credits
+## 👨‍💻 Credits
 - Francesco Compagnoni - Engineering
 - Dr Jeroen Keppens - Supervisor
