@@ -4,13 +4,16 @@
  */
 
 // Imports
-// ...
+import BeeQueue from "bee-queue";
 
 // Modules
-import BeeQueue from "bee-queue";
+import cache from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
 
 export async function start() {
+	// Initialise caching system.
+	await cache.start();
+
 	// Initialise queue system.
 	await queue.start();
 

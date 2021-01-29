@@ -7,12 +7,12 @@
 import Queue from "bee-queue";
 import redis, { RedisClient } from "redis";
 
-// Modules
-const logger = require("../utils/logger")("queue");
-
 // Config
 import loadConfig, { Config } from "../Config";
 const config : Config = loadConfig();
+
+// Modules
+const logger = require("../utils/logger")("queue");
 
 // Interfaces
 export interface RepoJob {

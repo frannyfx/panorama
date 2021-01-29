@@ -11,30 +11,38 @@ import path from "path";
 import getRoot from "./utils/root";
 
 export interface Config {
+	// Main database config
 	database?: {
-		host: string,
-		user: string,
-		password: string,
-		name: string
+		host: string,					// Host to connect to
+		user: string,					// MySQL username
+		password: string,				// MySQL password
+		name: string					// Database name
 	},
 	github?: {
-		clientId: string,
-		clientSecret: string
+		clientId: string,				// GitHub App client ID
+		clientSecret: string			// GitHub App secret
 	},
 	web: {
 		router: {
-			routeDirs: Array<string>
+			routeDirs: Array<string>	// Directories to scan to find routes.
 		},
-		publicDir: string,
-		assetsDir: string,
-		address: string,
-		port: number
+		publicDir: string,				// Static assets folder.
+		assetsDir: string,				// Static private assets folder.
+		address: string,				// Address to bind to.
+		port: number					// Port to run the HTTP server on.
 	},
 	lexing: {
-		langDirs: Array<string>
+		langDirs: Array<string>			// Directories to scan to find languages.
 	},
 	redis: {
-		url: string
+		url: string						// URL to connect to Redis server.
+	},
+	processing: {
+		cache: {
+			dir: string,				// Caching directory.
+			manifestFilename: string,	// SQLite manifest file name.
+			sizeLimit: number			// Max cache size in MiB
+		}
 	}
 };
 

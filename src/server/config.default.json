@@ -18,5 +18,19 @@
 		"langDirs": [
 			"lexing/langs"
 		]
+	},
+	"processing": {
+		"cache": {
+			"dir": "panorama_data/caches/repos",
+			"manifestFilename": "manifest.sqlite",
+			"sizeLimit": 100000
+		}
+	},
+	"redis": {
+		"url": "redis://localhost/"
+	},
+	"modules": {
+		"web": true,
+		"processing": true
 	}
 }

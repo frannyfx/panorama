@@ -1,6 +1,8 @@
 ## Project
 dist
 config.json
+panorama_data
+panorama_data/*
 
 # Redis
 *.rdb
