@@ -3,6 +3,8 @@ dist
 config.json
 panorama_data
 panorama_data/*
+src/assets/crypto/*
+!.keep
 
 # Redis
 *.rdb

@@ -32,7 +32,7 @@ let route : Array<Route> = [{
 	url: "/api/github/callback",
 	handler: async (request: Request, response: any) => {
 		// Create read stream for callback.html.
-		const callback = fs.createReadStream(path.join(getRoot(), config.web.assetsDir, "callback.html"));
+		const callback = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/callback.html"));
 		response.type("text/html").send(callback);
 	}
 }, {

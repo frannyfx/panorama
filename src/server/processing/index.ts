@@ -10,6 +10,7 @@ import BeeQueue from "bee-queue";
 const logger = require("../utils/logger")("repo_prc");
 import cache from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
+import { sleep } from "../utils";
 
 export async function start() {
 	// Initialise caching system.
@@ -26,9 +27,21 @@ export async function start() {
 	repoQueue.process(handleRepoJob);
 }
 
+/**
+ * Handler for processing a queued repository.
+ * @param job The job queued and the repository's data.
+ * @param done Callback for when the job is complete.
+ */
 export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) {
-	// ...
+	// Test progress reporting (TODO)
 	logger.info(`Processing repository '${job.data.repository.name}' with access token '${job.data.access_token.substr(0, 10)}...'.`);
+	await sleep(10000);
+	job.reportProgress(0.25);
+	await sleep(1000);
+	job.reportProgress(0.5);
+	await sleep(1000);
+	job.reportProgress(0.75);
+	await sleep(1000);
 	done(null, {
 		result: 12345
 	});

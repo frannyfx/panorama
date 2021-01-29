@@ -12,6 +12,9 @@ import getRoot from "./utils/root";
 
 export interface Config {
 	// Main database config
+	general: {
+		assetsDir: string,				// Static private assets folder.
+	},
 	database?: {
 		host: string,					// Host to connect to
 		user: string,					// MySQL username
@@ -27,7 +30,6 @@ export interface Config {
 			routeDirs: Array<string>	// Directories to scan to find routes.
 		},
 		publicDir: string,				// Static assets folder.
-		assetsDir: string,				// Static private assets folder.
 		address: string,				// Address to bind to.
 		port: number					// Port to run the HTTP server on.
 	},
@@ -43,6 +45,9 @@ export interface Config {
 			manifestFilename: string,	// SQLite manifest file name.
 			sizeLimit: number			// Max cache size in MiB
 		}
+	},
+	crypto: {
+		keyDir: string					// The path where the private key is stored.
 	}
 };
 

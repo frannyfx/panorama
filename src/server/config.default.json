@@ -1,4 +1,7 @@
 {
+	"general": {
+		"assetsDir": "../assets/"
+	},
 	"web": {
 		"router": {
 			"routeDirs": [
@@ -6,7 +9,6 @@
 			]
 		},
 		"publicDir": "../public/",
-		"assetsDir": "../assets/",
 		"address": "0.0.0.0",
 		"port": 8080
 	},
@@ -27,6 +29,9 @@
 		}
 	},
 	"redis": {
-		"url": ""
+		"url": "redis://localhost/"
+	},
+	"crypto": {
+		"keyDir": "../assets/crypto/key.pem"
 	}
 }

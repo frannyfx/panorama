@@ -4,6 +4,8 @@
  */
 
 // Imports
+import { FastifyRequest } from "fastify";
+import { SocketStream } from "fastify-websocket";
 import Joi from "joi";
 
 // Modules
@@ -16,7 +18,8 @@ export interface Request {
 	params?: Data,
 	body?: Data,
 	auth?: Auth
-	request: any
+	request?: FastifyRequest
+	connection?: SocketStream
 };
 
 // The interface for authentication data.
@@ -31,15 +34,25 @@ export interface Handler {
 	(request: Request, response: any): void
 };
 
+/*
+export interface EventHandler {
+	(connection: SocketStream, request: FastifyRequest): void
+}*/
+
 // The interface for the route.
 export interface Route {
 	method: Method,
 	url: string,
 	auth?: Boolean,
-	handler: Handler,
+	handler?: Handler,
 	schemas?: {
 		params?: Joi.ObjectSchema,
 		body?: Joi.ObjectSchema,
 		query?: Joi.ObjectSchema
+	},
+	on?: {
+		open: Function,
+		message: Function,
+		close: Function
 	}
 };

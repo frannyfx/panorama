@@ -51,6 +51,18 @@ export const Codes : API = {
 		httpCode: 500,
 		apiCode: 1004,
 		message: "Something went wrong on our end. Please try again later."
+	},
+	Forbidden: {
+		ok: false,
+		httpCode: 403,
+		apiCode: 1005,
+		message: "You are not allowed to view this content."
+	},
+	NotFound: {
+		ok: false,
+		httpCode: 404,
+		apiCode: 1006,
+		message: "This content cannot be found."
 	}
 };
 
@@ -63,6 +75,17 @@ export const Codes : API = {
  * @param payload The optional payload to send along with the response.
  */
 export function send(reply: any, code: Code, payload: Data | undefined = undefined, errorDescription: string | undefined = undefined) {
+	let response = buildResponse(code, payload, errorDescription);
+	reply.code(code.httpCode).header("Content-Type", "application/json").send(response);
+}
+
+/**
+ * Build a formatted API response.
+ * @param reply The Fastify reply object to send it with.
+ * @param code The API code to return.
+ * @param payload The optional payload to send along with the response.
+ */
+export function buildResponse(code: Code, payload: Data | undefined = undefined, errorDescription: string | undefined = undefined) : Response {
 	// Build response.
 	let response : Response = {
 		status: {
@@ -81,7 +104,5 @@ export function send(reply: any, code: Code, payload: Data | undefined = undefin
 
 	// Add specific details if available.
 	if (response.status.error && errorDescription) response.status.error.description = errorDescription;
-
-	// Send the response.
-	reply.code(code.httpCode).header("Content-Type", "application/json").send(response);
+	return response;
 }

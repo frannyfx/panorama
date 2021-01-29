@@ -7,6 +7,7 @@
 import { promises as fs } from "fs";
 import { ObjectSchema } from "joi";
 import path from "path";
+import websocket from "fastify-websocket";
 
 // Modules
 const logger = require("../../utils/logger")("router");
@@ -14,6 +15,7 @@ import { Method } from "../../../shared/Method";
 import { buildResult, Data, Result } from "../../../shared/Result";
 import { Auth, Handler, Request, Route } from "./Route";
 import { Codes, send } from "./API";
+import { SocketStream } from "fastify-websocket";
 
 // Constants
 const jsRegex = /([a-zA-Z0-9\s_\\.\-\(\):])+(.js)$/;
@@ -92,6 +94,10 @@ function registerRoute(fastify: any, route: Route, options: Options) {
 		register = (url: string, handler: Handler) => fastify.put(url, handler);
 		break;
 	}
+	case Method.WS: {
+		register = (url: string, handler: Handler) => fastify.get(url, { websocket: true }, handler);
+		break;
+	}
 	default: {
 		register = null;
 		logger.warn(`Unsupported route method ${Method[route.method]} for route ${route.url}.`);
@@ -114,7 +120,7 @@ function registerRoute(fastify: any, route: Route, options: Options) {
 function wrapRoute(route : Route, options: Options) : Function {
 	return async (request : any, response : any) => {
 		// Create a new request payload, setting the old payload as the original request.
-		let newRequest : Request = { request };
+		let newRequest : Request = {};
 
 		// Verify authentication.
 		if (options.verifyAuth && route.auth! === true) {
@@ -145,13 +151,35 @@ function wrapRoute(route : Route, options: Options) : Function {
 			newRequest.params = schemasResult.result?.params;
 			newRequest.body = schemasResult.result?.body;
 		}
+
 		
-		// Call route handler.
 		try {
-			route.handler(newRequest, response);
+			// Handle WS.
+			if (route.method == Method.WS) {
+				// Rename parameters.
+				let connection : SocketStream = request;
+				request = response;
+	
+				// Set parameters
+				newRequest.connection = connection;
+				newRequest.request = request;
+	
+				// Call open event immediately.
+				route.on!.open(connection, newRequest);
+
+				// Set other events.
+				if (route.on?.message) connection.socket.on("message", (message : string) => route.on!.message(connection, message));
+				if (route.on?.close) connection.socket.on("close", (event: any) => route.on!.close(connection, event));
+			} else {
+				// Call regular HTTP requests.
+				newRequest.request = request;
+				route.handler!(newRequest, response);
+			}
 		} catch (e) {
 			logger.error(`Unhandled error at route ${Method[route.method]} ${route.url} - ${e.message}.`);
+			send(response, Codes.ServerError);
 		}
+		
 	};
 }
 
@@ -200,6 +228,9 @@ async function loadRoutes(directory: string) : Promise<Array<Route>> {
 }
 
 export default async function (fastify: any, options: Options, done: Function) {
+	// Load dependencies
+	await fastify.register(websocket);
+
 	// Load the routes.
 	let routes = (await Promise.all(options.directories.map(directory => loadRoutes(directory)))).flat();
 

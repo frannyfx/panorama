@@ -7,22 +7,24 @@
 import Joi from "joi";
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
 
 // Config
-import loadConfig, { Config } from "../../../../Config";
+import loadConfig, { Config } from "../../../../../Config";
 const config : Config = loadConfig();
 
 // Modules
-import { Method } from "../../../../../shared/Method";
-import { Request, Route } from "../../Route";
-import { Codes, send } from "../../API";
-import queue from "../../../../processing/queue";
-import cache from "../../../../processing/cache";
-import { getRepository, Repository } from "../../../../github";
+import { Method } from "../../../../../../shared/Method";
+import { Request, Route } from "../../../Route";
+import { Codes, send } from "../../../API";
+import queue from "../../../../../processing/queue";
+import cache from "../../../../../processing/cache";
+import { getRepository, Repository } from "../../../../../github";
+import ticket from "../../../../../crypto/ticket";
 
 let route : Array<Route> = [{
 	method: Method.PUT,
-	url: "/api/queue/repo", // TODO: Make RESTified.
+	url: "/api/queue/repo",
 	auth: true,
 	schemas: {
 		body: Joi.object({
@@ -30,23 +32,7 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		/*
-		// Add repo to queue to be processed.
-		let job = await queue.getRepoQueue()?.createJob({
-			repoId: 123
-		}).save();
-
-		// Add job event handlers
-		// ...
-		
-		// Generate ticket to listen to job events.
-		// sign(job.id | user.auth)
-
-		// Send OK with ticket.
-		send(response, Codes.OK);*/
-
-		// TODO: Implement rate limiting.
-		// Get repository data with GitHub.
+		// Get repository information.
 		let repositoryResult = await getRepository(request.body!.name, request.auth!.token!);
 		if (!repositoryResult.status.ok) return send(response, Codes.BadRequest);
 
@@ -66,9 +52,15 @@ let route : Array<Route> = [{
 				access_token: request.auth!.token!
 			}).save();
 
+			// Generate ticket to listen to job events.
+			let jobTicket = await ticket.sign({
+				jobId: job.id,
+				accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex")
+			});
+
 			// Send ID.
 			send(response, Codes.OK, {
-				id: job.id
+				ticket: jobTicket
 			});
 		} catch {
 			// If anything goes wrong in the process, return internal server error.

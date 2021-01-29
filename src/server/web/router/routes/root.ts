@@ -21,7 +21,7 @@ let route : Array<Route> = [{
 	url: "/",
 	handler: (request: any, response: any) => {
 		// Create read stream for index.html.
-		const index = fs.createReadStream(path.join(getRoot(), config.web.assetsDir, "index.html"));
+		const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/index.html"));
 		response.type("text/html").send(index);
 	}
 }];
