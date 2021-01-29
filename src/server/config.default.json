@@ -27,6 +27,6 @@
 		}
 	},
 	"redis": {
-		"url": "redis://localhost/"
+		"url": ""
 	}
 }
