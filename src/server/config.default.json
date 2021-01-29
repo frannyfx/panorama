@@ -22,7 +22,7 @@
 	"processing": {
 		"cache": {
 			"dir": "panorama_data/caches/repos",
-			"manifestFilename": "manifest.sqlite",
+			"manifestFilename": "manifest.db",
 			"sizeLimit": 100000
 		}
 	},

@@ -41,7 +41,8 @@ export async function getManifestConnection() : Promise<knex | null> {
 			client: "sqlite3",
 			connection: {
 				filename: manifestFilename
-			}
+			},
+			useNullAsDefault: true
 		});
 
 		// Test the connection.
@@ -63,7 +64,7 @@ export async function resetManifestConnection() {
 	// Destroy the connection.
 	try {
 		await manifestConnection.destroy();
-		logger.warn("Closed cache manifest.");
+		logger.info("Closed cache manifest.");
 	} catch (e) {
 		// Fail gracefully.
 		logger.error("Unable to close cache manifest.");
@@ -89,7 +90,15 @@ export async function verifyCacheIntegrity() : Promise<CacheStatus> {
 	}
 
 	// Check manifest.
-	// ...
+	try {
+		await fs.stat(manifestFilename);
+	} catch (e) {
+		return {
+			manifest: false,
+			path: true
+		};
+	}
+
 	return {
 		manifest: true,
 		path: true
@@ -101,8 +110,10 @@ export async function verifyCacheIntegrity() : Promise<CacheStatus> {
  */
 export async function purgeCache() {
 	try {
-		await fs.unlink(cacheDir);
+		// TODO: Handle permissions.
+		await fs.rmdir(cacheDir, { recursive: true });
 	} catch (e) {
+		// ...
 		console.log(e);
 	}
 }
@@ -117,6 +128,20 @@ export async function initialiseCache() {
 	// Create manifest.
 	let connection = await getManifestConnection();
 	if (!connection) throw new Error("Unable to create cache manifest.");
+
+	// Create schema.
+	await connection.schema.createTable("Repository", table => {
+		// Add columns.
+		table.integer("id");
+		table.string("name");
+		table.string("path");
+		table.dateTime("updated_at");
+		table.integer("size");
+
+		// Add keys and indexes.
+		table.primary(["id"]);
+		table.index(["name"]);
+	});
 }
 
 /**
@@ -133,9 +158,14 @@ export async function start() {
 		await initialiseCache();
 	}
 
-	logger.info("Reading cache...");
+	// Connect to manifest.
+	let connection = await getManifestConnection();
+}
+
+export async function stop() {
+	await resetManifestConnection();
 }
 
 export default {
-	start
+	start, stop
 };

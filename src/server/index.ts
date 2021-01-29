@@ -27,6 +27,11 @@ async function initialise() {
 	}
 }
 
+async function destroy() {
+	await web.stop();
+	await processing.stop();
+}
+
 /**
  * Output the Panorama header to STDOUT.
  */
@@ -39,6 +44,19 @@ function writeHeader() {
 
 // Initialise the backend.
 initialise();
+
+// Catch SIGINT (CTRL+C).
+process.on("SIGINT", async () => {
+	// Print out the log on the next line.
+	console.log("");
+	logger.info("Received CTRL+C. Exiting...");
+
+	// Allow modules to shut down.
+	await destroy();
+
+	// Exit.
+	process.exit();
+});
 
 // Catch uncaught exceptions.
 process.on("uncaughtException", (err : Error) => {

@@ -33,8 +33,9 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	});
 }
 
-export function stop() {
-	queue.stop();
+export async function stop() {
+	await queue.stop();
+	await cache.stop();
 }
 
 export default {
