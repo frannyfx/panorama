@@ -28,9 +28,5 @@
 	},
 	"redis": {
 		"url": "redis://localhost/"
-	},
-	"modules": {
-		"web": true,
-		"processing": true
 	}
 }
