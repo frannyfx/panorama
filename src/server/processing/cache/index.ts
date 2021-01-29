@@ -19,6 +19,9 @@ import manifest from "./manifest";
 // Constants
 const cacheDir = path.join(getRoot(), config.processing.cache.dir);
 
+/**
+ * Start cache module.
+ */
 export async function start() {
 	// Create cache directory if it does not exist.
 	try {
@@ -35,6 +38,9 @@ export async function start() {
 	logger.success("Cache initialised successfully.");
 }
 
+/**
+ * Stop cache module.
+ */
 export async function stop() {
 	await manifest.stop();
 	logger.info("Stopped cache.");

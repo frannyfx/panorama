@@ -55,6 +55,7 @@ process.on("SIGINT", async () => {
 	await destroy();
 
 	// Exit.
+	logger.info("Bye!");
 	process.exit();
 });
 
