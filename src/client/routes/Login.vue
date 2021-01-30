@@ -21,7 +21,7 @@ import { saveAccessToken, send, testAuthentication } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
-import { getProfile } from '../modules/GitHub';
+import { getProfile, getRedirectURI } from '../modules/GitHub';
 
 export default Vue.extend({
 	components: {
@@ -40,7 +40,7 @@ export default Vue.extend({
 	methods: {
 		async signIn() {
 			this.popup.window = window.open(
-				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}`,
+				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}`,
 				"GitHub Authentication",
 				"menubar=no,location=no,resizable=no,scrollbars=no,status=no," + 
 				`width=${this.popup.width},height=${this.popup.height},` +

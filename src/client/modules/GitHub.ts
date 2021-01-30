@@ -38,3 +38,7 @@ export async function getProfile() : Promise<Result> {
 		result: result.data
 	};
 }
+
+export function getRedirectURI() : string {
+	return `${window.location.protocol}//${window.location.host}/api/github/callback`;
+}
