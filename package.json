@@ -18,24 +18,24 @@
     "@types/axios": "^0.14.0",
     "@types/figlet": "^1.2.1",
     "@types/joi": "^17.2.3",
-    "@types/node": "^14.14.11",
+    "@types/node": "^14.14.22",
     "@types/redis": "^2.8.28",
     "@types/vue": "^2.0.0",
-    "@typescript-eslint/eslint-plugin": "^4.9.1",
-    "@typescript-eslint/parser": "^4.9.1",
+    "@typescript-eslint/eslint-plugin": "^4.14.1",
+    "@typescript-eslint/parser": "^4.14.1",
     "css-loader": "^5.0.1",
-    "eslint": "^7.15.0",
-    "sass": "^1.30.0",
-    "sass-loader": "^10.1.0",
+    "eslint": "^7.18.0",
+    "sass": "^1.32.5",
+    "sass-loader": "^10.1.1",
     "style-loader": "^2.0.0",
-    "ts-loader": "^8.0.11",
-    "typescript": "^4.1.2",
+    "ts-loader": "^8.0.14",
+    "typescript": "^4.1.3",
     "vue": "^2.6.12",
-    "vue-loader": "^15.9.5",
+    "vue-loader": "^15.9.6",
     "vue-template-compiler": "^2.6.12",
-    "vuex": "^3.6.0",
-    "webpack": "^5.10.0",
-    "webpack-cli": "^4.2.0"
+    "vuex": "^3.6.2",
+    "webpack": "^5.19.0",
+    "webpack-cli": "^4.4.0"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
@@ -58,6 +58,6 @@
     "nodegit": "^0.27.0",
     "redis": "^3.0.2",
     "sqlite3": "^5.0.1",
-    "vue-router": "^3.4.9"
+    "vue-router": "^3.5.1"
   }
 }

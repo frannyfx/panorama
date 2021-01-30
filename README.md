@@ -1,7 +1,13 @@
 ![Panorama header](docs/img/panorama.jpg)
 # Panorama
-## 🤔 Description
+## 📖 Description
 The **Panorama** project aims to shine light on the amount of work that contributors have carried out on a group project.
+
+## ☕️ Requirements
+Panorama has the following requirements:
+- Node.js ≥ 13.9.0;
+- NPM ≥ 6.14.8;
+- A Redis server for its distributed job queue system;
 
 ## ⚙️ Compiling
 The following values need to be added to the `config.json` file before compilation:
