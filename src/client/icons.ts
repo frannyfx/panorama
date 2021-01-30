@@ -12,7 +12,8 @@ import { faEye } from "@fortawesome/free-solid-svg-icons/faEye";
 import { faCodeBranch } from "@fortawesome/free-solid-svg-icons/faCodeBranch";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons/faCheckCircle";
+import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 
 // Add the icons to the library.
-export default library.add(faEye, faCodeBranch, faExclamationCircle, faCheckCircle, faGithub);
+export default library.add(faEye, faCodeBranch, faExclamationCircle, faCheckCircle, faUser, faGithub);

@@ -42,6 +42,7 @@ import Navbar from "../components/Navbar.vue";
 import { loadAccessToken, send, testAuthentication } from "../modules/API";
 import { Response } from "../../shared/Response";
 import { Method } from "../../shared/Method";
+import { getProfile } from "../modules/GitHub";
 
 export default Vue.extend({
 	components: {
@@ -53,10 +54,19 @@ export default Vue.extend({
 	computed: {
 		navbarVisible() : boolean {
 			return this.$route.name == "dashboard" && !this.$store.state.loading;
-		}	
+		}
 	},
-	async mounted() {
-		// Get client id.
+	methods: {
+		notAuthenticated() {
+			// Navigate back to login since we're not signed in.
+			if (this.$route.name != "login") this.$router.replace({ name: "login"});
+			this.$store.commit("setAuthStatus", false);
+			this.$store.commit("setAccessToken", "");
+			this.$store.commit("setLoading", false);
+		}
+	},
+	mounted: async function () {
+		// Get client ID.
 		let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
 		if (clientIdResponse.status.ok) this.$store.commit("setClientId", clientIdResponse.result?.clientId);
 		else {
@@ -65,25 +75,40 @@ export default Vue.extend({
 			return;
 		}
 
-		// Check cached GitHub authentication info.
+		// Load cached auth info.
 		loadAccessToken();
+
+		// If there is no info, fail.
 		if (this.$store.state.auth.accessToken == "") {
-			// Navigate back to login since we're not signed in.
-			if (this.$route.name != "login") this.$router.replace({ name: "login"});
-
-			this.$store.commit("setAuthStatus", false);
-			this.$store.commit("setLoading", false);
-		} else {
-			// Check whether cached auth info is valid.
-			let auth = await testAuthentication();
-			this.$store.commit("setAuthStatus", auth);
-
-			// If auth is successful, set access token to store.
-			if (auth) {
-				if (this.$route.name == "login") this.$router.replace({ name: "dashboard" });
-				this.$store.commit("setLoading", false);
-			}
+			this.notAuthenticated();
+			return;
 		}
+
+		// Check validity of cached info.
+		let auth = await testAuthentication();
+
+		// If invalid, fail.
+		if (!auth) {
+			console.log("Cached credentials failed.", auth);
+			this.notAuthenticated();
+			return;
+		}
+		
+		// If auth is successful, retrieve user data and navigate to dashboard.
+		let profileResult = await getProfile();
+
+		// If unable to retrieve user data, fail.
+		if (!profileResult.status.ok) {
+			this.notAuthenticated();
+			return;
+		}
+
+		// Save user data to store.
+		this.$store.commit("setUser", profileResult.result);
+
+		// Navigate to dashboard if attempting to load login page.
+		if (this.$route.name == "login") this.$router.replace({ name: "dashboard" });
+		this.$store.commit("setLoading", false);
 
 		
 	}

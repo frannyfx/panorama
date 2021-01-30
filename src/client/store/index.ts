@@ -1,6 +1,7 @@
 // Imports
 import Vue from "vue";
 import Vuex from "vuex";
+import { Data } from "../../shared/Result";
 
 // Use plugin
 Vue.use(Vuex);
@@ -14,6 +15,13 @@ export default new Vuex.Store({
 			status: false as boolean,
 			clientId: "" as string,
 			accessToken: "" as string
+		},
+		user: {
+			id: -1 as number,
+			login: "" as string,
+			avatarUrl: "" as string,
+			name: "" as string,
+			email: "" as string,
 		}
 	},
 	mutations: {
@@ -28,6 +36,13 @@ export default new Vuex.Store({
 		},
 		setAccessToken(state, accessToken: string) {
 			state.auth.accessToken = accessToken;
+		},
+		setUser(state, user: Data) {
+			state.user.id = user.id;
+			state.user.login = user.login;
+			state.user.avatarUrl = user.avatar_url;
+			state.user.name = user.name;
+			state.user.email = user.email;
 		}
 	},
 	strict: debug

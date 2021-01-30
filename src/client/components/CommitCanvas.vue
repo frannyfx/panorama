@@ -1,6 +1,6 @@
 <template>
 	<div class="background">
-		<canvas :class="{ visible }" id="commitCanvas"></canvas>
+		<canvas :class="{ visible: shouldDraw }" id="commitCanvas"></canvas>
 	</div>
 </template>
 <script lang="ts">
@@ -51,7 +51,8 @@ export default Vue.extend({
 			speed: 0.2,
 			maxFontSize: 40,
 			maxAlpha: 0.3,
-			shouldDraw: true
+			shouldDraw: true,
+			visibilitySwitchTimeout: null as NodeJS.Timeout | null
 		};
 	},
 	computed: {
@@ -61,9 +62,17 @@ export default Vue.extend({
 	},
 	watch: {
 		visible(newValue : boolean) {
-			console.log("Visible value changed to", newValue);
-			this.shouldDraw = newValue;
-			if (this.shouldDraw) requestAnimationFrame(ts => this.draw(ts));
+			// Clear previous timeouts.
+			if (this.visibilitySwitchTimeout)
+				clearTimeout(this.visibilitySwitchTimeout);
+
+			// Delay stopping drawing so the canvas is hidden.
+			this.visibilitySwitchTimeout = setTimeout(() => {
+				console.log(`Commit canvas is ${newValue ? '' : 'not '}visible.`);
+				this.shouldDraw = newValue;
+				if (this.shouldDraw) requestAnimationFrame(ts => this.draw(ts));
+			}, newValue ? 0 : 1500);
+			
 		}
 	},
 	methods: {

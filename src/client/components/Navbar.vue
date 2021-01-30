@@ -7,9 +7,11 @@
 			<div class="nav-content">
 				<a class="profile">
 					<div class="profile-picture">
-						<div class="image" style="background-image: url('https://avatars.githubusercontent.com/u/13662803?v=4')"></div>
+						<div class="image" :style="{'background-image': this.$store.state.user.avatarUrl != '' ? `url('${this.$store.state.user.avatarUrl}')` : ''}">
+							<font-awesome-icon v-if="this.$store.state.user.avatarUrl == ''" icon="user"/>
+						</div>
 					</div>
-					<span class="username">frannyfx</span>
+					<span class="username">{{username}}</span>
 				</a>
 				<a @click="logOut">Log out</a>
 			</div>
@@ -27,6 +29,13 @@ import { clearAuthenticationData } from "../modules/API";
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon
+	},
+	computed: {
+		username() : string {
+			if (this.$store.state.user.name != "") return this.$store.state.user.name;
+			if (this.$store.state.user.login != "") return this.$store.state.user.login;
+			return "Unknown";
+		}	
 	},
 	methods: {
 		navigateToDashboard() {
@@ -98,12 +107,22 @@ export default Vue.extend({
 		overflow: hidden;
 		border-radius: 100px;
 		width: 25px; height: 25px;
+		background-color: white;
+		border: 2px solid white;
 
 		.image {
 			width: 100%;
 			height: 100%;
 			background-size: cover;
 			background-position: center;
+			display: flex;
+			align-items: flex-end;
+			justify-content: center;
+
+			svg {
+				color: $deep;
+				font-size: 1.6em;
+			}
 		}
 	}
 
@@ -114,13 +133,13 @@ export default Vue.extend({
 
 /* Animations */
 .navbar-enter-active, .navbar-leave-active {
-	transition: top 0.7s, opacity 0.7s;
+	transition: top .7s .1s, opacity .7s .1s;
 
 	.nav-inner > .nav-content > * {
 		@for $i from 1 through 2 {
 			&:nth-child(#{$i}) {
-				transition: opacity 0.5s;
-				transition-delay: #{$i * .2}s;
+				transition: opacity 0.4s;
+				transition-delay: #{$i * .2 + .2}s;
 			}
 		}
 	}

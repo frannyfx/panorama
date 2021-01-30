@@ -21,6 +21,7 @@ import { saveAccessToken, send, testAuthentication } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
+import { getProfile } from '../modules/GitHub';
 
 export default Vue.extend({
 	components: {
@@ -61,6 +62,19 @@ export default Vue.extend({
 
 				// Fetch initial data.
 				this.$store.commit("setAuthStatus", true);
+				
+				// Retrieve user data.
+				let profileResult = await getProfile();
+
+				// Save user data to store.
+				this.$store.commit("setUser", profileResult.result);
+
+				// If unable to retrieve user data, show error.
+				if (!profileResult.status.ok) {
+					// ...
+					return;
+				}
+
 				this.$router.replace({ name: "dashboard" });
 			}
 		}
