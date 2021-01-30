@@ -1,7 +1,7 @@
 {
-  "name": "codecontrib",
+  "name": "panorama",
   "version": "1.0.0",
-  "description": "6CCS3PRJ - Francesco Compagnoni",
+  "description": "Quantify code contributions in a group project.",
   "main": "dist/index.js",
   "scripts": {
     "start": "tsc && node dist/server/index.js",
