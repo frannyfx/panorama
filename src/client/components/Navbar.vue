@@ -135,10 +135,14 @@ export default Vue.extend({
 .navbar-enter-active, .navbar-leave-active {
 	transition: top .7s .1s, opacity .7s .1s;
 
+	.title > svg {
+		transition: opacity .4s .2s, margin-top .4s .2s;
+	}
+
 	.nav-inner > .nav-content > * {
 		@for $i from 1 through 2 {
 			&:nth-child(#{$i}) {
-				transition: opacity 0.4s;
+				transition: opacity .4s, margin-top .4s;
 				transition-delay: #{$i * .2 + .2}s;
 			}
 		}
@@ -146,19 +150,19 @@ export default Vue.extend({
 }
 
 .navbar-enter, .navbar-leave-to {
-
 	top: #{-1 * $navbar-height};
 	
-	.nav-inner > .nav-content > * {
+	.title > svg, .nav-inner > .nav-content > * {
+		margin-top: -10px;
 		opacity: 0;
 	}
 }
 
 .navbar-enter-to, .navbar-leave {
-	opacity: 1;
 	top: 0;
 
-	.nav-inner > .nav-content > * {
+	.title > svg, .nav-inner > .nav-content > * {
+		margin-top: 0;
 		opacity: 1;
 	}
 }
