@@ -20,6 +20,11 @@ To compile the frontend using Webpack, which will also take care of compiling th
 npm run build-client
 ```
 
+Running Webpack in production mode will drastically reduce file size, but may take a long time to complete. To do so, run the following command:
+```
+npm run build-client-prod
+```
+
 ### Backend
 #### Configuration
 Create a new `config.json` file by running:
