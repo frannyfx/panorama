@@ -63,18 +63,10 @@ export async function send(method: "GET" | "POST" | "PUT" | "DELETE", url: strin
  */
 export async function checkAuth(accessToken: string) : Promise<Result> {
 	// Get data associated with the access token from GitHub.
-	let response = await send("POST", `https://api.github.com/applications/${config.github!.clientId}/token`, {
-		access_token: accessToken
-	}, undefined, {
-		username: config.github!.clientId,
-		password: config.github!.clientSecret
-	});
+	let response = await send("GET", "https://api.github.com/user", undefined, accessToken);
 
 	// Check if an error has occurred in checking the auth.
 	if (!response.status.ok) return buildResult(false);
-
-	// Check that the returned token is the same.
-	if (accessToken != response.result?.token) return buildResult(false);
 	return buildResult(true, response.result);
 }
 

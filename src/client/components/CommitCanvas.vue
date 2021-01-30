@@ -1,6 +1,6 @@
 <template>
 	<div class="background">
-		<canvas id="commitCanvas"></canvas>
+		<canvas :class="{ visible }" id="commitCanvas"></canvas>
 	</div>
 </template>
 <script lang="ts">
@@ -53,6 +53,18 @@ export default Vue.extend({
 			maxAlpha: 0.3,
 			shouldDraw: true
 		};
+	},
+	computed: {
+		visible() : boolean {
+			return this.$route.name == "login" || this.$store.state.loading;
+		}
+	},
+	watch: {
+		visible(newValue : boolean) {
+			console.log("Visible value changed to", newValue);
+			this.shouldDraw = newValue;
+			if (this.shouldDraw) requestAnimationFrame(ts => this.draw(ts));
+		}
 	},
 	methods: {
 		resize() {
@@ -130,6 +142,13 @@ export default Vue.extend({
 canvas {
 	width: 100%;
 	height: 100%;
-	filter: blur(2px);
+	opacity: 0;
+	transition: opacity 1s;
+
+	&.visible {
+		filter: blur(2px);
+		opacity: 1;
+	}
+	
 }
 </style>

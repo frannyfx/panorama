@@ -1,6 +1,6 @@
 <template>
-	<div class="wrapper">
-		<div class="container">
+	<div class="page center">
+		<div class="content">
 			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
 			<!-- Spinner -->
 			<transition name="height">
@@ -85,40 +85,29 @@ export default Vue.extend({
 </style>
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
-.wrapper {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	flex-direction: column;
-
+.page {
 	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
 
-	.container {
-		text-align: center;
-
-		/* Children */
-		.title {
-			svg {
-				margin-right: 10px;
-			}
-
-			color: white;
-			margin-bottom: 10px;
-			filter: drop-shadow(0px 4px 8px rgba(black, 0.3));
+	/* Children */
+	.title {
+		svg {
+			margin-right: 10px;
 		}
 
-		.subtitle {
-			margin-top: 0;
-			font-size: 0.8em;
-			display: flex;
-			align-items: center;
+		color: white;
+		margin-bottom: 10px;
+		filter: drop-shadow(0px 4px 8px rgba(black, 0.3));
+	}
 
-			svg {
-				margin-right: 8px;
-				font-size: 1.2em;
-			}
+	.subtitle {
+		margin-top: 0;
+		font-size: 0.8em;
+		display: flex;
+		align-items: center;
+
+		svg {
+			margin-right: 8px;
+			font-size: 1.2em;
 		}
 	}
 }

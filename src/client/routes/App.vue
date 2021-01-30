@@ -5,12 +5,15 @@
 			<div class="background fade"></div>
 		</div>
 		<transition name="zoom" mode="out-in" tag="div">
-			<router-view class="foreground" v-show="!$store.state.loading"></router-view>
+			<router-view v-if="!$store.state.loading"></router-view>
 		</transition>
 		<transition name="zoom" mode="out-in" tag="div">
-			<div class="loader foreground" v-show="$store.state.loading">
+			<div class="page center" v-show="$store.state.loading">
 				<spinner/>
 			</div>
+		</transition>
+		<transition name="navbar">
+			<navbar v-if="navbarVisible"/>
 		</transition>
 		<transition name="credits">
 			<div class="credits" v-show="$route.name == 'login' && !$store.state.loading">
@@ -33,12 +36,56 @@ import Vue from "vue";
 import Spinner from "../components/Spinner.vue";
 import CommitCanvas from "../components/CommitCanvas.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import Navbar from "../components/Navbar.vue";
+
+// Modules
+import { loadAccessToken, send, testAuthentication } from "../modules/API";
+import { Response } from "../../shared/Response";
+import { Method } from "../../shared/Method";
 
 export default Vue.extend({
 	components: {
 		Spinner,
 		CommitCanvas,
-		FontAwesomeIcon
+		FontAwesomeIcon,
+		Navbar
+	},
+	computed: {
+		navbarVisible() : boolean {
+			return this.$route.name == "dashboard" && !this.$store.state.loading;
+		}	
+	},
+	async mounted() {
+		// Get client id.
+		let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
+		if (clientIdResponse.status.ok) this.$store.commit("setClientId", clientIdResponse.result?.clientId);
+		else {
+			// TODO: Show error.
+			console.warn("Unable to retrieve client ID.")
+			return;
+		}
+
+		// Check cached GitHub authentication info.
+		loadAccessToken();
+		if (this.$store.state.auth.accessToken == "") {
+			// Navigate back to login since we're not signed in.
+			if (this.$route.name != "login") this.$router.replace({ name: "login"});
+
+			this.$store.commit("setAuthStatus", false);
+			this.$store.commit("setLoading", false);
+		} else {
+			// Check whether cached auth info is valid.
+			let auth = await testAuthentication();
+			this.$store.commit("setAuthStatus", auth);
+
+			// If auth is successful, set access token to store.
+			if (auth) {
+				if (this.$route.name == "login") this.$router.replace({ name: "dashboard" });
+				this.$store.commit("setLoading", false);
+			}
+		}
+
+		
 	}
 })
 </script>
@@ -52,22 +99,8 @@ export default Vue.extend({
 	height: 100%;
 }
 
-.loader {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
 .background.fade {
 	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
-}
-
-.foreground {
-	position: absolute;
-	top: 0; left: 0;
-	width: 100%; height: 100%;
 }
 
 .credits {

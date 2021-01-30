@@ -6,16 +6,11 @@
 // Imports
 import { Method } from "../../shared/Method";
 import { Response, isResponse } from "../../shared/Response";
+import Store from "../store";
 
 // Interfaces
 interface Params {
 	[key: string]: string
-};
-
-export interface AuthenticationData {
-	accessToken : string | null,
-	scope : string | null,
-	tokenType: string | null
 };
 
 // Constants
@@ -29,71 +24,46 @@ const defaultResponse : Response = {
 	}
 };
 
-// Token data
-let authenticationData : AuthenticationData = {
-	accessToken: null, scope: null, tokenType: null
-};
-
 /**
- * Load the saved authentication data from local storage.
+ * Load the saved access token from local storage.
  */
-export function loadAuthenticationData() : AuthenticationData {
-	console.log("Loading authentication data...");
-	authenticationData.accessToken = window.localStorage.getItem("accessToken");
-	authenticationData.scope = window.localStorage.getItem("scope");
-	authenticationData.tokenType = window.localStorage.getItem("tokenType");
-
-	console.log(authenticationData);
-	return authenticationData;
+export function loadAccessToken() {
+	let accessToken = window.localStorage.getItem("accessToken");
+	Store.commit("setAccessToken", accessToken ? accessToken : "");
 }
 
 /**
- * Save the newly received authentication data to local storage.
+ * Save the newly received access token to local storage.
  * @param data The data being saved. 
  */
-export function saveAuthenticationData(data: AuthenticationData) {
-	console.log("Saved authentication data.");
-	authenticationData = data;
-	window.localStorage.setItem("accessToken", data.accessToken!);
-	window.localStorage.setItem("scope", data.scope!);
-	window.localStorage.setItem("tokenType", data.tokenType!);
+export function saveAccessToken(accessToken: string) {
+	Store.commit("setAccessToken", accessToken ? accessToken : "");
+	window.localStorage.setItem("accessToken", accessToken);
 }
 
 /**
- * Get the current authentication data.
- */
-export function getAuthenticationData() : AuthenticationData {
-	return authenticationData;
-}
-
-/**
- * Remove saved authentication data.
+ * Remove saved access token.
  */
 export function clearAuthenticationData() {
-	console.log("Cleared authentication data.");
-
-	// Remove current authentication data.
-	authenticationData = {
-		accessToken: null, scope: null, tokenType: null
-	};
+	Store.commit("setAccessToken", "");
+	Store.commit("setAuthStatus", false);
 
 	// Clear it from local storage.
 	window.localStorage.removeItem("accessToken");
-	window.localStorage.removeItem("scope");
-	window.localStorage.removeItem("tokenType");
 }
 
 /**
- * 
+ * Test whether the authentication to GitHub is valid.
  */
 export async function testAuthentication() : Promise<Boolean> {
+	// Test by getting auth route.
 	let response = await send(Method.GET, "auth");
+	
+	// Set auth value.
+	Store.commit("setAuthStatus", response.status.ok);
 
 	// Remove authentication data if found to be invalid.
-	if (!response.status.ok) {
-		clearAuthenticationData();
-	}
-
+	if (!response.status.ok) clearAuthenticationData();
 	return response.status.ok;
 }
 
@@ -109,7 +79,7 @@ export async function send(method: Method, url: string, payload: Object | null =
 		let options : any = {
 			method: Method[method],
 			headers: {
-				"Authorization": authenticationData.accessToken ? `Bearer ${authenticationData.accessToken}` : ""
+				"Authorization": Store.state.auth.accessToken != "" ? `Bearer ${Store.state.auth.accessToken}` : ""
 			} 
 		};
 

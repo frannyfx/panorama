@@ -1,0 +1,146 @@
+<template>
+	<div class="navbar">
+		<div class="container nav-inner">
+			<a @click="navigateToDashboard" class="title">
+				<font-awesome-icon icon="eye"/>
+			</a>
+			<div class="nav-content">
+				<a class="profile">
+					<div class="profile-picture">
+						<div class="image" style="background-image: url('https://avatars.githubusercontent.com/u/13662803?v=4')"></div>
+					</div>
+					<span class="username">frannyfx</span>
+				</a>
+				<a @click="logOut">Log out</a>
+			</div>
+		</div>
+	</div>
+</template>
+<script lang="ts">
+// Imports
+import Vue from "vue";
+
+// Components
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { clearAuthenticationData } from "../modules/API";
+
+export default Vue.extend({
+	components: {
+		FontAwesomeIcon
+	},
+	methods: {
+		navigateToDashboard() {
+			if (this.$route.name != "dashboard")
+				this.$router.replace({ name: "dashboard" });
+		},
+		logOut() {
+			clearAuthenticationData();
+			this.$router.replace({ name: "login" });
+		}
+	}
+})
+</script>
+<style lang="scss" scoped>
+@import "../stylesheets/globals.scss";
+.navbar {
+	/* Layout */
+	width: 100%;
+	height: 48px;
+	line-height: 48px;
+	position: absolute;
+	top: 0; left: 0;
+	z-index: 100;
+
+	/* Appearance */
+	background-color: $deep;
+	color: white;
+
+	.nav-inner {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+
+		.title {
+			font-size: 1.2em;
+		}
+
+		.nav-content {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 0.8em;
+
+			color: rgba(white, 0.7);
+			> * {
+				transition: color 0.3s;
+			}
+
+			> *:hover {
+				color: white;
+			}
+
+			> *:not(:last-child) {
+				margin-right: 20px;
+			}
+		}
+	}
+}
+
+.profile {
+	display: flex;
+	align-items: center;
+
+	> *:not(:last-child) {
+		margin-right: 10px;
+	}
+	
+	.profile-picture {
+		overflow: hidden;
+		border-radius: 100px;
+		width: 25px; height: 25px;
+
+		.image {
+			width: 100%;
+			height: 100%;
+			background-size: cover;
+			background-position: center;
+		}
+	}
+
+	.username {
+		
+	}
+}
+
+/* Animations */
+.navbar-enter-active, .navbar-leave-active {
+	transition: top 0.7s, opacity 0.7s;
+
+	.nav-inner > .nav-content > * {
+		@for $i from 1 through 2 {
+			&:nth-child(#{$i}) {
+				transition: opacity 0.5s;
+				transition-delay: #{$i * .2}s;
+			}
+		}
+	}
+}
+
+.navbar-enter, .navbar-leave-to {
+
+	top: #{-1 * $navbar-height};
+	
+	.nav-inner > .nav-content > * {
+		opacity: 0;
+	}
+}
+
+.navbar-enter-to, .navbar-leave {
+	opacity: 1;
+	top: 0;
+
+	.nav-inner > .nav-content > * {
+		opacity: 1;
+	}
+}
+</style>
