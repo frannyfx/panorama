@@ -11,10 +11,6 @@ Panorama has the following requirements:
 - `typescript` and `webpack-cli` installed as global Node modules.
 
 ## ⚙️ Compiling
-The following values need to be added to the `config.json` file before compilation:
-- 🔐 A valid RSA key generated using OpenSSL to sign tickets.
-- 🐙 A valid GitHub client ID and secret.
-
 You should build the frontend component first, as the script will also transfer the necessary files to the compilation directory.
 
 ### Frontend
@@ -25,6 +21,21 @@ npm run build-client
 ```
 
 ### Backend
+#### Configuration
+Create a new `config.json` file by running:
+```
+cp src/server/config.default.json cp src/server/config.json
+```
+
+Edit the new config file to include the client ID and secret for your app.
+
+You will also need a valid RSA private key used in Panorama's cryptographic modules. To generate one, run:
+
+```
+openssl genrsa -out assets/crypto/key.pem
+```
+
+#### Prerequisites
 Firstly, install the NPM packages by running:
 ```
 npm install
@@ -35,6 +46,7 @@ Additionally, if you haven't already, install the required modules globally:
 npm install -g typescript webpack-cli
 ```
 
+#### Compiling
 Then, compile the TypeScript code using the compiler:
 
 ```
