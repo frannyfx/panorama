@@ -16,14 +16,25 @@ import getRoot from "../../../utils/root";
 import { Method } from "../../../../shared/Method";
 import { Route } from "../Route";
 
-let route : Array<Route> = [{
+/**
+ * Return the homepage so Vue history mode works with all pages.
+ * @param request The request.
+ * @param response The response.
+ */
+function getIndex(request: any, response: any) {
+	// Create read stream for index.html.
+	const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/index.html"));
+	response.type("text/html").send(index);
+}
+
+let routes : Array<Route> = [{
 	method: Method.GET,
 	url: "/",
-	handler: (request: any, response: any) => {
-		// Create read stream for index.html.
-		const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/index.html"));
-		response.type("text/html").send(index);
-	}
+	handler: getIndex
+}, {
+	method: Method.GET,
+	url: "/dashboard",
+	handler: getIndex
 }];
 
-export default route;
+export default routes;

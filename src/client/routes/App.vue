@@ -109,8 +109,6 @@ export default Vue.extend({
 		// Navigate to dashboard if attempting to load login page.
 		if (this.$route.name == "login") this.$router.replace({ name: "dashboard" });
 		this.$store.commit("setLoading", false);
-
-		
 	}
 })
 </script>

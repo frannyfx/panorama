@@ -32,7 +32,10 @@ const routes = [{
 	name: "dashboard"
 }];
 
-const router = new VueRouter({ routes });
+const router = new VueRouter({
+	mode: "history",
+	routes
+});
 
 // Set up the app.
 const app = new Vue({
