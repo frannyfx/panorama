@@ -16,7 +16,7 @@ import Icons from "../icons";
 Icons;
 
 // Routes
-const Login = () => import("../routes/Login.vue");
+const SignIn = () => import("../routes/SignIn.vue");
 const Dashboard = () => import("../routes/Dashboard.vue");
 
 // Set up the client-side routes.
@@ -24,8 +24,8 @@ Vue.use(VueRouter);
 
 const routes = [{
 	path: "/",
-	component: Login,
-	name: "login"
+	component: SignIn,
+	name: "sign-in"
 }, {
 	path: "/dashboard",
 	component: Dashboard,

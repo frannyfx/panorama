@@ -57,7 +57,7 @@ export default Vue.extend({
 	},
 	computed: {
 		visible() : boolean {
-			return this.$route.name == "login" || this.$store.state.loading;
+			return this.$route.name == "sign-in" || this.$store.state.loading;
 		}
 	},
 	watch: {

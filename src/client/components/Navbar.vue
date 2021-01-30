@@ -13,7 +13,10 @@
 					</div>
 					<span class="username">{{username}}</span>
 				</a>
-				<a @click="logOut">Log out</a>
+				<a class="nav-link" @click="logOut">
+					<font-awesome-icon icon="sign-out-alt"/>
+					Sign out
+				</a>
 			</div>
 		</div>
 	</div>
@@ -44,7 +47,7 @@ export default Vue.extend({
 		},
 		logOut() {
 			clearAuthenticationData();
-			this.$router.replace({ name: "login" });
+			this.$router.replace({ name: "sign-in" });
 		}
 	}
 })
@@ -54,14 +57,16 @@ export default Vue.extend({
 .navbar {
 	/* Layout */
 	width: 100%;
-	height: 48px;
-	line-height: 48px;
+	height: $navbar-height;
+	line-height: $navbar-height;
 	position: absolute;
 	top: 0; left: 0;
 	z-index: 100;
 
 	/* Appearance */
-	background-color: $deep;
+	background-color: rgba($deep, .95);
+	-webkit-backdrop-filter: blur(5px) saturate(150%);
+	backdrop-filter: blur(5px) saturate(150%);
 	color: white;
 
 	.nav-inner {
@@ -90,6 +95,12 @@ export default Vue.extend({
 
 			> *:not(:last-child) {
 				margin-right: 20px;
+			}
+
+			.nav-link {
+				> svg {
+					margin-right: 5px;
+				}
 			}
 		}
 	}

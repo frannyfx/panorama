@@ -16,7 +16,7 @@
 			<navbar v-if="navbarVisible"/>
 		</transition>
 		<transition name="credits">
-			<div class="credits" v-show="$route.name == 'login' && !$store.state.loading">
+			<div class="credits" v-show="$route.name == 'sign-in' && !$store.state.loading">
 				<p>
 					<span>frannyfx &copy; 2021</span>
 					<span>&bull;</span>
@@ -58,8 +58,8 @@ export default Vue.extend({
 	},
 	methods: {
 		notAuthenticated() {
-			// Navigate back to login since we're not signed in.
-			if (this.$route.name != "login") this.$router.replace({ name: "login"});
+			// Navigate back to sign in since we're not signed in.
+			if (this.$route.name != "sign-in") this.$router.replace({ name: "sign-in"});
 			this.$store.commit("setAuthStatus", false);
 			this.$store.commit("setAccessToken", "");
 			this.$store.commit("setLoading", false);
@@ -106,8 +106,8 @@ export default Vue.extend({
 		// Save user data to store.
 		this.$store.commit("setUser", profileResult.result);
 
-		// Navigate to dashboard if attempting to load login page.
-		if (this.$route.name == "login") this.$router.replace({ name: "dashboard" });
+		// Navigate to dashboard if attempting to load sign in page.
+		if (this.$route.name == "sign-in") this.$router.replace({ name: "dashboard" });
 		this.$store.commit("setLoading", false);
 	}
 })
