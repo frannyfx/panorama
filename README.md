@@ -55,4 +55,4 @@ node dist/index.js
 
 ## 👨‍💻 Credits
 - Francesco Compagnoni - Engineering
-- Dr Jeroen Keppens - Supervisor
+- Dr Jeroen Keppens - Project supervisor
