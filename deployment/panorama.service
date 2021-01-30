@@ -1,0 +1,14 @@
+[Unit]
+Description=Panorama
+
+[Service]
+ExecStart=/usr/bin/nodejs /root/panorama/live/dist/server/index.js
+WorkingDirectory=/root/panorama/live/
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=panorama
+
+[Install]
+WantedBy=multi-user.target
