@@ -1,6 +1,6 @@
 #!/bin/sh
 echo "Pulling changes..."
-cd /root/panorama/live || exit
+cd /root/projects/panorama/live || exit
 unset GIT_DIR
 git reset --hard
 git pull bare master

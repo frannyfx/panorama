@@ -2,8 +2,8 @@
 Description=Panorama
 
 [Service]
-ExecStart=/usr/bin/nodejs /root/panorama/live/dist/server/index.js
-WorkingDirectory=/root/panorama/live/
+ExecStart=/usr/bin/nodejs /root/projects/panorama/live/dist/server/index.js
+WorkingDirectory=/root/projects/panorama/live/
 Restart=on-failure
 RestartSec=10
 StandardOutput=syslog
