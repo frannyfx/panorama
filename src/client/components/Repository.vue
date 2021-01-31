@@ -1,19 +1,28 @@
 <template>
-	<div class="repo">
-		<font-awesome-icon class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
+	<div class="repo" :class="{ 'first': index == 0 }">
+		<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? 'Private' : 'Public' }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
 		<div class="details">
 			<div class="title">
-				<span class="owner">{{repo.owner.login}}/</span><span class="name">{{repo.name}}</span>
+				<span class="owner">{{repo.owner.login}}</span>
+				<span class="slash">/</span>
+				<span class="name">{{repo.name}}</span>
 			</div>
 			<div class="subtitle">
 				Last updated <span class="strong">{{updatedAt}}</span>.
 			</div>
 		</div>
-		<div class="contributors hide-small" v-if="repo.contributors.length > 0">
-			<div v-for="(contributor, index) in repo.contributors" :key="contributor.id" class="contributor"  :style="{'background-image':`url('${contributor.avatarUrl}')`, 'z-index': 5 - index}"></div>
+		<div class="contributors hide-small">
+			<div class="contributors-row" v-if="repo.contributors.length > 0">
+				<div v-tooltip="{ theme: 'panorama', content: contributor.login }" v-for="(contributor, index) in repo.contributors" :key="contributor.id" class="contributor"  :style="{ 'z-index': 5 - index }">
+					<div class="image" :style="{'background-image': `url('${contributor.avatarUrl}')`}"></div>
+				</div>
+			</div>
+			<div class="subtitle" v-else>
+				No contributors.
+			</div>
 		</div>
 		<div class="actions">
-			<button><font-awesome-icon icon="chart-bar"/>Analyse</button>
+			<font-awesome-icon icon="chevron-right"/>
 		</div>
 	</div>
 </template>
@@ -39,6 +48,11 @@ export default Vue.extend({
 		repo: {
 			type: Object as PropType<Repository>,
 			required: true
+		},
+		index: {
+			type: Number,
+			required: true,
+			default: -1
 		}
 	},
 	mounted: function () {
@@ -49,17 +63,36 @@ export default Vue.extend({
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
 .repo {
-	border-bottom: 1px solid rgba(black, .1);
-	padding: 10px 0px;
-	box-sizing: border-box;
-	height: 70px;
-
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
 
+	box-sizing: border-box;
+	padding: 10px 0px;
+	height: 70px;
+
+	cursor: pointer;
+	border-top: 1px solid rgba(black, .1);
+	&.first {
+		border-top: none !important;
+	}
+	
+	transition: background-color 0.3s;
+
+	&:hover {
+		background-color: rgba($blue, .05);
+	}
+
+	> :first-child {
+		margin-left: 30px;
+	}
+
+	> :last-child {
+		margin-right: 30px;
+	}
+
 	> *:not(:last-child) {
-		margin-right: 20px;
+		margin-right: 30px;
 	}
 
 	.repo-icon {
@@ -70,7 +103,7 @@ export default Vue.extend({
 	.details {
 		display: flex;
 		flex-direction: column;
-		width: 500px;
+		flex-grow: 1;
 
 		.title {
 			font-size: 1em;
@@ -78,54 +111,70 @@ export default Vue.extend({
 			overflow: hidden;
 			white-space: nowrap;
 			text-overflow: ellipsis;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
 
-			.owner {
+			.owner, .name {
+				color: $blue;
+			}
+
+			.slash {
+				margin: 0px 4px;
+				font-size: 1.3em;
+				font-weight: 400;
+			}
+
+			.name {
 				font-weight: 700;
 			}
 		}
+	}
 
-		.subtitle {
-			font-size: 0.7em;
-			color: #aaa;
-			overflow: hidden;
-			white-space: nowrap;
-			text-overflow: ellipsis;
-		}
-
-		
+	.subtitle {
+		font-size: 0.7em;
+		color: #aaa;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 	}
 
 	.contributors {
-		display: flex;
-		flex-direction: row;
-		
-		.contributor {
-			width: 20px;
-			height: 20px;
+		.contributors-row {
+			display: flex;
+			flex-direction: row;
+			
+			.contributor {
+				width: 30px;
+				height: 30px;
+				background-color: white;
+				overflow: hidden;
+				border-radius: 30px;
+				border: 3px solid white;
 
-			background-size: cover;
-			background-position: center;
-			border: 2px solid white;
-			border-radius: 30px;
+				.image {
+					width: 100%;
+					height: 100%;
+					background-size: cover;
+					background-position: center;
+				}
 
-			transition: transform 0.3s;
-
-			&:not(:first-child) {
-				margin-left: -8px;
-			}
-
-			&:hover {
-				transform: scale(2);
-				z-index: 10 !important;
+				&:not(:first-child) {
+					margin-left: -10px;
+				}
 			}
 		}
 	}
+	
 
 	.actions {
 		display: flex;
 		align-items: center;
 		justify-content: flex-end;
-		flex-grow: 1;
+		flex-grow: 0;
+
+		color: #aaa;
+		font-size: 0.9em;
 	}
 }
 </style>

@@ -6,6 +6,7 @@
 // Imports
 import Vue from "vue";
 import VueRouter from "vue-router";
+import VTooltip from "v-tooltip";
 import Store from "../store";
 
 // Components
@@ -20,8 +21,20 @@ const SignIn = () => import/* webpackChunkName: "sign-in" */ ("../routes/SignIn.
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ "../routes/Dashboard.vue");
 const Test = () => import(/* webpackChunkName: "test" */ "../routes/Test.vue");
 
-// Set up the client-side routes.
+// Set up plugins.
 Vue.use(VueRouter);
+Vue.use(VTooltip, {
+	themes: {
+		panorama: {
+			"$extend": "tooltip",
+			placement: "top",
+			delay: {
+				show: 100,
+				hide: 0
+			}
+		},
+	},
+});
 
 const routes = [{
 	path: "/",

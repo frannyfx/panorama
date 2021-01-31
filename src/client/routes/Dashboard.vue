@@ -1,12 +1,15 @@
 <template>
 	<div class="page nav">
 		<div class="content container">
-			<h2>
-				<font-awesome-icon icon="folder"/>
-				<span>Repositories</span>
-			</h2>
+			<h2>Activity</h2>
+			<div class="activities">
+				<div class="activity"></div>
+				<div class="activity"></div>
+				<div class="activity"></div>
+			</div>
+			<h2>Repositories</h2>
 			<div class="repos">
-				<repository v-for="repo in $store.state.repos.list" :key="repo.id" :repo="repo"/>
+				<repository v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
 			</div>
 		</div>
 	</div>
@@ -61,6 +64,7 @@ export default Vue.extend({
 h2 {
 	display: flex;
 	align-items: center;
+
 	svg {
 		margin-right: 10px;
 		font-size: 0.8em;
@@ -68,8 +72,33 @@ h2 {
 	}
 }
 
+.activities {
+	width: 100%;
+	margin: 20px 0px;
+
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+
+	.activity {
+		width: 300px;
+		height: 180px;
+		border-radius: 16px;
+		background-color: rgba(black, .1);
+
+		&:not(:last-child) {
+			margin-right: 20px;
+		}
+	}
+}
+
 .repos {
 	width: 100%;
 	margin: 20px 0px;
+	border: 1px solid rgba(black, .1);
+	border-radius: 16px;
+	box-sizing: border-box;
+	overflow: hidden;
 }
 </style>

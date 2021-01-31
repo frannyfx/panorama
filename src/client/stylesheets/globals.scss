@@ -1,3 +1,6 @@
+/* Imports */
+@import "v-tooltip/dist/v-tooltip.css";
+
 /* Colour scheme */
 $deep: #192B5D;
 $blue: #3960A1;
@@ -7,7 +10,7 @@ $blue: #3960A1;
 
 /* Layout */
 $navbar-height: 60px;
-$navbar-content-padding: 20px;
+$navbar-content-padding: 30px;
 
 body {
 	position: absolute;
@@ -43,6 +46,7 @@ body {
 
 	&.nav {
 		padding-top: #{$navbar-height + $navbar-content-padding};
+		overflow-y: auto;
 	}
 }
 
@@ -51,6 +55,34 @@ body {
 	max-width: 960px;
 	box-sizing: border-box;
 	padding: 0px 20px;
+}
+
+/* Customise tooltips */
+.v-popper--theme-panorama {
+	filter: drop-shadow(0px 2px 8px rgba(black, 0.1));
+
+	&.v-popper__popper--shown {
+		transition: opacity .3s;
+	}
+
+	.v-popper__inner {
+		border-radius: 100px; 
+		padding: 8px 18px;
+		font-size: 0.8em;
+		color: black;
+		background-color: rgba(#fff, 0.6);
+
+		backdrop-filter: blur(5px);
+		-webkit-backdrop-filter: blur(5px);
+	}
+
+	.v-popper__arrow {
+		border-color: rgba(#fff, 0.6);
+	}
+	
+	.v-popper__wrapper {
+		margin-bottom: 5px;	
+	}
 }
 
 /* Media queries */
