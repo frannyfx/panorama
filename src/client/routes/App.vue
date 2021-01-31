@@ -4,8 +4,12 @@
 			<commit-canvas/>
 			<div class="background fade"></div>
 		</div>
-		<transition name="zoom" mode="out-in" tag="div">
-			<router-view></router-view>
+		<transition :name="$store.state.loading ? 'zoom' : ''" mode="out-in">
+			<div class="route" v-show="!$store.state.loading">
+				<transition name="zoom" mode="out-in" tag="div">
+					<router-view></router-view>
+				</transition>
+			</div>
 		</transition>
 		<transition name="zoom" mode="out-in" tag="div">
 			<div class="page center" v-show="$store.state.loading">
@@ -71,6 +75,13 @@ export default Vue.extend({
 
 .background.fade {
 	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
+}
+
+.route {
+	position: absolute;
+	top: 0; left: 0;
+	width: 100vw;
+	height: 100vh;
 }
 
 .credits {

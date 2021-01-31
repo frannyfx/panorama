@@ -10,28 +10,12 @@ import { AuthInterface } from "@octokit/types";
 
 // Modules
 import Store from "../store";
-import { Result } from "../../shared/Result";
+import { Data, Result } from "../../shared/Result";
+import { Repository, toRepository } from "./models/Repository";
+import { User } from "./models/User";
 
 // Variables
 var instance : Octokit | null = null;
-
-// Interfaces
-interface User {
-	id: number,
-	login: string,
-	avatarUrl: string,
-	name: string,
-	email: string
-};
-
-export interface Repository {
-	id: number,
-	name: string,
-	private: boolean,
-	description: string,
-	contributors: User[],
-	updated_at: Date
-};
 
 /**
  * Get the current instance of Octokit.
@@ -66,7 +50,7 @@ export function getRedirectURI() : string {
 export async function getRepositories() : Promise<Repository[]> {
 	// Get repos.
 	let result = await (await getOctokit()).repos.listForAuthenticatedUser({
-		per_page: 5,
+		per_page: 10,
 		affiliation: "owner,collaborator",
 		sort: "updated",
 		direction: "desc"
@@ -83,27 +67,8 @@ export async function getRepositories() : Promise<Repository[]> {
 			per_page: 5
 		});
 
-		let contributors : User[] = [];
-		if (contributorsResult.status == 200) {
-			contributorsResult.data.map(user => {
-				contributors.push({
-					id: user.id!,
-					login: user.login!,
-					avatarUrl: user.avatar_url!,
-					name: user.name!,
-					email: user.email!
-				});
-			});
-		} 
-
-		return {
-			id: repo.id!,
-			name: repo.full_name!,
-			private: repo.private!,
-			description: repo.description!,
-			contributors,
-			updated_at: new Date(repo.pushed_at!)
-		};
+		let contributors : Data[] = contributorsResult.status == 200 ? contributorsResult.data : [];
+		return toRepository(repo, contributors);
 	}));
 
 	reposWithContributors.sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());

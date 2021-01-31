@@ -70,6 +70,6 @@ h2 {
 
 .repos {
 	width: 100%;
-	font-size: 1em;
+	margin: 20px 0px;
 }
 </style>

@@ -11,7 +11,7 @@
 							<font-awesome-icon v-if="this.$store.state.user.avatarUrl == ''" icon="user"/>
 						</div>
 					</div>
-					<span class="username">{{username}}</span>
+					<span class="username hide-small">{{username}}</span>
 				</a>
 				<a class="nav-link" @click="logOut">
 					<font-awesome-icon icon="sign-out-alt"/>
@@ -109,10 +109,6 @@ export default Vue.extend({
 .profile {
 	display: flex;
 	align-items: center;
-
-	> *:not(:last-child) {
-		margin-right: 10px;
-	}
 	
 	.profile-picture {
 		overflow: hidden;
@@ -120,6 +116,11 @@ export default Vue.extend({
 		width: 25px; height: 25px;
 		background-color: white;
 		border: 2px solid white;
+		
+		margin-right: 10px;
+		@include sm {
+			margin-right: 0px;
+		}
 
 		.image {
 			width: 100%;

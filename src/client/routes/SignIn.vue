@@ -40,6 +40,10 @@ export default Vue.extend({
 	},
 	methods: {
 		async signIn() {
+			// Navigate to dashboard.
+			//this.$store.commit("setLoading", true);
+			//this.$router.replace({ name: "test" });
+			
 			this.popup.window = window.open(
 				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
 				"GitHub Authentication",
@@ -66,7 +70,6 @@ export default Vue.extend({
 				
 				// Retrieve user data.
 				let profileResult = await getProfile();
-				console.log(profileResult);
 
 				// Save user data to store.
 				this.$store.commit("setUser", profileResult.result);
@@ -77,6 +80,8 @@ export default Vue.extend({
 					return;
 				}
 
+				// Navigate to dashboard.
+				this.$store.commit("setLoading", true);
 				this.$router.replace({ name: "dashboard" });
 			}
 		}

@@ -16,9 +16,9 @@ import Icons from "../icons";
 Icons;
 
 // Routes
-const Loader = () => import(/* webpackChunkName: "loader" */ "../routes/Loader.vue");
 const SignIn = () => import/* webpackChunkName: "sign-in" */ ("../routes/SignIn.vue");
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ "../routes/Dashboard.vue");
+const Test = () => import(/* webpackChunkName: "test" */ "../routes/Test.vue");
 
 // Set up the client-side routes.
 Vue.use(VueRouter);
@@ -31,6 +31,10 @@ const routes = [{
 	path: "/dashboard",
 	component: Dashboard,
 	name: "dashboard"
+}, {
+	path: "/test",
+	component: Test,
+	name: "test"
 }];
 
 const router = new VueRouter({

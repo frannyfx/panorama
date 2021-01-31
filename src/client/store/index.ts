@@ -2,7 +2,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import { Data } from "../../shared/Result";
-import { Repository } from "../modules/GitHub";
+import { Repository } from "../modules/models/Repository";
 
 // Use plugin
 Vue.use(Vuex);

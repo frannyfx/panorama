@@ -68,6 +68,12 @@ $screen-lg-min: 992px;
     }
 }
 
+.hide-small {
+	@include sm {
+		display: none !important;
+	}
+}
+
 /* Text styles */
 h1 {
 	font-weight: 400;
@@ -83,6 +89,10 @@ a {
 	color: inherit;
 	text-decoration: none;
 	cursor: pointer;
+}
+
+.strong {
+	font-weight: 600;
 }
 
 /* Transitions */
