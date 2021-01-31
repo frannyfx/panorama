@@ -5,7 +5,7 @@
 			<div class="background fade"></div>
 		</div>
 		<transition name="zoom" mode="out-in" tag="div">
-			<router-view v-if="!$store.state.loading"></router-view>
+			<router-view></router-view>
 		</transition>
 		<transition name="zoom" mode="out-in" tag="div">
 			<div class="page center" v-show="$store.state.loading">
@@ -16,7 +16,7 @@
 			<navbar v-if="navbarVisible"/>
 		</transition>
 		<transition name="credits">
-			<div class="credits" v-show="$route.name == 'sign-in' && !$store.state.loading">
+			<div class="credits" v-show="$route.name == 'sign-in'">
 				<p>
 					<span>frannyfx &copy; 2021</span>
 					<span>&bull;</span>
@@ -39,10 +39,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Navbar from "../components/Navbar.vue";
 
 // Modules
-import { loadAccessToken, send, testAuthentication } from "../modules/API";
-import { Response } from "../../shared/Response";
-import { Method } from "../../shared/Method";
-import { getProfile } from "../modules/GitHub";
+import { performAuth } from "../modules/API";
 
 export default Vue.extend({
 	components: {
@@ -53,62 +50,12 @@ export default Vue.extend({
 	},
 	computed: {
 		navbarVisible() : boolean {
-			return this.$route.name == "dashboard" && !this.$store.state.loading;
+			return this.$route.name == "dashboard";
 		}
 	},
-	methods: {
-		notAuthenticated() {
-			// Navigate back to sign in since we're not signed in.
-			if (this.$route.name != "sign-in") this.$router.replace({ name: "sign-in"});
-			this.$store.commit("setAuthStatus", false);
-			this.$store.commit("setAccessToken", "");
-			this.$store.commit("setLoading", false);
-		}
-	},
+	methods: { },
 	mounted: async function () {
-		// Get client ID.
-		let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
-		if (clientIdResponse.status.ok) this.$store.commit("setClientId", clientIdResponse.result?.clientId);
-		else {
-			// TODO: Show error.
-			console.warn("Unable to retrieve client ID.")
-			return;
-		}
-
-		// Load cached auth info.
-		loadAccessToken();
-
-		// If there is no info, fail.
-		if (this.$store.state.auth.accessToken == "") {
-			this.notAuthenticated();
-			return;
-		}
-
-		// Check validity of cached info.
-		let auth = await testAuthentication();
-
-		// If invalid, fail.
-		if (!auth) {
-			console.log("Cached credentials failed.", auth);
-			this.notAuthenticated();
-			return;
-		}
-		
-		// If auth is successful, retrieve user data and navigate to dashboard.
-		let profileResult = await getProfile();
-
-		// If unable to retrieve user data, fail.
-		if (!profileResult.status.ok) {
-			this.notAuthenticated();
-			return;
-		}
-
-		// Save user data to store.
-		this.$store.commit("setUser", profileResult.result);
-
-		// Navigate to dashboard if attempting to load sign in page.
-		if (this.$route.name == "sign-in") this.$router.replace({ name: "dashboard" });
-		this.$store.commit("setLoading", false);
+		await performAuth();
 	}
 })
 </script>

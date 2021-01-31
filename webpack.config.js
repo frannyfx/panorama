@@ -1,5 +1,6 @@
 // Imports
 let path = require("path");
+let webpack = require("webpack");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 // Configuration
@@ -34,7 +35,8 @@ module.exports = {
 		}]
 	},
 	plugins: [
-		new VueLoaderPlugin()
+		new VueLoaderPlugin(),
+		new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
 	],
 	resolve: {
 		extensions: [".js", ".ts", ".tsx", ".scss"],

@@ -10,7 +10,7 @@ import BeeQueue from "bee-queue";
 const logger = require("../utils/logger")("repo_prc");
 import cache from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
-import { sleep } from "../utils";
+import { sleep } from "../../shared/utils";
 
 export async function start() {
 	// Initialise caching system.

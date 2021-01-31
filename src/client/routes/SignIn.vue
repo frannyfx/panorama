@@ -10,14 +10,15 @@
 </template>
 <script lang="ts">
 // Imports
-import Vue from 'vue';
+import Vue from "vue";
+import Store from "../store";
 
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import CommitCanvas from "../components/CommitCanvas.vue";
 
 // API imports
-import { saveAccessToken, send, testAuthentication } from "../modules/API";
+import { saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
@@ -40,7 +41,7 @@ export default Vue.extend({
 	methods: {
 		async signIn() {
 			this.popup.window = window.open(
-				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}`,
+				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
 				"GitHub Authentication",
 				"menubar=no,location=no,resizable=no,scrollbars=no,status=no," + 
 				`width=${this.popup.width},height=${this.popup.height},` +
@@ -65,6 +66,7 @@ export default Vue.extend({
 				
 				// Retrieve user data.
 				let profileResult = await getProfile();
+				console.log(profileResult);
 
 				// Save user data to store.
 				this.$store.commit("setUser", profileResult.result);
@@ -79,17 +81,17 @@ export default Vue.extend({
 			}
 		}
 	},
+	async beforeRouteEnter (to, from, next) {
+		await waitForAuth();
+		if (Store.state.auth.status) return next({ name: "dashboard"});
+		next(vm => {
+			vm.$store.commit("setLoading", false);
+		});
+	},
 	mounted: async function() {
 		// Add event listener to receive data from pop-up.
 		window.addEventListener("message", this.onReceiveMessage);
-	}, /*
-	beforeRouteEnter (to, from, next) {
-		next(async vm => {
-			
-
-			
-		});
-	} */
+	}
 });
 </script>
 <style lang="scss" scoped>

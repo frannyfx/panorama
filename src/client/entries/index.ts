@@ -16,8 +16,9 @@ import Icons from "../icons";
 Icons;
 
 // Routes
-const SignIn = () => import("../routes/SignIn.vue");
-const Dashboard = () => import("../routes/Dashboard.vue");
+const Loader = () => import(/* webpackChunkName: "loader" */ "../routes/Loader.vue");
+const SignIn = () => import/* webpackChunkName: "sign-in" */ ("../routes/SignIn.vue");
+const Dashboard = () => import(/* webpackChunkName: "dashboard" */ "../routes/Dashboard.vue");
 
 // Set up the client-side routes.
 Vue.use(VueRouter);

@@ -7,6 +7,7 @@
 import { Method } from "../../shared/Method";
 import { Response, isResponse } from "../../shared/Response";
 import Store from "../store";
+import { getProfile } from "./GitHub";
 
 // Interfaces
 interface Params {
@@ -23,6 +24,72 @@ const defaultResponse : Response = {
 		}
 	}
 };
+
+// Variables
+let authResolves : Function[] = [];
+
+/**
+ * Update the store with non-authenticated values.
+ */
+function setNotAuthenticated() {
+	Store.commit("setAuthLoaded", true);
+	Store.commit("setAuthStatus", false);
+	Store.commit("setAccessToken", "");
+
+	// Call resolves.
+	authResolves.map(resolve => resolve());
+	authResolves.splice(0, authResolves.length);
+}
+
+/**
+ * 
+ */
+export async function performAuth() {
+	// Get client ID.
+	let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
+	if (clientIdResponse.status.ok) Store.commit("setClientId", clientIdResponse.result?.clientId);
+	else {
+		// TODO: Show error.
+		console.warn("Unable to retrieve client ID.");
+		return;
+	}
+
+	// Load cached auth info.
+	loadAccessToken();
+
+	// If there is no info, fail.
+	if (Store.state.auth.accessToken == "") return setNotAuthenticated();
+
+	// Check validity of cached info.
+	let auth = await testAuthentication();
+
+	// If invalid, fail.
+	if (!auth) return setNotAuthenticated();
+
+	// Get user profile.
+	let profileResult = await getProfile();
+
+	// If unable to retrieve user data, fail.
+	if (!profileResult.status.ok) return setNotAuthenticated();
+
+	// Commit data to store.
+	Store.commit("setAuthLoaded", true);
+	Store.commit("setAuthStatus", auth);
+	Store.commit("setUser", profileResult.result);
+
+	// Call resolves.
+	authResolves.map(resolve => resolve());
+	authResolves.splice(0, authResolves.length);
+}
+
+export function waitForAuth() : Promise<void> {
+	if (Store.state.auth.loaded) return Promise.resolve();
+	let promise = new Promise<void>(resolve => {
+		authResolves.push(resolve);
+	});
+	return promise;
+}
+
 
 /**
  * Load the saved access token from local storage.
@@ -58,9 +125,6 @@ export function clearAuthenticationData() {
 export async function testAuthentication() : Promise<Boolean> {
 	// Test by getting auth route.
 	let response = await send(Method.GET, "auth");
-	
-	// Set auth value.
-	Store.commit("setAuthStatus", response.status.ok);
 
 	// Remove authentication data if found to be invalid.
 	if (!response.status.ok) clearAuthenticationData();
