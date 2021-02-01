@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"target": "es5",
+		"module": "esnext",
+		"moduleResolution": "node",
+		"strict": true,
+		"importHelpers": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"paths": {
+			"v-tooltip": [
+				"./src/client/definitions/v-tooltip.d.ts"
+			]
+		}
+	},
+	"files": [
+		"src/client/definitions/vue-shim.d.ts"
+	],
+  }

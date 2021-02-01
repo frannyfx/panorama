@@ -11,7 +11,8 @@ module.exports = {
 	},
 	output: {
 		path: path.resolve(__dirname, "dist/public/js"),
-		filename: "[name].bundle.js"
+		filename: "[name].bundle.js",
+		chunkFilename: "[id].chunk.js"
 	},
 	module: {
 		rules: [{
@@ -31,7 +32,10 @@ module.exports = {
 			test: /\.tsx?$/,
 			loader: "ts-loader",
 			exclude: /node_modules/,
-			options: { appendTsSuffixTo: [/\.vue$/] }
+			options: { 
+				appendTsSuffixTo: [/\.vue$/],
+				configFile: "tsconfig.webpack.json"
+			}
 		}]
 	},
 	plugins: [

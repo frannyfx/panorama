@@ -7,19 +7,11 @@
 		"esModuleInterop": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"resolveJsonModule": true,
-		"paths": {
-			"v-tooltip": [
-				"./src/client/definitions/v-tooltip.d.ts"
-			]
-		}
+		"resolveJsonModule": true
 	},
 	"include": [
 		"src/server/**/*",
 		"src/server/*.json", 
 		"src/shared/**/*"
-	],
-	"files": [
-		"src/client/definitions/vue-shim.d.ts"
-	],
+	]
 }

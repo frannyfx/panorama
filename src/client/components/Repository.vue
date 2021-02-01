@@ -29,7 +29,7 @@
 <script lang="ts">
 // Imports
 import Vue, { PropType } from "vue";
-import moment from "moment";
+const moment = () => import("moment");
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
@@ -55,8 +55,9 @@ export default Vue.extend({
 			default: -1
 		}
 	},
-	mounted: function () {
-		this.updatedAt = moment(this.repo.updated_at).fromNow();
+	mounted: async function () {
+		let m = await moment();
+		this.updatedAt = m.default(this.repo.updated_at).fromNow();
 	}
 });
 </script>
