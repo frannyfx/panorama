@@ -12,6 +12,7 @@ export interface NotificationData {
 	icon: string[],
 	title: string,
 	description: string,
+	dismissable: boolean,
 	progress?: {
 		value: number,
 		status: string
@@ -102,6 +103,8 @@ export function createAlert(type: "INFO" | "WARNING", title: string, description
 	return addNotification({
 		type: "NORMAL",
 		icon,
-		title, description
+		title,
+		description,
+		dismissable: true
 	});
 }

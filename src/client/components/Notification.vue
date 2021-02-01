@@ -28,10 +28,18 @@
 				<div class="title">{{notification.data.title}}</div>
 				<div class="description">
 					{{notification.data.description}}
+					<div v-if="notification.data.type == 'PROGRESS'" class="progress-container">
+						<div class="progress-bar">
+							<div class="progress" :style="{ width: `${notification.data.progress.value * 100}%`}"></div>
+						</div>
+						<div class="progress-status">
+							{{notification.data.progress.status}}
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-		<div class="close-button" @click="remove">
+		<div v-if="notification.data.dismissable" class="close-button" @click="remove">
 			<font-awesome-icon icon="times"/>
 		</div>
 	</div>
@@ -45,7 +53,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import { Notification, removeNotification } from "../modules/Notifications";
 
 // Constants
-const MAX_NEGATIVE_DELTA = 80; // The maximum distance a user can drag the notification in the wrong direction.
+const MAX_RUBBER_DELTA = 80; // The maximum distance a user can drag the notification in the wrong direction.
 const MIN_SWIPE_DELTA = 80;
 
 export default Vue.extend({
@@ -72,11 +80,19 @@ export default Vue.extend({
 			let deltaX = clientX - this.startX;
 			
 			// Rubber-banding to prevent from swiping the wrong way.
-			if (deltaX < 0) this.deltaX = MAX_NEGATIVE_DELTA * (Math.pow(Math.E, (1 / MAX_NEGATIVE_DELTA) * deltaX) - 1);
+			if (deltaX < 0 || !this.notification.data.dismissable) {
+				let rubberDeltaX = MAX_RUBBER_DELTA * (Math.pow(Math.E, (1 / MAX_RUBBER_DELTA) * Math.abs(deltaX) * -1) - 1);	
+				this.deltaX = deltaX > 0 ? rubberDeltaX * -1 : rubberDeltaX;
+			}
 			else this.deltaX = deltaX;
 		},
 		dragend(clientX : number | undefined = undefined) {
-			if (!this.down) return;
+			if (!this.down || !this.notification.data.dismissable) {
+				this.down = false;
+				this.startX = 0;
+				this.deltaX = 0;
+				return;
+			}
 
 			let deltaX = clientX ? clientX - this.startX : this.deltaX;
 			if (deltaX > MIN_SWIPE_DELTA) {
@@ -119,7 +135,7 @@ export default Vue.extend({
 	width: 100%;
 	height: auto;
 	box-sizing: border-box;
-	padding: 20px;
+	padding: 20px 25px;
 
 	display: flex;
 	flex-direction: row;
@@ -138,7 +154,7 @@ export default Vue.extend({
 	> .icon {
 		color: $blue;
 		font-size: 1.7em;
-		padding: 0px 5px;
+		margin-right: 15px;
 	}
 
 	> .content {
@@ -158,17 +174,37 @@ export default Vue.extend({
 			font-size: .7em;
 			font-weight: 400;
 
-			/*
-			.progress-status {
-				margin-top: 3px;
+			.progress-container {
+				margin-top: 5px;
+				.progress-bar {
+					width: 100%;
+					height: 5px;
+					border-radius: 5px;
+					background-color: rgba($deep, .2);
+					overflow: hidden;
 
-				> svg {
-					color: $blue;
+					.progress {
+						width: 75%;
+						transition: width 1s;
+						height: 100%;
+						border-radius: 5px;
+
+						background-color: $blue;
+					}
 				}
-			}*/
+
+				.progress-status {
+					margin-top: 3px;
+
+					> svg {
+						color: $blue;
+					}
+				}
+			}
 		}
 	}
 }
+
 .notification {
 	position: relative;
 	pointer-events: all;

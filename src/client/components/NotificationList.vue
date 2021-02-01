@@ -50,7 +50,6 @@ $notifications-margin: 20px;
 	}
 }
 
-
 /* Notification transition animations */
 .notification-enter-active {
 	transition: transform .5s .1s, opacity .5s .1s, max-height .5s, margin-bottom .5s;
@@ -68,7 +67,7 @@ $notifications-margin: 20px;
 }
 
 .notification-enter-to, .notification-leave {
-	max-height: 80px;
+	max-height: 87px;
 	margin-bottom: 10px;
 }
 </style>

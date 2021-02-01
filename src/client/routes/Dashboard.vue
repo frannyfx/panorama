@@ -28,7 +28,7 @@ import { getProfile, getRepositories } from "../modules/GitHub";
 import Repository from "../components/Repository.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import { waitForAuth } from "../modules/API";
-import { createAlert } from "../modules/Notifications";
+import { addNotification, createAlert } from "../modules/Notifications";
 
 export default Vue.extend({
 	components: {
@@ -37,7 +37,18 @@ export default Vue.extend({
 	},
 	methods: {
 		testNotifications() {
-			createAlert("INFO", "Test notification.", "This is the notification's content.");
+			//createAlert("INFO", "Test notification.", "This is the notification's content.");
+			addNotification({
+				type: "PROGRESS",
+				icon: ["fab", "github"],
+				title: "Processing repo frannyfx/ether",
+				description: "",
+				dismissable: false,
+				progress: {
+					value: 0.3,
+					status: "Cloning repo..."
+				}
+			});
 		}
 	},
 	async beforeRouteEnter (to, from, next) {
