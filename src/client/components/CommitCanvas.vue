@@ -70,7 +70,10 @@ export default Vue.extend({
 			this.visibilitySwitchTimeout = setTimeout(() => {
 				console.log(`Commit canvas is ${newValue ? '' : 'not '}visible.`);
 				this.shouldDraw = newValue;
-				if (this.shouldDraw) requestAnimationFrame(ts => this.draw(ts));
+				if (this.shouldDraw) {
+					this.lastTs = undefined;
+					requestAnimationFrame(ts => this.draw(0));	
+				}
 			}, newValue ? 0 : 1500);
 			
 		}
