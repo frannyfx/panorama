@@ -8,6 +8,7 @@ import { Method } from "../../shared/Method";
 import { Response, isResponse } from "../../shared/Response";
 import Store from "../store";
 import { getProfile } from "./GitHub";
+import { createAlert } from "./Notifications";
 
 // Interfaces
 interface Params {
@@ -49,9 +50,8 @@ export async function performAuth() {
 	let clientIdResponse : Response = await send(Method.GET, "/github/client-id");
 	if (clientIdResponse.status.ok) Store.commit("setClientId", clientIdResponse.result?.clientId);
 	else {
-		// TODO: Show error.
-		console.warn("Unable to retrieve client ID.");
-		return;
+		setNotAuthenticated();
+		return createAlert("WARNING", "Something went wrong.", "Please try to sign in again later.");
 	}
 
 	// Load cached auth info.
@@ -112,6 +112,7 @@ export function saveAccessToken(accessToken: string) {
  * Remove saved access token.
  */
 export function clearAuthenticationData() {
+	// TODO: Clear the entire store of data.
 	Store.commit("setAccessToken", "");
 	Store.commit("setAuthStatus", false);
 

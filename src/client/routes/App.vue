@@ -20,7 +20,7 @@
 			<navbar v-if="navbarVisible"/>
 		</transition>
 		<transition name="credits">
-			<div class="credits" v-show="$route.name == 'sign-in'">
+			<div class="credits no-select" v-show="$route.name == 'sign-in'">
 				<p>
 					<span>frannyfx &copy; 2021</span>
 					<span>&bull;</span>
@@ -30,6 +30,7 @@
 				</p>
 			</div>
 		</transition>
+		<notification-list/>
 	</div>
 </template>
 <script lang="ts">
@@ -41,6 +42,7 @@ import Spinner from "../components/Spinner.vue";
 import CommitCanvas from "../components/CommitCanvas.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Navbar from "../components/Navbar.vue";
+import NotificationList from "../components/NotificationList.vue";
 
 // Modules
 import { performAuth } from "../modules/API";
@@ -50,7 +52,8 @@ export default Vue.extend({
 		Spinner,
 		CommitCanvas,
 		FontAwesomeIcon,
-		Navbar
+		Navbar,
+		NotificationList
 	},
 	computed: {
 		navbarVisible() : boolean {

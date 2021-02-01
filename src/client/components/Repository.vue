@@ -8,7 +8,7 @@
 				<span class="name">{{repo.name}}</span>
 			</div>
 			<div class="subtitle">
-				Last updated <span class="strong">{{updatedAt}}</span>.
+				Last updated <span class="strong">{{updatedAt}}</span>
 			</div>
 		</div>
 		<div class="contributors hide-small">

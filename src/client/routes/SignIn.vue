@@ -1,5 +1,5 @@
 <template>
-	<div class="page center">		
+	<div class="page center no-select">		
 		<div class="content">
 			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
 			<button @click="signIn" class="transparent blur" :disabled="$store.state.auth.status || $store.state.auth.clientId == ''">
@@ -23,6 +23,7 @@ import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
 import { getProfile, getRedirectURI } from '../modules/GitHub';
+import { createAlert } from "../modules/Notifications";
 
 export default Vue.extend({
 	components: {
@@ -34,16 +35,13 @@ export default Vue.extend({
 			popup: {
 				window: null as Window | null,
 				width: 450,
-				height: 820
+				height: 820,
 			} 
 		};
 	},
 	methods: {
 		async signIn() {
 			// Navigate to dashboard.
-			//this.$store.commit("setLoading", true);
-			//this.$router.replace({ name: "test" });
-			
 			this.popup.window = window.open(
 				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
 				"GitHub Authentication",
@@ -61,29 +59,27 @@ export default Vue.extend({
 			if (isResult(event.data)) result = event.data;
 			if (result == undefined) return;
 
+			// If authentication was not successful, show alert.
+			if (!result.status.ok) return createAlert("INFO", "You did not sign in.", "Please sign in with GitHub to use Panorama.");
+
 			// If successful, save the data.
-			if (result.status.ok) {
-				saveAccessToken(result.result?.accessToken);
+			saveAccessToken(result.result?.accessToken);
 
-				// Fetch initial data.
-				this.$store.commit("setAuthStatus", true);
-				
-				// Retrieve user data.
-				let profileResult = await getProfile();
+			// Fetch initial data.
+			this.$store.commit("setAuthStatus", true);
+			
+			// Retrieve user data.
+			let profileResult = await getProfile();
 
-				// Save user data to store.
-				this.$store.commit("setUser", profileResult.result);
+			// Save user data to store.
+			this.$store.commit("setUser", profileResult.result);
 
-				// If unable to retrieve user data, show error.
-				if (!profileResult.status.ok) {
-					// ...
-					return;
-				}
+			// If unable to retrieve user data, show error.
+			if (!profileResult.status.ok) return createAlert("WARNING", "Unable to fetch your profile.", "Something went wrong. Please try again later.");
 
-				// Navigate to dashboard.
-				this.$store.commit("setLoading", true);
-				this.$router.replace({ name: "dashboard" });
-			}
+			// Navigate to dashboard.
+			this.$store.commit("setLoading", true);
+			this.$router.replace({ name: "dashboard" });
 		}
 	},
 	async beforeRouteEnter (to, from, next) {

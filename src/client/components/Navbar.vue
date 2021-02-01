@@ -1,5 +1,5 @@
 <template>
-	<div class="navbar">
+	<div class="navbar no-select">
 		<div class="container nav-inner">
 			<a @click="navigateToDashboard" class="title">
 				<font-awesome-icon icon="eye"/>

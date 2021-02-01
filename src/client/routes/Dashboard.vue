@@ -1,5 +1,5 @@
 <template>
-	<div class="page nav">
+	<div class="page nav no-select">
 		<div class="content container">
 			<h2>Activity</h2>
 			<div class="activities">
@@ -11,6 +11,8 @@
 			<div class="repos">
 				<repository v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
 			</div>
+			<h2>Test</h2>
+			<a @click="testNotifications">Test notifications</a>
 		</div>
 	</div>
 </template>
@@ -26,11 +28,17 @@ import { getProfile, getRepositories } from "../modules/GitHub";
 import Repository from "../components/Repository.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import { waitForAuth } from "../modules/API";
+import { createAlert } from "../modules/Notifications";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
 		Repository
+	},
+	methods: {
+		testNotifications() {
+			createAlert("INFO", "Test notification.", "This is the notification's content.");
+		}
 	},
 	async beforeRouteEnter (to, from, next) {
 		// Prevent loading if auth is invalid.

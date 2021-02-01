@@ -10,7 +10,7 @@
 		"resolveJsonModule": true,
 		"paths": {
 			"v-tooltip": [
-				"./src/client/lib/vtooltip.d.ts"
+				"./src/client/definitions/v-tooltip.d.ts"
 			]
 		}
 	},
@@ -20,6 +20,6 @@
 		"src/shared/**/*"
 	],
 	"files": [
-		"src/client/vue-shim.d.ts"
+		"src/client/definitions/vue-shim.d.ts"
 	],
 }

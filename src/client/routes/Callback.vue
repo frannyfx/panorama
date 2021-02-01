@@ -12,7 +12,7 @@
 				<p class="animate-height subtitle" v-show="status != null">
 					<font-awesome-icon :icon="status ? 'check-circle' : 'exclamation-circle'"/>
 					<span>
-						{{status ? "You have successfully logged in." : "Something went wrong. Please try again later."}}
+						{{status ? "Signed in." : "Not signed in."}}
 					</span>
 				</p>
 			</transition>
@@ -32,6 +32,7 @@ import { send, formatURL } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { Result, buildResult } from '../../shared/Result';
+import { sleep } from '../../shared/utils';
 
 export default Vue.extend({
 	components: {
@@ -56,23 +57,18 @@ export default Vue.extend({
 
 			// Return the access token data.
 			return buildResult(true, accessTokenResponse.result);
-		},
-		sleep(time: number) : Promise<void> {
-			return new Promise(resolve => {
-				setTimeout(resolve, time);
-			});
 		}
 	},
-	mounted: async function() {
-		// Wait to start for HCI reasons.
-		await this.sleep(1000);
-		
+	mounted: async function() {	
+		// Wait for HCI reasons.
+		await sleep(800);
+
 		// Get access token and set status.
 		let accessToken = await this.getAccessToken();
 		this.status = accessToken.status.ok;
 
 		// Wait so the user understands what's happening.
-		await this.sleep(2000);
+		await sleep(2000);
 
 		// Post the result and close.
 		window.opener.postMessage(accessToken);
@@ -104,6 +100,7 @@ export default Vue.extend({
 		font-size: 0.8em;
 		display: flex;
 		align-items: center;
+		justify-content: center;
 
 		svg {
 			margin-right: 8px;
