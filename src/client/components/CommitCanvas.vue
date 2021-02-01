@@ -72,7 +72,7 @@ export default Vue.extend({
 				this.shouldDraw = newValue;
 				if (this.shouldDraw) {
 					this.lastTs = undefined;
-					requestAnimationFrame(ts => this.draw(0));	
+					requestAnimationFrame(() => this.draw(0));	
 				}
 			}, newValue ? 0 : 1500);
 			
