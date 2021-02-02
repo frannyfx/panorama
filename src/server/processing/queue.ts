@@ -25,6 +25,20 @@ export interface RepoJobResult {
 	result: number
 }
 
+export interface RepoJobProgress {
+	value: number,
+	stage: AnalysisStage
+}
+
+export enum AnalysisStage {
+	Starting,
+	Cloning,
+	Lexing,
+	Processing,
+	Finalising,
+	Done
+};
+
 // Connection and queue
 var redisClient : RedisClient | null = null;
 var repoQueue : Queue<RepoJob> | null = null;

@@ -116,6 +116,7 @@ async function initialiseCache() {
 		table.string("name");
 		table.string("path");
 		table.dateTime("updated_at");
+		table.dateTime("analysed_at");
 		table.integer("size");
 
 		// Add keys and indexes.
@@ -141,14 +142,6 @@ export async function start() {
 	// Connect to manifest.
 	let connection = await getConnection();
 	if (!connection) return;
-
-	/*await connection("Repository").insert({
-		id: 1,
-		name: "frannyfx/ether",
-		path: "test",
-		updated_at: Date.now(),
-		size: 103
-	});*/
 }
 
 /**
