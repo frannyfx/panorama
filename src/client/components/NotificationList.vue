@@ -16,7 +16,7 @@ export default Vue.extend({
 	},
 	computed: {
 		hasNavbar() {
-			return this.$route.name == "dashboard";
+			return this.$route.name == "dashboard" || this.$route.name == "repo";
 		}
 	}
 })

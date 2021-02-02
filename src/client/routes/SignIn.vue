@@ -78,12 +78,17 @@ export default Vue.extend({
 			if (!profileResult.status.ok) return createAlert("WARNING", "Unable to fetch your profile.", "Something went wrong. Please try again later.");
 
 			// Navigate to dashboard.
-			this.$store.commit("setLoading", true);
 			this.$router.replace({ name: "dashboard" });
 		}
 	},
 	async beforeRouteEnter (to, from, next) {
+		// Wait for initial auth.
 		await waitForAuth();
+
+		// Set loading.
+		if (!Store.state.auth.loaded) Store.commit("setLoading", true);
+
+		// If we're authenticated, redirect to dashboard.
 		if (Store.state.auth.status) return next({ name: "dashboard"});
 		next(vm => {
 			vm.$store.commit("setLoading", false);

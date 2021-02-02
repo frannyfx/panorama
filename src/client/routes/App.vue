@@ -57,7 +57,7 @@ export default Vue.extend({
 	},
 	computed: {
 		navbarVisible() : boolean {
-			return this.$route.name == "dashboard";
+			return this.$route.name == "dashboard" || this.$route.name == "repo";
 		}
 	},
 	methods: { },

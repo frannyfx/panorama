@@ -20,6 +20,7 @@ Icons;
 const SignIn = () => import(/* webpackChunkName: "sign-in" */ /* webpackMode: "lazy" */ "../routes/SignIn.vue");
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ /* webpackMode: "lazy" */  "../routes/Dashboard.vue");
 const Test = () => import(/* webpackChunkName: "test" */ /* webpackMode: "lazy" */  "../routes/Test.vue");
+const Repository = () => import(/* webpackChunkName: "repository" */ /* webpackMode: "lazy" */ "../routes/Repository.vue");
 
 // Set up plugins.
 Vue.use(VueRouter);
@@ -48,6 +49,10 @@ const routes = [{
 	path: "/test",
 	component: Test,
 	name: "test"
+}, {
+	path: "/repo/:owner/:repo",
+	component: Repository,
+	name: "repo"
 }];
 
 const router = new VueRouter({

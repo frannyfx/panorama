@@ -9,7 +9,7 @@
 			</div>
 			<h2>Repositories</h2>
 			<div class="repos">
-				<repository v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
+				<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
 			</div>
 			<h2>Test</h2>
 			<a @click="testAlert">Test alert</a>
@@ -26,15 +26,16 @@ import Store from "../store";
 import { getProfile, getRepositories } from "../modules/GitHub";
 
 // Components
-import Repository from "../components/Repository.vue";
+import RepositoryListItem from "../components/RepositoryListItem.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import { waitForAuth } from "../modules/API";
 import { addNotification, createAlert } from "../modules/Notifications";
+import { Repository } from "../modules/models/Repository";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
-		Repository
+		RepositoryListItem
 	},
 	methods: {
 		testAlert() {
@@ -53,6 +54,10 @@ export default Vue.extend({
 					status: "Cloning repo..."
 				}
 			});
+		},
+		getRepo(repo: Repository) {
+			console.log("Getting repo...", repo);
+			this.$router.push({ name: "repo", params: { owner: repo.owner.login, repo: repo.name}});
 		}
 	},
 	async beforeRouteEnter (to, from, next) {
@@ -62,10 +67,17 @@ export default Vue.extend({
 			name: "sign-in"
 		});
 
-		// Load repos and navigate.
-		let repos = await getRepositories();
+		// Load repos if they have not yet been loaded.
+		var repos : Repository[] | null = null;
+		if (!Store.state.repos.loaded) {
+			// Set loading and load repos.
+			Store.commit("setLoading", true);	
+			repos = await getRepositories();
+		}
+		
+		// Navigate.
 		next(vm => {
-			vm.$store.commit("setRepositories", repos);
+			if (repos) vm.$store.commit("setRepositories", repos);
 			vm.$store.commit("setLoading", false);
 		});
 	},
