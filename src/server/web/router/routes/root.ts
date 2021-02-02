@@ -6,6 +6,7 @@
 // Imports
 import fs from "fs";
 import path from "path";
+import Joi from "joi";
 
 // Config
 import loadConfig, { Config } from "../../../Config";
@@ -15,6 +16,7 @@ const config : Config = loadConfig();
 import getRoot from "../../../utils/root";
 import { Method } from "../../../../shared/Method";
 import { Route } from "../Route";
+
 
 /**
  * Return the homepage so Vue history mode works with all pages.
@@ -34,6 +36,16 @@ let routes : Array<Route> = [{
 }, {
 	method: Method.GET,
 	url: "/dashboard",
+	handler: getIndex
+}, {
+	method: Method.GET,
+	url: "/repo/:owner/:repo",
+	schemas: {
+		params: Joi.object({
+			owner: Joi.string(),
+			repo: Joi.string()
+		})
+	},
 	handler: getIndex
 }];
 
