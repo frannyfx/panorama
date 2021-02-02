@@ -161,7 +161,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	}
 
 	reportJobProgress(job, AnalysisStage.Lexing);
-	console.log("lol");
+	// ...
 
 	done(null, {
 		result: 12345
