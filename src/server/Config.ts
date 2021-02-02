@@ -39,7 +39,7 @@ export interface Config {
 	redis: {
 		url: string						// URL to connect to Redis server.
 	},
-	processing: {
+	analysis: {
 		cache: {
 			dir: string,				// Caching directory.
 			manifestFilename: string,	// SQLite manifest file name.

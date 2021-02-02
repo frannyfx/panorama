@@ -17,8 +17,8 @@ const logger = require("../../utils/logger")("cache_db");
 import getRoot from "../../utils/root";
 
 // Constants
-const cacheDir = path.join(getRoot(), config.processing.cache.dir);
-const manifestFilename = path.join(cacheDir, config.processing.cache.manifestFilename);
+const cacheDir = path.join(getRoot(), config.analysis.cache.dir);
+const manifestFilename = path.join(cacheDir, config.analysis.cache.manifestFilename);
 
 // Variables
 var manifestConnection : knex | null = null;

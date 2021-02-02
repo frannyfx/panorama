@@ -16,7 +16,7 @@ import { Method } from "../../../../../../shared/Method";
 import { Request, Route } from "../../../Route";
 import { SocketStream } from "fastify-websocket";
 import { Data } from "../../../../../../shared/Result";
-import queue from "../../../../../processing/queue";
+import queue from "../../../../../analysis/queue";
 import ticket, { TicketVerificationResult } from "../../../../../crypto/ticket";
 import { buildResponse, Codes } from "../../../API";
 import { checkAuth } from "../../../../../github";

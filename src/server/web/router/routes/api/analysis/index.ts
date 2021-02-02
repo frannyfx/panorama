@@ -1,5 +1,5 @@
 /**
- * @file Routes handling requests to process repositories.
+ * @file Routes handling requests to analyse repositories.
  * @author Francesco Compagnoni
  */
 
@@ -17,8 +17,8 @@ const config : Config = loadConfig();
 import { Method } from "../../../../../../shared/Method";
 import { Request, Route } from "../../../Route";
 import { Codes, send } from "../../../API";
-import queue from "../../../../../processing/queue";
-import cache from "../../../../../processing/cache";
+import queue from "../../../../../analysis/queue";
+import cache from "../../../../../analysis/cache";
 import { getRepository, Repository } from "../../../../../github";
 import ticket from "../../../../../crypto/ticket";
 
@@ -57,6 +57,8 @@ let route : Array<Route> = [{
 				jobId: job.id,
 				accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex")
 			});
+
+			// TODO: Handle failed job ticket generation.
 
 			// Send ID.
 			send(response, Codes.OK, {

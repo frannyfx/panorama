@@ -21,7 +21,7 @@
 			"lexing/langs"
 		]
 	},
-	"processing": {
+	"analysis": {
 		"cache": {
 			"dir": "panorama_data/caches/repos",
 			"manifestFilename": "manifest.db",

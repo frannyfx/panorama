@@ -1,5 +1,5 @@
 /**
- * @file Repository processing system.
+ * @file Repository analysis system.
  * @author Francesco Compagnoni
  */
 
@@ -14,7 +14,7 @@ import loadConfig, { Config } from "../Config";
 const config : Config = loadConfig();
 
 // Modules
-const logger = require("../utils/logger")("repo_prc");
+const logger = require("../utils/logger")("analysis");
 import cache, { getCacheDir, getRepository, insertRepository } from "./cache";
 import queue, { AnalysisStage, RepoJob, RepoJobProgress, RepoJobResult } from "./queue";
 import { buildResult, Result } from "../../shared/Result";
@@ -111,7 +111,7 @@ async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
 }
 
 /**
- * Handler for processing a queued repository.
+ * Handler for analysing a queued repository.
  * @param job The job queued and the repository's data.
  * @param done Callback for when the job is complete.
  */

@@ -17,7 +17,7 @@ import getRoot from "../../utils/root";
 import manifest from "./manifest";
 
 // Constants
-const cacheDir = path.join(getRoot(), config.processing.cache.dir);
+const cacheDir = path.join(getRoot(), config.analysis.cache.dir);
 
 // Interfaces
 export interface CacheRepository {

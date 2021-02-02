@@ -45,7 +45,7 @@ export default Vue.extend({
 			addNotification({
 				type: "PROGRESS",
 				icon: ["fab", "github"],
-				title: "Processing repo frannyfx/ether",
+				title: "Analysing repo frannyfx/ether...",
 				description: "",
 				dismissable: false,
 				expiry: false,
