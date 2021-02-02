@@ -127,6 +127,8 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	// Cache miss, we have to clone the repo.
 	var clonedRepository : Git.Repository | null = null;
 	if (!cachedRepository) {
+		logger.info(`Repository '${job.data.repository.name}' not found in cache. Cloning...`);
+
 		// Clone the repository.
 		let cloneResult = await cloneRepository(job);
 
@@ -149,6 +151,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		// Set repository.
 		clonedRepository = cloneResult.result!.repository;
 	} else {
+		logger.info(`Repository '${job.data.repository.name}' found in cache. Updating...`);
 		// Repo already cached, open it.
 		clonedRepository = await Git.Repository.open(cachedRepository.path);
 
@@ -161,7 +164,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	}
 
 	reportJobProgress(job, AnalysisStage.Lexing);
-	// ...
+	logger.info(`Lexing code from repository '${job.data.repository.name}'.`);
 
 	done(null, {
 		result: 12345
