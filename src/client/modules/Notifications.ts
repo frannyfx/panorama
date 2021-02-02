@@ -5,6 +5,7 @@
 
 // Imports
 import Store from "../store";
+import Notifications from "../store/modules/notifications";
 
 // Interfaces
 export interface NotificationData {
@@ -13,6 +14,7 @@ export interface NotificationData {
 	title: string,
 	description: string,
 	dismissable: boolean,
+	expiry: boolean,
 	progress?: {
 		value: number,
 		status: string
@@ -23,15 +25,23 @@ export interface Notification {
 	id: string,
 	expiry: {
 		enabled: boolean,
-		status: "NORMAL" | "FADING" | "EXPIRED",
-		fadeTs: number,
-		expiryTs: number
+		status: "NORMAL" | "FADING" | "EXPIRED"
 	},
+	removed: boolean,
 	data: NotificationData
 };
 
 export interface NotificationObject {
 	[key: string]: Notification
+};
+
+export interface NotificationTimeouts {
+	fade?: NodeJS.Timeout,
+	expiry?: NodeJS.Timeout
+};
+
+export interface NotificationTimeoutsObject {
+	[key: string]: NotificationTimeouts
 };
 
 // Constants
@@ -45,7 +55,7 @@ const WARNING_ICON = ["fas", "exclamation-circle"];
 
 // Variables
 var notificationCounter = 0;
-var notificationTimeouts = {}; // TODO: Implement notifications fading.
+var notificationTimeouts : NotificationTimeoutsObject = {};
 
 /**
  * Add a notification to the store.
@@ -55,31 +65,23 @@ var notificationTimeouts = {}; // TODO: Implement notifications fading.
 export function addNotification(notificationData : NotificationData) : string {
 	// Create unique ID for the notification.
 	let notificationId = `notif_${notificationCounter++}`;
-	
-	// Generate expiry dates.
-	let creationDate = new Date();
-	let fadeTs = new Date(creationDate).getTime() + NOTIFICATION_FADE_BEGIN;
-	let expiryTs = new Date(creationDate).getTime() + NOTIFICATION_DURATION;
 
 	// Create notification.
 	let notification : Notification = {
 		id: notificationId,
 		expiry: {
-			enabled: true,
-			status: "NORMAL",
-			fadeTs,
-			expiryTs
+			enabled: notificationData.expiry,
+			status: "NORMAL"
 		},
+		removed: false,
 		data: notificationData
 	};
 
-	// Create timeouts.
-	// ...
-	//setTimeout(() => Store.commit("Notifications/setExpiryState", { id: notificationId, status: "FADING" }), NOTIFICATION_FADE_BEGIN);
-	//setTimeout(() => Store.commit("Notifications/setExpiryState", { id: notificationId, status: "EXPIRED" }), NOTIFICATION_DURATION);
-
-	console.log("Created notification", notification);
+	// Add to store.
 	Store.commit("Notifications/add", notification);
+
+	// Create timeouts.
+	toggleNotificationExpiry(notification, notification.expiry.enabled);
 	return notificationId;
 }
 
@@ -88,8 +90,20 @@ export function addNotification(notificationData : NotificationData) : string {
  * @param notification The notification to remove.
  */
 export function removeNotification(notification: Notification) {
-	console.log(notification);
+	// Clear the notification's timeouts.
+	let timeouts = notificationTimeouts[notification.id];
+	if (timeouts) {
+		console.log("Clearing timeouts for", notification.id, timeouts);
+		if (timeouts.fade) clearTimeout(timeouts.fade);
+		if (timeouts.expiry) clearTimeout(timeouts.expiry);
+		delete notificationTimeouts[notification.id];
+	}
+	
+	// Remove the notification.
 	Store.commit("Notifications/remove", notification);
+
+	// Lazy delete the notification data.
+	setTimeout(() => Store.commit("Notifications/deleteData", notification), 5000);
 }
 
 /**
@@ -105,6 +119,36 @@ export function createAlert(type: "INFO" | "WARNING", title: string, description
 		icon,
 		title,
 		description,
-		dismissable: true
+		dismissable: true,
+		expiry: true
 	});
+}
+
+export function toggleNotificationExpiry(notification: Notification, enabled: boolean) {
+	// Prevent accidental re-enabling of the notification by checking the removed flag.
+	// This would be triggered by the mouse leaving the notification component in Vue after deletion.
+	if (notification.removed) return;
+	
+	// Get the notification timeouts.
+	var timeouts : NotificationTimeouts = notificationTimeouts[notification.id];
+	if (!timeouts) timeouts = {
+		fade: undefined,
+		expiry: undefined
+	};	
+
+	// Clear previous timeouts to prevent duplicates.
+	if (timeouts.fade) clearTimeout(timeouts.fade);
+	if (timeouts.expiry) clearTimeout(timeouts.expiry);
+
+	// Re-enable the timeouts.
+	if (enabled) {
+		timeouts.fade = setTimeout(() => Store.commit("Notifications/setExpiryStatus", { id: notification.id, status: "FADING" }), NOTIFICATION_FADE_BEGIN);
+		timeouts.expiry = setTimeout(() => removeNotification(notification), NOTIFICATION_DURATION);
+	} else Store.commit("Notifications/setExpiryStatus", { id: notification.id, status: "NORMAL" });
+
+	// Update the notification in the store.
+	if (enabled != notification.expiry.enabled) Store.commit("Notifications/setExpiryEnabled", { id: notification.id, enabled });
+
+	// Set it back in the object.
+	notificationTimeouts[notification.id] = timeouts;
 }

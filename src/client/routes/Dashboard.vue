@@ -12,7 +12,8 @@
 				<repository v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
 			</div>
 			<h2>Test</h2>
-			<a @click="testNotifications">Test notifications</a>
+			<a @click="testAlert">Test alert</a>
+			<a @click="testProgress">Test progress notification</a>
 		</div>
 	</div>
 </template>
@@ -36,14 +37,17 @@ export default Vue.extend({
 		Repository
 	},
 	methods: {
-		testNotifications() {
-			//createAlert("INFO", "Test notification.", "This is the notification's content.");
+		testAlert() {
+			createAlert("INFO", "Test notification.", "This is the notification's content.");
+		},
+		testProgress() {
 			addNotification({
 				type: "PROGRESS",
 				icon: ["fab", "github"],
 				title: "Processing repo frannyfx/ether",
 				description: "",
 				dismissable: false,
+				expiry: false,
 				progress: {
 					value: 0.3,
 					status: "Cloning repo..."

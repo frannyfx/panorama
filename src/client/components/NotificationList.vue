@@ -67,7 +67,7 @@ $notifications-margin: 20px;
 }
 
 .notification-enter-to, .notification-leave {
-	max-height: 87px;
+	max-height: 88px;
 	margin-bottom: 10px;
 }
 </style>

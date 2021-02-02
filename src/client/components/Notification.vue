@@ -1,13 +1,14 @@
 <template>
 	<div class="notification no-select" :class="{ 'dragging': down && deltaX != 0 }">
-		<div class="notification-content" :style="{'transform': `translateX(${deltaX}px)`}" :class="{ 'elastic': !down }"
-			@mousedown="(e) => dragstart(e.clientX)"
+		<div class="notification-content" :style="{'transform': `translateX(${deltaX}px)`}" :class="{ 'elastic': !down, 'fading': notification.expiry.status == 'FADING' }"
+			@mousedown="(e) => e.button == 0 ? dragstart(e.clientX) : null"
 			@mousemove="(e) => drag(e.clientX)"
 			@mouseup="(e) => dragend(e.clientX)"
-			@mouseleave="(e) => dragend(e.clientX)"
+			@mouseleave="(e) => { dragend(e.clientX); toggleExpiry(true) }"
 			@touchstart="touchstart"
 			@touchmove="touchmove"
-			@touchend="touchend">
+			@touchend="touchend"
+			@mouseenter="() => toggleExpiry(false)">
 			<div class="icon">
 				<font-awesome-icon :icon="notification.data.icon"/>
 			</div>
@@ -50,11 +51,11 @@ import Vue, { PropType } from "vue";
 
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { Notification, removeNotification } from "../modules/Notifications";
+import { Notification, removeNotification, toggleNotificationExpiry } from "../modules/Notifications";
 
 // Constants
 const MAX_RUBBER_DELTA = 80; // The maximum distance a user can drag the notification in the wrong direction.
-const MIN_SWIPE_DELTA = 80;
+const MIN_SWIPE_DELTA = 80; // The minimum distance a user needs to swipe the notification before it should be dismissed.
 
 export default Vue.extend({
 	components: {
@@ -95,10 +96,7 @@ export default Vue.extend({
 			}
 
 			let deltaX = clientX ? clientX - this.startX : this.deltaX;
-			if (deltaX > MIN_SWIPE_DELTA) {
-				console.log("Removing notification", this.notification.id);
-				this.remove();
-			}
+			if (deltaX > MIN_SWIPE_DELTA) this.remove();
 
 			this.down = false;
 			this.startX = 0;
@@ -112,6 +110,10 @@ export default Vue.extend({
 		},
 		touchend(e: TouchEvent) {
 			this.dragend();
+		},
+		toggleExpiry(enabled: boolean) {
+			if (!this.notification.data.expiry) return;
+			toggleNotificationExpiry(this.notification, enabled);
 		}
 	},
 	props: {
@@ -128,12 +130,12 @@ export default Vue.extend({
 	border-radius: 16px;
 	background-color: rgba(white, .7);
 	color: black;
-	box-shadow: 0px 2px 10px rgba(black, .2);
+	box-shadow: 0px 4px 15px rgba(black, .2);
 	backdrop-filter: blur(10px) saturate(150%);
 	-webkit-backdrop-filter: blur(10px) saturate(150%);
 
 	width: 100%;
-	height: auto;
+	height: 88px;
 	box-sizing: border-box;
 	padding: 20px 25px;
 
@@ -142,9 +144,22 @@ export default Vue.extend({
 	align-items: center;
 	justify-content: flex-start;
 	cursor: pointer;
+	transition: opacity 2s;
 
 	&.elastic {
-		transition: transform .3s;
+		transition: transform .3s, opacity 2s;
+	}
+
+	&.fading {
+		opacity: 0;
+	}
+
+	&:hover {
+		transition: opacity .3s;
+
+		&.elastic {
+			transition: opacity .3s, transform .3s;
+		}
 	}
 
 	> :not(:last-child) {
@@ -159,7 +174,6 @@ export default Vue.extend({
 
 	> .content {
 		flex-grow: 1;
-		height: 100%;
 		
 		.title {
 			font-size: .85em;
@@ -175,7 +189,8 @@ export default Vue.extend({
 			font-weight: 400;
 
 			.progress-container {
-				margin-top: 5px;
+				margin-top: 6px;
+
 				.progress-bar {
 					width: 100%;
 					height: 5px;
@@ -188,7 +203,6 @@ export default Vue.extend({
 						transition: width 1s;
 						height: 100%;
 						border-radius: 5px;
-
 						background-color: $blue;
 					}
 				}
@@ -219,8 +233,8 @@ export default Vue.extend({
 		box-shadow: 0px 2px 10px rgba(black, .2);
 		color: rgba(black, .6);
 		font-size: 10px;
-		backdrop-filter: blur(5px) saturate(150%);
-		-webkit-backdrop-filter: blur(5px) saturate(150%);
+		backdrop-filter: blur(15px) saturate(150%);
+		-webkit-backdrop-filter: blur(15px) saturate(150%);
 		cursor: pointer;
 
 		display: flex;
@@ -238,7 +252,7 @@ export default Vue.extend({
 			transition: opacity .3s, background-color .1s, color .1s, transform .1s;
 			color: rgba(white, .6);
 			transform: scale(.95);
-			background-color: rgba(black, .7);
+			background-color: rgba(black, .4);
 		}
 	}
 
