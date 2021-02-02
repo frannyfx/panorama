@@ -71,6 +71,10 @@ export async function getRepository(id: number) : Promise<CacheRepository | null
 	return result[0];
 }
 
+/**
+ * Insert a repository into the cache manifest.
+ * @param repository The repository to insert.
+ */
 export async function insertRepository(repository: CacheRepository) : Promise<boolean> {
 	// Get the manifest connection.
 	let connection = await manifest.getConnection();

@@ -20,7 +20,7 @@ import queue, { AnalysisStage, RepoJob, RepoJobProgress, RepoJobResult } from ".
 import { buildResult, Result } from "../../shared/Result";
 
 /**
- * 
+ * Start the analysis system.
  */
 export async function start() {
 	// Initialise caching system.
@@ -38,9 +38,17 @@ export async function start() {
 }
 
 /**
- * 
- * @param job 
- * @param progressStage 
+ * Stop the analysis system.
+ */
+export async function stop() {
+	await queue.stop();
+	await cache.stop();
+}
+
+/**
+ * Report progress for a specific job.
+ * @param job The job.
+ * @param progressStage The current stage of analysis.
  */
 function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage) {
 	// Create progress object.
@@ -78,8 +86,8 @@ function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage) {
 }
 
 /**
- * 
- * @param job 
+ * Clone a repository and return the repository object and the path where it was cloned.
+ * @param job The job the repository is from.
  */
 async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
 	try {
@@ -116,7 +124,7 @@ async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
  * @param done Callback for when the job is complete.
  */
 export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) {
-	logger.info(`Analysing repository '${job.data.repository.name}' with access token '${job.data.access_token.substr(0, 10)}'...`);
+	logger.info(`Analysing repository '${job.data.repository.name}'.`);
 
 	// Report progress that the job is starting.
 	reportJobProgress(job, AnalysisStage.Starting);
@@ -127,7 +135,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	// Cache miss, we have to clone the repo.
 	var clonedRepository : Git.Repository | null = null;
 	if (!cachedRepository) {
-		logger.info(`Repository '${job.data.repository.name}' not found in cache. Cloning...`);
+		logger.info(`Repository '${job.data.repository.name}' not found in cache.`);
 
 		// Clone the repository.
 		let cloneResult = await cloneRepository(job);
@@ -151,7 +159,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		// Set repository.
 		clonedRepository = cloneResult.result!.repository;
 	} else {
-		logger.info(`Repository '${job.data.repository.name}' found in cache. Updating...`);
+		logger.info(`Repository '${job.data.repository.name}' found in cache.`);
 		// Repo already cached, open it.
 		clonedRepository = await Git.Repository.open(cachedRepository.path);
 
@@ -169,14 +177,6 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	done(null, {
 		result: 12345
 	});
-}
-
-/**
- * 
- */
-export async function stop() {
-	await queue.stop();
-	await cache.stop();
 }
 
 export default {
