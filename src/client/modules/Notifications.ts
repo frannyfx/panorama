@@ -93,7 +93,6 @@ export function removeNotification(notification: Notification) {
 	// Clear the notification's timeouts.
 	let timeouts = notificationTimeouts[notification.id];
 	if (timeouts) {
-		console.log("Clearing timeouts for", notification.id, timeouts);
 		if (timeouts.fade) clearTimeout(timeouts.fade);
 		if (timeouts.expiry) clearTimeout(timeouts.expiry);
 		delete notificationTimeouts[notification.id];
