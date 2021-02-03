@@ -23,7 +23,6 @@ function setI18nLanguage(lang : string) {
  */
 export async function loadLanguageAsync(lang : string) {
 	// Resolve immediately if the language requested has already been loaded.
-	console.log(i18n.locale, i18n.messages);
 	if (i18n.locale == lang || loadedLanguages.includes(lang)) return setI18nLanguage(lang);
 	
 	// Load the desired locale.
