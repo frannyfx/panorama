@@ -98,8 +98,7 @@ export async function removeRepository(id: number) : Promise<boolean> {
 
 	// Remove item.
 	try {
-		let result = await connection("Repository").where({ id }).del();
-		console.log(result);
+		await connection("Repository").where({ id }).del();
 		logger.info(`Removed repository ${ id } from the cache.`);
 		return true;
 	} catch (e) {

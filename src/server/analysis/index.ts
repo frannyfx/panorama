@@ -137,9 +137,16 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 
 			return repository;
 		} catch (e) {
-			// Remove repository from cache & filesystem and continue with attempting to clone it.
+			// Remove repository from cache.
 			logger.warn(`Failed to open repository ${job.data.repository.id}. Removing and cloning...`);
-			await removeRepository(job.data.repository.id);
+
+			// If we couldn't remove the repository from the cache, fail.
+			if (!(await removeRepository(job.data.repository.id))) {
+				logger.warn(`Failed to remove repository ${job.data.repository.id} from cache.`);
+				return null;
+			}
+
+			// Remove from filesystem.
 			await fs.rmdir(cachedRepository.path, { recursive: true });
 		}
 	}
