@@ -25,6 +25,9 @@ import { isResult } from '../../shared/Result';
 import { getProfile, getRedirectURI } from '../modules/GitHub';
 import { createAlert } from "../modules/Notifications";
 
+// Modules
+import { i18n } from "../i18n";
+
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
@@ -92,7 +95,7 @@ export default Vue.extend({
 		if (!Store.state.auth.loaded) Store.commit("setLoading", true);
 
 		// If we're authenticated, redirect to dashboard.
-		if (Store.state.auth.status) return next({ name: "dashboard"});
+		if (Store.state.auth.status) return next({ name: "dashboard", params: { locale: i18n.locale } });
 		next(vm => {
 			vm.$store.commit("setLoading", false);
 		});

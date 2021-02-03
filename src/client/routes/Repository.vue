@@ -13,6 +13,7 @@ import Store from "../store";
 // Modules
 import { waitForAuth } from "../modules/API";
 import { sleep } from "../../shared/utils";
+import { i18n } from "../i18n";
 
 export default Vue.extend({
 	async beforeRouteEnter(to, from, next) {
@@ -22,7 +23,10 @@ export default Vue.extend({
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
 		if (!Store.state.auth.status) return next({
-			name: "sign-in"
+			name: "sign-in",
+			params: {
+				locale: i18n.locale
+			}
 		});
 
 		// Load repo...

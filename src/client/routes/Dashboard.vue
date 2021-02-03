@@ -24,6 +24,7 @@ import Store from "../store";
 
 // Modules
 import { getProfile, getRepositories } from "../modules/GitHub";
+import { i18n } from "../i18n";
 
 // Components
 import RepositoryListItem from "../components/RepositoryListItem.vue";
@@ -64,7 +65,10 @@ export default Vue.extend({
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
 		if (!Store.state.auth.status) return next({
-			name: "sign-in"
+			name: "sign-in",
+			params: {
+				locale: i18n.locale
+			}
 		});
 
 		// Load repos if they have not yet been loaded.
