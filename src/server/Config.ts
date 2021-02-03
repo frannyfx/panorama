@@ -33,9 +33,6 @@ export interface Config {
 		address: string,				// Address to bind to.
 		port: number					// Port to run the HTTP server on.
 	},
-	lexing: {
-		langDirs: Array<string>			// Directories to scan to find languages.
-	},
 	redis: {
 		url: string						// URL to connect to Redis server.
 	},
@@ -44,7 +41,10 @@ export interface Config {
 			dir: string,				// Caching directory.
 			manifestFilename: string,	// SQLite manifest file name.
 			sizeLimit: number			// Max cache size in MiB
-		}
+		},
+		lexing: {
+			langDirs: Array<string>			// Directories to scan to find languages.
+		},
 	},
 	crypto: {
 		keyDir: string					// The path where the private key is stored.

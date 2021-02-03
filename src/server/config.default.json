@@ -16,16 +16,16 @@
 		"clientId": "",
 		"clientSecret": ""
 	},
-	"lexing": {
-		"langDirs": [
-			"lexing/langs"
-		]
-	},
 	"analysis": {
 		"cache": {
 			"dir": "panorama_data/caches/repos",
 			"manifestFilename": "manifest.db",
 			"sizeLimit": 100000
+		},
+		"lexing": {
+			"langDirs": [
+				"analysis/lexing/langs"
+			]
 		}
 	},
 	"redis": {

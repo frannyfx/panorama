@@ -91,6 +91,22 @@ export async function insertRepository(repository: CacheRepository) : Promise<bo
 	}
 }
 
+export async function removeRepository(id: number) : Promise<boolean> {
+	// Get the manifest connection.
+	let connection = await manifest.getConnection();
+	if (!connection) return false;
+
+	// Remove item.
+	try {
+		let result = await connection("Repository").where({ id }).del();
+		console.log(result);
+		logger.info(`Removed repository ${ id } from the cache.`);
+		return true;
+	} catch (e) {
+		return false;
+	}
+}
+
 /**
  * Return the cache directory.
  */
