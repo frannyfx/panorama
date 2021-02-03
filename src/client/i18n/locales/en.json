@@ -1,0 +1,42 @@
+{
+	"general": {
+		"title": "Panorama",
+		"privacyPolicy": "Privacy Policy"
+	},
+	"routes": {
+		"callback": {
+			"title": "Signing in",
+			"signedIn": "Signed in.",
+			"notSignedIn": "Not signed in."
+		},
+		"dashboard": {
+			"title": "Dashboard",
+			"activity": "Activity",
+			"repositories": "Repositories",
+			"test": "Test"
+		},
+		"signIn": {
+			"title": "Sign in",
+			"signInWithGitHub": "Sign in with GitHub"
+		}
+	},
+	"alerts": {
+		"signInFailed": {
+			"title": "You did not sign in.",
+			"description": "Please sign in with GitHub to use Panorama."
+		},
+		"profileFetchFailed": {
+			"title": "Unable to fetch your profile.",
+			"description": "Something went wrong. Please try again later."
+		}
+	},
+	"components": {
+		"navbar": {
+			"signOut": "Sign out"
+		},
+		"repositoryListItem": {
+			"lastUpdated": "Last updated {0}.",
+			"noContributors": "No contributors."
+		}
+	}
+}

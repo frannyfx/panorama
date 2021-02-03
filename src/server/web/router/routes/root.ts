@@ -16,7 +16,7 @@ const config : Config = loadConfig();
 import getRoot from "../../../utils/root";
 import { Method } from "../../../../shared/Method";
 import { Route } from "../Route";
-
+import { getValidLocales } from "../..";
 
 /**
  * Return the homepage so Vue history mode works with all pages.
@@ -32,16 +32,33 @@ function getIndex(request: any, response: any) {
 let routes : Array<Route> = [{
 	method: Method.GET,
 	url: "/",
-	handler: getIndex
+	handler: (request, response) => {
+		response.redirect("/en");
+	}
 }, {
 	method: Method.GET,
-	url: "/dashboard",
-	handler: getIndex
-}, {
-	method: Method.GET,
-	url: "/repo/:owner/:repo",
+	url: "/:locale",
 	schemas: {
 		params: Joi.object({
+			locale: Joi.string().valid(...getValidLocales())
+		})
+	},
+	handler: getIndex
+}, {
+	method: Method.GET,
+	url: "/:locale/dashboard",
+	schemas: {
+		params: Joi.object({
+			locale: Joi.string().valid(...getValidLocales())
+		})
+	},
+	handler: getIndex
+}, {
+	method: Method.GET,
+	url: "/:locale/repo/:owner/:repo",
+	schemas: {
+		params: Joi.object({
+			locale: Joi.string().valid(...getValidLocales()),
 			owner: Joi.string(),
 			repo: Joi.string()
 		})

@@ -1,9 +1,9 @@
 <template>
 	<div class="page center no-select">		
 		<div class="content">
-			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
+			<h1 class="title"><font-awesome-icon icon="eye"/>{{ $t("general.title")}}</h1>
 			<button @click="signIn" class="transparent blur" :disabled="$store.state.auth.status || $store.state.auth.clientId == ''">
-				<font-awesome-icon :icon="['fab', 'github']"/>Sign in with GitHub
+				<font-awesome-icon :icon="['fab', 'github']"/>{{ $t("routes.signIn.signInWithGitHub") }}
 			</button>
 		</div>
 	</div>
@@ -41,9 +41,12 @@ export default Vue.extend({
 	},
 	methods: {
 		async signIn() {
+			// Get redirect URI with locale.
+			let redirectURI = getRedirectURI() + `/${this.$i18n.locale}`;
+
 			// Navigate to dashboard.
 			this.popup.window = window.open(
-				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
+				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${redirectURI}&scope=repo`,
 				"GitHub Authentication",
 				"menubar=no,location=no,resizable=no,scrollbars=no,status=no," + 
 				`width=${this.popup.width},height=${this.popup.height},` +
@@ -60,7 +63,7 @@ export default Vue.extend({
 			if (result == undefined) return;
 
 			// If authentication was not successful, show alert.
-			if (!result.status.ok) return createAlert("INFO", "You did not sign in.", "Please sign in with GitHub to use Panorama.");
+			if (!result.status.ok) return createAlert("INFO", this.$i18n.t("alerts.signInFailed.title").toString(), this.$i18n.t("alerts.signInFailed.description").toString());
 
 			// If successful, save the data.
 			saveAccessToken(result.result?.accessToken);
@@ -75,10 +78,10 @@ export default Vue.extend({
 			this.$store.commit("setUser", profileResult.result);
 
 			// If unable to retrieve user data, show error.
-			if (!profileResult.status.ok) return createAlert("WARNING", "Unable to fetch your profile.", "Something went wrong. Please try again later.");
+			if (!profileResult.status.ok) return createAlert("WARNING", this.$i18n.t("alerts.profileFetchFailed.title").toString(), this.$i18n.t("alerts.profileFetchFailed.description").toString());
 
 			// Navigate to dashboard.
-			this.$router.replace({ name: "dashboard" });
+			this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } });
 		}
 	},
 	async beforeRouteEnter (to, from, next) {

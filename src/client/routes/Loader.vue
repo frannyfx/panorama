@@ -19,8 +19,8 @@ export default Vue.extend({
 	mounted: async function() {
 		await waitForAuth();
 		await sleep(500);
-		if (!this.$store.state.auth.status) this.$router.replace({ name: "sign-in"});
-		else this.$router.replace({ name: "dashboard" });
+		if (!this.$store.state.auth.status) this.$router.replace({ name: "sign-in", params: { locale: this.$i18n.locale } });
+		else this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } });
 	}
 });
 </script>

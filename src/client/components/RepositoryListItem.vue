@@ -7,8 +7,7 @@
 				<span class="slash">/</span>
 				<span class="name">{{repo.name}}</span>
 			</div>
-			<div class="subtitle">
-				Last updated <span class="strong">{{updatedAt}}</span>
+			<div class="subtitle" v-html="$t('components.repositoryListItem.lastUpdated', [`<span class='strong'>${updatedAt}</span>`])">
 			</div>
 		</div>
 		<div class="contributors hide-small">
@@ -18,7 +17,7 @@
 				</div>
 			</div>
 			<div class="subtitle" v-else>
-				No contributors.
+				{{ $t("components.repositoryListItem.noContributors") }}
 			</div>
 		</div>
 		<div class="actions">
@@ -57,7 +56,7 @@ export default Vue.extend({
 	},
 	mounted: async function () {
 		let m = await moment();
-		this.updatedAt = m.default(this.repo.updated_at).fromNow();
+		this.updatedAt = m.default(this.repo.updated_at).locale(this.$i18n.locale).fromNow();
 	}
 });
 </script>

@@ -20,6 +20,9 @@ const logger = require("../utils/logger")("web");
 // Web-server
 var webServer : FastifyInstance;
 
+// Constants
+const validLocales = ["en", "it", "es"];
+
 /**
  * Start the web server.
  */
@@ -71,8 +74,13 @@ async function verifyAuth(request: any) : Promise<Auth> {
 	} catch (e) {
 		return { ok: false };
 	}
-	
-	
+}
+
+/**
+ * Return the valid locales for the routes.
+ */
+export function getValidLocales() {
+	return validLocales; 
 }
 
 /**

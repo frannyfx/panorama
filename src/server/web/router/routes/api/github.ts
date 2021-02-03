@@ -18,6 +18,7 @@ import { Method } from "../../../../../shared/Method";
 import { Request, Route } from "../../Route";
 import { Codes, send } from "../../API";
 import { getAccessToken } from "../../../../github";
+import { getValidLocales } from "../../..";
 
 let route : Array<Route> = [{
 	method: Method.GET,
@@ -29,7 +30,12 @@ let route : Array<Route> = [{
 	}
 }, {
 	method: Method.GET,
-	url: "/api/github/callback",
+	schemas: {
+		params: Joi.object({
+			locale: Joi.string().valid(...getValidLocales())
+		})
+	},
+	url: "/api/github/callback/:locale",
 	handler: async (request: Request, response: any) => {
 		// Create read stream for callback.html.
 		const callback = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/callback.html"));

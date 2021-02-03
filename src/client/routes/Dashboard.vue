@@ -1,17 +1,17 @@
 <template>
 	<div class="page nav no-select">
 		<div class="content container">
-			<h2>Activity</h2>
+			<h2>{{ $t("routes.dashboard.activity") }}</h2>
 			<div class="activities">
 				<div class="activity"></div>
 				<div class="activity"></div>
 				<div class="activity"></div>
 			</div>
-			<h2>Repositories</h2>
+			<h2>{{ $t("routes.dashboard.repositories") }}</h2>
 			<div class="repos">
 				<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
 			</div>
-			<h2>Test</h2>
+			<h2>{{ $t("routes.dashboard.test") }}</h2>
 			<a @click="testAlert">Test alert</a>
 			<a @click="testProgress">Test progress notification</a>
 		</div>
@@ -57,7 +57,7 @@ export default Vue.extend({
 		},
 		getRepo(repo: Repository) {
 			console.log("Getting repo...", repo);
-			this.$router.push({ name: "repo", params: { owner: repo.owner.login, repo: repo.name}});
+			this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name}});
 		}
 	},
 	async beforeRouteEnter (to, from, next) {

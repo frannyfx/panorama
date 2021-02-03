@@ -15,7 +15,7 @@
 				</a>
 				<a class="nav-link" @click="logOut">
 					<font-awesome-icon icon="sign-out-alt"/>
-					Sign out
+					{{ $t("components.navbar.signOut") }}
 				</a>
 			</div>
 		</div>
@@ -43,11 +43,11 @@ export default Vue.extend({
 	methods: {
 		navigateToDashboard() {
 			if (this.$route.name != "dashboard")
-				this.$router.replace({ name: "dashboard" });
+				this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } });
 		},
 		logOut() {
 			clearAuthenticationData();
-			this.$router.replace({ name: "sign-in" });
+			this.$router.replace({ name: "sign-in", params: { locale: this.$i18n.locale } });
 		}
 	}
 })

@@ -1,0 +1,42 @@
+{
+	"general": {
+		"title": "Panorama",
+		"privacyPolicy": "Normas de privacidad"
+	},
+	"routes": {
+		"callback": {
+			"title": "Acceder",
+			"signedIn": "Conectado",
+			"notSignedIn": "Desconectado"
+		},
+		"dashboard": {
+			"title": "Panel de control",
+			"activity": "Actividades",
+			"repositories": "Archivos",
+			"test": "Test"
+		},
+		"signIn": {
+			"title": "Acceder",
+			"signInWithGitHub": "Acceder con GitHub"
+		}
+	},
+	"alerts": {
+		"signInFailed": {
+			"title": "No has efectuado el acceso.",
+			"description": "Efectuar el acceso con GitHub para utilisar Panorama."
+		},
+		"profileFetchFailed": {
+			"title": "No ha sido posible encontrar tu perfil.",
+			"description": "Algo ha fallado. Por favor intentar otra vez."
+		}
+	},
+	"components": {
+		"navbar": {
+			"signOut": "Salir"
+		},
+		"repositoryListItem": {
+			"lastUpdated": "Actualizado {0}.",
+			"noContributors": "Sin collaboradores."
+		}
+	}
+}

@@ -12,7 +12,7 @@
 				<p class="animate-height subtitle" v-show="status != null">
 					<font-awesome-icon :icon="status ? 'check-circle' : 'exclamation-circle'"/>
 					<span>
-						{{status ? "Signed in." : "Not signed in."}}
+						{{status ? $t("routes.callback.signedIn") : $t("routes.callback.notSignedIn")}}
 					</span>
 				</p>
 			</transition>
@@ -33,6 +33,7 @@ import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { Result, buildResult } from '../../shared/Result';
 import { sleep } from '../../shared/utils';
+import { loadLanguageAsync } from '../i18n';
 
 export default Vue.extend({
 	components: {
@@ -60,6 +61,10 @@ export default Vue.extend({
 		}
 	},
 	mounted: async function() {	
+		// Load locale.
+		let locale = window.location.pathname.split("/")[4];
+		await loadLanguageAsync(locale);
+
 		// Wait for HCI reasons.
 		await sleep(800);
 

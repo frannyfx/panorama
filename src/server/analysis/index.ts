@@ -223,6 +223,9 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let files = await getRepoFiles(repository);
 	if (!files) return done(new Error("Could not analyse repository files."));
 
+	// TODO: Filter .panoramaignore files.
+	// ...
+
 	// Process the files using Git blame.
 	
 

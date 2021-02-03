@@ -12,11 +12,14 @@ import Store from "../store";
 // Components
 import App from "../routes/App.vue";
 
+// Modules
+import { i18n } from "../i18n";
+
 // Force import icons
 import Icons from "../icons";
 Icons;
 
-// Routes
+// Routes - loaded asynchronously.
 const SignIn = () => import(/* webpackChunkName: "sign-in" */ /* webpackMode: "lazy" */ "../routes/SignIn.vue");
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ /* webpackMode: "lazy" */  "../routes/Dashboard.vue");
 const Test = () => import(/* webpackChunkName: "test" */ /* webpackMode: "lazy" */  "../routes/Test.vue");
@@ -37,12 +40,13 @@ Vue.use(VTooltip, {
 	},
 });
 
+// Set up routes.
 const routes = [{
-	path: "/",
+	path: "/:locale",
 	component: SignIn,
 	name: "sign-in"
 }, {
-	path: "/dashboard",
+	path: "/:locale/dashboard",
 	component: Dashboard,
 	name: "dashboard"
 }, {
@@ -50,7 +54,7 @@ const routes = [{
 	component: Test,
 	name: "test"
 }, {
-	path: "/repo/:owner/:repo",
+	path: "/:locale/repo/:owner/:repo",
 	component: Repository,
 	name: "repo"
 }];
@@ -64,6 +68,7 @@ const router = new VueRouter({
 const app = new Vue({
 	el: "#app",
 	router,
+	i18n,
 	store: Store,
 	render: h => h(App)
 });
