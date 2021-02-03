@@ -65,6 +65,7 @@ export default Vue.extend({
 	mounted: async function () {
 		// Load locale.
 		let locale = window.location.pathname.split("/")[1];
+		window.localStorage.setItem("locale", locale);
 		await loadLanguageAsync(locale);
 
 		// Perform initial authentication.

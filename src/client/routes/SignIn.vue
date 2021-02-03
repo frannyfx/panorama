@@ -44,12 +44,9 @@ export default Vue.extend({
 	},
 	methods: {
 		async signIn() {
-			// Get redirect URI with locale.
-			let redirectURI = getRedirectURI() + `/${this.$i18n.locale}`;
-
 			// Navigate to dashboard.
 			this.popup.window = window.open(
-				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${redirectURI}&scope=repo`,
+				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
 				"GitHub Authentication",
 				"menubar=no,location=no,resizable=no,scrollbars=no,status=no," + 
 				`width=${this.popup.width},height=${this.popup.height},` +

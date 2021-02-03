@@ -62,8 +62,8 @@ export default Vue.extend({
 	},
 	mounted: async function() {	
 		// Load locale.
-		let locale = window.location.pathname.split("/")[4];
-		await loadLanguageAsync(locale);
+		let locale = window.localStorage.getItem("locale");
+		await loadLanguageAsync(locale || "en");
 
 		// Wait for HCI reasons.
 		await sleep(800);

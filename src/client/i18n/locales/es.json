@@ -6,8 +6,8 @@
 	"routes": {
 		"callback": {
 			"title": "Acceder",
-			"signedIn": "Conectado",
-			"notSignedIn": "Desconectado"
+			"signedIn": "Conectado.",
+			"notSignedIn": "Desconectado."
 		},
 		"dashboard": {
 			"title": "Panel de control",

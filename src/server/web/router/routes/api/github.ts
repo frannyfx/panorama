@@ -30,12 +30,7 @@ let route : Array<Route> = [{
 	}
 }, {
 	method: Method.GET,
-	schemas: {
-		params: Joi.object({
-			locale: Joi.string().valid(...getValidLocales())
-		})
-	},
-	url: "/api/github/callback/:locale",
+	url: "/api/github/callback",
 	handler: async (request: Request, response: any) => {
 		// Create read stream for callback.html.
 		const callback = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/callback.html"));
