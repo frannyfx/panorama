@@ -26,7 +26,7 @@ export async function loadLanguageAsync(lang : string) {
 	if (i18n.locale == lang || loadedLanguages.includes(lang)) return setI18nLanguage(lang);
 	
 	// Load the desired locale.
-	let locale = await import(/* webpackChunkName: "lang-[request]" */ `./locales/${lang}.json`);
+	let locale = await import(/* webpackChunkName: "locales/[request]" */ `./locales/${lang}.json`);
 	i18n.setLocaleMessage(lang, locale);
 	loadedLanguages.push(lang);
 	return setI18nLanguage(lang);
