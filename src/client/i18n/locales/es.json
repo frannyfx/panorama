@@ -28,6 +28,15 @@
 		"profileFetchFailed": {
 			"title": "No ha sido posible encontrar tu perfil.",
 			"description": "Algo ha fallado. Por favor intentar otra vez."
+		},
+		"analysis": {
+			"title": "Analizando archivo {0}...",
+			"progress": {
+				"Starting": "Empezando...",
+				"Cloning": "Descargando el archivo...",
+				"Lexing": "Analizando el código...",
+				"Finalising": "Casi terminado..."
+			}
 		}
 	},
 	"components": {

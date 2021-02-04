@@ -28,6 +28,15 @@
 		"profileFetchFailed": {
 			"title": "Caricamento del profilo fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."
+		},
+		"analysis": {
+			"title": "Analizzando archivio {0}...",
+			"progress": {
+				"Starting": "Iniziando...",
+				"Cloning": "Scaricando archivio...",
+				"Lexing": "Analizzando codice...",
+				"Finalising": "Quasi fatto..."
+			}
 		}
 	},
 	"components": {

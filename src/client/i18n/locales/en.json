@@ -28,6 +28,15 @@
 		"profileFetchFailed": {
 			"title": "Unable to fetch your profile.",
 			"description": "Something went wrong. Please try again later."
+		},
+		"analysis": {
+			"title": "Analysing repo {0}...",
+			"progress": {
+				"Starting": "Starting...",
+				"Cloning": "Cloning the repository...",
+				"Lexing": "Lexing code...",
+				"Finalising": "Almost done..."
+			}
 		}
 	},
 	"components": {
