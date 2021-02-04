@@ -29,10 +29,14 @@ npm run build-client-prod
 #### Configuration
 Create a new `config.json` file by running:
 ```
-cp src/server/config.default.json cp src/server/config.json
+cp src/server/config.default.json src/server/config.json
 ```
 
-Edit the new config file to include the client ID and secret for your app.
+Edit the new config file in your preferred editor to include the client ID and secret for your app.
+
+```
+nano src/server/config.json
+```
 
 You will also need a valid RSA private key used in Panorama's cryptographic modules. To generate one, run:
 
