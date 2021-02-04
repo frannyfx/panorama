@@ -19,6 +19,7 @@ import cache, { getCacheDir, getRepository, insertRepository, removeRepository }
 import queue, { AnalysisStage, RepoJob, RepoJobProgress, RepoJobResult } from "./queue";
 import { buildResult, Result } from "../../shared/Result";
 import { WASI } from "wasi";
+import { computeRepoBlame } from "./blame";
 
 /**
  * Start the analysis system.
@@ -69,16 +70,8 @@ function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage) {
 		progress = { value: .4, stage };
 		break;
 	}
-	case AnalysisStage.Processing: {
-		progress = { value: .7, stage };
-		break;
-	}
 	case AnalysisStage.Finalising: {
 		progress = { value: .9, stage };
-		break;
-	}
-	case AnalysisStage.Done: {
-		progress = { value: 1, stage };
 		break;
 	}
 	}
@@ -223,11 +216,17 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let files = await getRepoFiles(repository);
 	if (!files) return done(new Error("Could not analyse repository files."));
 
+	// Process the files using Git blame.
 	// TODO: Filter .panoramaignore files.
+	let fileBlames = computeRepoBlame(repository, files);
+	
+	// Lex files.
 	// ...
 
-	// Process the files using Git blame.
-	
+	// Commit analysis to database.
+	// ...
+	reportJobProgress(job, AnalysisStage.Finalising);
+
 
 	done(null, {
 		result: 12345

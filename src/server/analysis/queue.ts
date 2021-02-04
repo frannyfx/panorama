@@ -34,9 +34,7 @@ export enum AnalysisStage {
 	Starting,
 	Cloning,
 	Lexing,
-	Processing,
-	Finalising,
-	Done
+	Finalising
 };
 
 // Connection and queue
