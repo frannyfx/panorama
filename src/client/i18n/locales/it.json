@@ -45,7 +45,9 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Aggiornato {0}.",
-			"noContributors": "Nessun collaboratore."
+			"noContributors": "Nessun collaboratore.",
+			"public": "Pubblico",
+			"private": "Privato"
 		}
 	}
 }

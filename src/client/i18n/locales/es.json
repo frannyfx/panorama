@@ -12,7 +12,7 @@
 		"dashboard": {
 			"title": "Panel de control",
 			"activity": "Actividades",
-			"repositories": "Archivos",
+			"repositories": "Repositorios",
 			"test": "Test"
 		},
 		"signIn": {
@@ -30,10 +30,10 @@
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		},
 		"analysis": {
-			"title": "Analizando archivo {0}...",
+			"title": "Analizando repositorio {0}...",
 			"progress": {
 				"Starting": "Empezando...",
-				"Cloning": "Descargando el archivo...",
+				"Cloning": "Descargando el repositorio...",
 				"Lexing": "Analizando el código...",
 				"Finalising": "Casi terminado..."
 			}
@@ -45,7 +45,9 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Actualizado {0}.",
-			"noContributors": "Sin collaboradores."
+			"noContributors": "Sin collaboradores.",
+			"public": "Público",
+			"private": "Privado"
 		}
 	}
 }

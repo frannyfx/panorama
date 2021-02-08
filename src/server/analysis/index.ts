@@ -18,8 +18,8 @@ const logger = require("../utils/logger")("analysis");
 import cache, { getCacheDir, getRepository, insertRepository, removeRepository } from "./cache";
 import queue, { AnalysisStage, RepoJob, RepoJobProgress, RepoJobResult } from "./queue";
 import { buildResult, Result } from "../../shared/Result";
-import { WASI } from "wasi";
 import { computeRepoBlame } from "./blame";
+import { testLexing } from "./lexing/Lexer";
 
 /**
  * Start the analysis system.
@@ -221,7 +221,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let fileBlames = computeRepoBlame(repository, files);
 	
 	// Lex files.
-	// ...
+	//testLexing();
 
 	// Commit analysis to database.
 	// ...

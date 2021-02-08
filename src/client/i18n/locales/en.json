@@ -45,7 +45,9 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Last updated {0}.",
-			"noContributors": "No contributors."
+			"noContributors": "No contributors.",
+			"public": "Public",
+			"private": "Private"
 		}
 	}
 }
