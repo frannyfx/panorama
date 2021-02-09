@@ -176,7 +176,7 @@ export class Alt extends RExp {
 				}
 			};
 
-		if (simpLeft.regex == simpRight.regex)
+		if (simpLeft.regex.toString() == simpRight.regex.toString())
 			return {
 				regex: simpLeft.regex,
 				simplify: (v: Value) => {
@@ -187,11 +187,13 @@ export class Alt extends RExp {
 			regex: new Alt(simpLeft.regex, simpRight.regex),
 			simplify: (v: Value) => {
 				if (v.constructor == Right) {
-					return new Right(simpRight.simplify(v));
+					let right = <Right>v;
+					return new Right(simpRight.simplify(right.value));
 				}
 
 				if (v.constructor == Left) {
-					return new Left(simpLeft.simplify(v));
+					let left = <Left>v;
+					return new Left(simpLeft.simplify(left.value));
 				}
 
 				return v;

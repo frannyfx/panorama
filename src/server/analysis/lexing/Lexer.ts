@@ -75,7 +75,7 @@ export function inject(r: RExp, c: string, v: Value) : Value {
 			let sequence = <Sequence>v;
 			if (sequence.value2.constructor == Stars) {
 				let stars = <Stars>sequence.value2;
-				return new Stars(stars.values.concat(inject(star.exp, c, sequence.value1)));
+				return new Stars([inject(star.exp, c, sequence.value1)].concat(stars.values));
 			}
 		}
 	}
@@ -94,7 +94,7 @@ export function inject(r: RExp, c: string, v: Value) : Value {
 			let sequence = <Sequence>v;
 			if (sequence.value2.constructor == Stars) {
 				let stars = <Stars>sequence.value2;
-				return new Stars(stars.values.concat(inject(plus.exp, c, sequence.value1)));
+				return new Stars([inject(plus.exp, c, sequence.value1)].concat(stars.values));
 			}
 		}
 	}
@@ -105,7 +105,7 @@ export function inject(r: RExp, c: string, v: Value) : Value {
 			let sequence = <Sequence>v;
 			if (sequence.value2.constructor == Stars) {
 				let stars = <Stars>sequence.value2;
-				return new Stars(stars.values.concat(inject(nTimes.exp, c, sequence.value1)));
+				return new Stars([inject(nTimes.exp, c, sequence.value1)].concat(stars.values));
 			}
 		}
 	}

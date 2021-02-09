@@ -128,6 +128,6 @@ export class RecV extends Value {
 			match: this.value.flatten()
 		};
 
-		return [token].concat(this.value.env());
+		return this.value.env().concat(token);
 	}
 }
