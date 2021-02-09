@@ -1,3 +1,15 @@
+/**
+ * @file Lexer for Java-like languages.
+ * The languages include:
+ * - Java
+ * - JavaScript
+ * - TypeScript
+ * - Scala
+ * - C
+ * - C++
+ * - C#
+ */
+
 // Imports
 // ...
 
@@ -17,14 +29,37 @@ let comment : RExp = new Alt(
 
 // Implement lexer.
 const lexer : Lexer = {
-	extensions: ["js"],
+	extensions: [
+		// Java
+		"java",
+		
+		// JavaScript and TypeScript
+		"js",
+		"ts",
+		
+		// Scala
+		"scala",
+		"sc",
+		
+		// C
+		"c",
+		"h",
+
+		// C++
+		"cpp",
+		"hpp",
+		"cc",
+
+		// C#
+		"cs"
+	],
 	expression: new Star(
 		new Alt(
 			new Alt(
 				new Rec("Comment", comment),
 				new Rec("Code", new Star(new Range(acceptableCharacters + asterisk + slash)))
 			),
-			new Rec("Break", new Star(new Range(newLineCharacters)))
+			new Rec("Whitespace", new Star(new Range(newLineCharacters + "\t ")))
 		)
 	)
 };
