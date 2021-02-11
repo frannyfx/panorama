@@ -1,5 +1,5 @@
 /**
- * @file Value class which describes how a regular expression was matches.
+ * @file Value class which describes how a regular expression was matched.
  * @author Francesco Compagnoni
  */
 
