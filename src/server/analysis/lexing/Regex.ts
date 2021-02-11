@@ -4,6 +4,7 @@
  */
 
 // Modules
+import { TokenType } from "./Lexer";
 import { Empty, Left, RecV, Right, Sequence, Stars, Value } from "./Value";
 
 // Simplification
@@ -439,14 +440,14 @@ export class Not extends RExp {
 }
 
 /**
- * Regular expression for debugging that includes a comment along with a regular expression.
+ * Regular expression for matching a regular expression with a token type.
  */
 export class Rec extends RExp {
-	comment: string;
+	type: TokenType;
 	exp: RExp;
-	constructor(comment: string, exp: RExp) {
+	constructor(type: TokenType, exp: RExp) {
 		super();
-		this.comment = comment;
+		this.type = type;
 		this.exp = exp;
 	}
 
@@ -459,14 +460,10 @@ export class Rec extends RExp {
 	}
 
 	mkeps() {
-		return new RecV(this.comment, this.exp.mkeps());
+		return new RecV(this.type, this.exp.mkeps());
 	}
 
 	toString() {
-		return `(${this.comment}, ${this.exp.toString()})`;
+		return `(${this.type}, ${this.exp.toString()})`;
 	}
 }
-
-export default {
-
-};

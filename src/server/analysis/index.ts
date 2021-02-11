@@ -20,10 +20,6 @@ import queue, { AnalysisStage, RepoJob, RepoJobProgress, RepoJobResult } from ".
 import { buildResult, Result } from "../../shared/Result";
 import { computeRepoBlame } from "./blame";
 import lexing, { lexFile } from "./lexing";
-import { lexIterative, lex, testLexing } from "./lexing/Lexer";
-
-// Test
-import javascriptLexer from "./lexing/langs/javalike";
 
 /**
  * Start the analysis system.
@@ -226,14 +222,15 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Process the files using Git blame.
 	// TODO: Filter .panoramaignore files.
-	//let fileBlames = computeRepoBlame(repository, files);
+	let fileBlames = await computeRepoBlame(repository, files);
+	//fileBlames.map(blame => console.log(blame.contributors));
 	
 	// Get complete file paths and lex the files.
-	let cacheDir = path.join(getCacheDir(), job.data.repository.name);
-	let results = await Promise.all(files.map(filePath => path.join(cacheDir, filePath)).map(file => lexFile(file)));
-	results.map(result => {
-		console.log(result.ok, result.path, result.tokens);
-	});
+	let repoDir = path.join(getCacheDir(), job.data.repository.name);
+	let lexingResults = await Promise.all(files.map(filePath => lexFile(repoDir, filePath)));
+
+	// Integrate the lexer analysis with the file blames.
+	
 
 	// Commit analysis to database.
 	// ...

@@ -1,5 +1,5 @@
 /**
- * @file Lexer for Java-like languages.
+ * @file Lexer for languages that have Java-like comments.
  * The languages include:
  * - Java
  * - JavaScript
@@ -14,18 +14,23 @@
 // ...
 
 // Modules
-import { Lexer } from "../Lexer";
+import { Lexer, TokenType } from "../Lexer";
 import { Alt, Char, Range, Rec, RExp, Seq, Star } from "../Regex";
 
 // Constants
-let acceptableCharacters : string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890()[]{}-_$.,:;\"'=+`!?\t\\@|~%^£€&#>< ";
-let asterisk : string = "*";
-let slash : string  = "/";
-let newLineCharacters : string = "\r\n";
-let comment : RExp = new Alt(
-	new Seq(new Char("/"), new Seq(new Char("*"), new Seq(new Star(new Alt(new Range(acceptableCharacters + newLineCharacters + slash), new Seq(new Char(asterisk), new Range(acceptableCharacters + asterisk + newLineCharacters)))), new Seq(new Char("*"), new Char("/"))))),
-	new Seq(new Char("/"), new Seq(new Char("/"), new Seq(new Star(new Range(acceptableCharacters + asterisk + slash)), new Star(new Range(newLineCharacters)))))	
+const ACCEPTABLE_CHARS : string = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz01234567890()[]{}-_$.,:;\"'=+`!?\t\\@|~%^£€&#>< "; // TODO: Be able to define Unicode ranges for character lists.
+const ASTERISK : string = "*";
+const SLASH : string  = "/";
+const NEWLINE_CHARS : string = "\r\n";
+
+// Tokens
+const DOCUMENTATION_TOKEN : RExp = new Alt(
+	new Seq(new Char("/"), new Seq(new Char("*"), new Seq(new Star(new Alt(new Range(ACCEPTABLE_CHARS + NEWLINE_CHARS + SLASH), new Seq(new Char(ASTERISK), new Range(ACCEPTABLE_CHARS + ASTERISK + NEWLINE_CHARS)))), new Seq(new Char("*"), new Char("/"))))),
+	new Seq(new Char("/"), new Seq(new Char("/"), new Seq(new Star(new Range(ACCEPTABLE_CHARS + ASTERISK + SLASH)), new Star(new Range(NEWLINE_CHARS)))))	
 );
+
+const CODE_TOKEN : RExp = new Star(new Range(ACCEPTABLE_CHARS + ASTERISK + SLASH));
+const WHITESPACE_TOKEN : RExp = new Star(new Range(NEWLINE_CHARS + "\t "));
 
 // Implement lexer.
 const lexer : Lexer = {
@@ -56,10 +61,10 @@ const lexer : Lexer = {
 	expression: new Star(
 		new Alt(
 			new Alt(
-				new Rec("Comment", comment),
-				new Rec("Code", new Star(new Range(acceptableCharacters + asterisk + slash)))
+				new Rec(TokenType.Documentation, DOCUMENTATION_TOKEN),
+				new Rec(TokenType.Code, CODE_TOKEN)
 			),
-			new Rec("Whitespace", new Star(new Range(newLineCharacters + "\t ")))
+			new Rec(TokenType.Whitespace, WHITESPACE_TOKEN)
 		)
 	)
 };

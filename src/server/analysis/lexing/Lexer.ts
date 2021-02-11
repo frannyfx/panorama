@@ -9,20 +9,25 @@ import { Alt, Char, NTimes, Optional, Plus, Range, Rec, RExp, Seq, Simplificatio
 import { Character, Empty, Left, RecV, Right, Sequence, Stars, Value } from "./Value";
 
 // Enums
-export enum LineCategory {
+export enum TokenType {
 	Documentation,
-	Code
+	Code,
+	Whitespace
 };
 
 // Interfaces
+export interface Token {
+	type: TokenType,
+	match: string,
+	position?: {
+		start: number,
+		end: number
+	}
+};
+
 export interface Lexer {
 	extensions: string[],
 	expression: RExp
-};
-
-export interface Token {
-	name: string,
-	match: string
 };
 
 /**
@@ -82,7 +87,7 @@ export function inject(r: RExp, c: string, v: Value) : Value {
 
 	if (r.constructor == Rec) {
 		let rec = <Rec>r;
-		return new RecV(rec.comment, inject(rec.exp, c, v));
+		return new RecV(rec.type, inject(rec.exp, c, v));
 	}
 
 	if (r.constructor == Range)
@@ -173,13 +178,40 @@ export function lexIterative(r: RExp, input: string) : Value {
 }
 
 /**
+ * Get the series of tokens from lexing the string including the line numbers where each token begins and ends.
+ * @param r The regular expression to lex the string with.
+ * @param input The string to lex.
+ */
+export function getTokens(r: RExp, input: string) : Token[] {
+	let result = lexIterative(r, input).env();
+
+	// Calculate line numbers.
+	var currentLineNumber = 1;
+	result.map(token => {
+		// Find number of new-line characters in the token.
+		let numLines = (token.match.match(/\n/g)||[]).length;
+
+		// Write the position to the token.
+		token.position = {
+			start: currentLineNumber,
+			end: currentLineNumber + numLines
+		};
+
+		// Update the counter.
+		currentLineNumber += numLines;
+	});
+
+	return result;
+}
+
+/**
  * Test the performance of the two methods of lexing.
  */
 export function testLexing() {
 	try {
 		logger.info("Running performance test...");
 		// Set up test language.
-		let language : RExp = new Rec("Comment", new Seq(new Seq(new Char("/"), new Char("*")), new Seq(
+		let language : RExp = new Rec(TokenType.Documentation, new Seq(new Seq(new Char("/"), new Char("*")), new Seq(
 			new Star(new Char("1")),
 			new Seq(
 				new Char("*"), new Char("/")

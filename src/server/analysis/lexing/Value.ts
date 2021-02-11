@@ -3,11 +3,8 @@
  * @author Francesco Compagnoni
  */
 
-// Interfaces
-export interface Token {
-	name: string,
-	match: string
-};
+// Modules
+import { TokenType, Token} from "./Lexer";
 
 /**
  * Abstract value class.
@@ -110,11 +107,12 @@ export class Stars extends Value {
 }
 
 export class RecV extends Value {
-	comment: string;
+	type: TokenType;
 	value: Value;
-	constructor(comment: string, value: Value) {
+
+	constructor(type: TokenType, value: Value) {
 		super();
-		this.comment = comment;
+		this.type = type;
 		this.value = value;
 	}
 
@@ -124,8 +122,8 @@ export class RecV extends Value {
 
 	env() {
 		let token : Token = {
-			name: this.comment,
-			match: this.value.flatten()
+			type: this.type,
+			match: this.value.flatten(),
 		};
 
 		return this.value.env().concat(token);
