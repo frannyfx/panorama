@@ -37,6 +37,10 @@
 				"Lexing": "Lexing code...",
 				"Finalising": "Almost done..."
 			}
+		},
+		"jobProgressSubscriptionFailed": {
+			"title": "Failed to subscribe to repo updates.",
+			"description": "Could not connect to the server. Please try again later."
 		}
 	},
 	"components": {
