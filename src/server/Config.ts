@@ -15,7 +15,7 @@ export interface Config {
 	general: {
 		assetsDir: string,				// Static private assets folder.
 	},
-	database?: {
+	database: {
 		host: string,					// Host to connect to
 		user: string,					// MySQL username
 		password: string,				// MySQL password

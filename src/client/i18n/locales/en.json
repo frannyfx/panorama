@@ -30,17 +30,22 @@
 			"description": "Something went wrong. Please try again later."
 		},
 		"analysis": {
-			"title": "Analysing repo {0}...",
+			"title": "Analysing {0}...",
 			"progress": {
 				"Starting": "Starting...",
 				"Cloning": "Cloning the repository...",
 				"Lexing": "Lexing code...",
-				"Finalising": "Almost done..."
+				"Finalising": "Almost done...",
+				"Done": "Done."
 			}
 		},
 		"jobProgressSubscriptionFailed": {
 			"title": "Failed to subscribe to repo updates.",
 			"description": "Could not connect to the server. Please try again later."
+		},
+		"analysisFailed": {
+			"title": "Repository analysis failed.",
+			"description": "Failed to analyse {0}. Please try again later."
 		}
 	},
 	"components": {

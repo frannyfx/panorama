@@ -19,22 +19,10 @@ const logger = require("../utils/logger")("queue");
 export interface RepoJob {
 	repository: Repository,
 	access_token: string
-}
+};
 
 export interface RepoJobResult {
 	result: number
-}
-
-export interface RepoJobProgress {
-	value: number,
-	stage: AnalysisStage
-}
-
-export enum AnalysisStage {
-	Starting,
-	Cloning,
-	Lexing,
-	Finalising
 };
 
 // Connection and queue

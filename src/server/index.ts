@@ -10,6 +10,7 @@ import figlet from "figlet";
 const logger = require("./utils/logger")("main");
 import web from "./web";
 import analysis from "./analysis";
+import database from "./database";
 
 /**
  * Initialise the backend.
@@ -18,11 +19,14 @@ async function initialise() {
 	writeHeader();
 	try {
 		logger.info("Initialising...");
+		await database.start();
 		await web.start();
 		await analysis.start();
 		logger.success("Initialisation complete.");
 	} catch (e) {
-		logger.error(`Unable to initialise Panorama: ${e}\nExiting.`);
+		logger.error("Unable to initialise Panorama.");
+		logger.error(e);
+		logger.error("Exiting.");
 		process.exit(0);
 	}
 }

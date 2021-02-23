@@ -13,6 +13,10 @@ export interface Repository {
 	updated_at: Date
 };
 
+export interface RepositoryObject {
+	[key: string]: Repository
+};
+
 export function toRepository(input: Data, contributors: Data[]) : Repository {
 	return {
 		id: input.id!,

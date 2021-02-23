@@ -62,6 +62,7 @@ let route : Array<Route> = [{
 
 			// Send ID.
 			send(response, Codes.OK, {
+				jobId: job.id,
 				ticket: jobTicket
 			});
 		} catch {

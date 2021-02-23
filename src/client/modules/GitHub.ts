@@ -13,6 +13,7 @@ import Store from "../store";
 import { Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
 import { User } from "./models/User";
+import { File, toFile } from "./models/File";
 
 // Variables
 var instance : Octokit | null = null;
@@ -73,4 +74,20 @@ export async function getRepositories() : Promise<Repository[]> {
 
 	reposWithContributors.sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());
 	return reposWithContributors;
+}
+
+export async function getFiles(repository: Repository, path: string) : Promise<File[]> {
+	// Get files.
+	let result = await (await getOctokit()).repos.getContent({
+		owner: repository.owner.login,
+		repo: repository.name,
+		path
+	});
+
+	if (result.status != 200) return [];
+
+	// Convert to file interfaces.
+	//let files : File[] = [].concat(result.data!).map(file => toFile(file));
+	//return files;
+	return [];
 }

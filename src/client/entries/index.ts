@@ -57,7 +57,12 @@ const routes = [{
 	path: "/:locale/repo/:owner/:repo",
 	component: Repository,
 	name: "repo"
-}];
+}/*, {
+	path: "/:locale/repo/:owner/:repo/path/",
+	component: Repository,
+	name: "repo-path",
+	props: (route : any) => ({ query: route.query.q })
+}*/];
 
 const router = new VueRouter({
 	mode: "history",

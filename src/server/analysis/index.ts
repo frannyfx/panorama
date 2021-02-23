@@ -16,10 +16,12 @@ const config : Config = loadConfig();
 // Modules
 const logger = require("../utils/logger")("analysis");
 import cache, { getCacheDir, getRepository, insertRepository, removeRepository } from "./cache";
-import queue, { AnalysisStage, RepoJob, RepoJobProgress, RepoJobResult } from "./queue";
+import queue, { RepoJob, RepoJobResult } from "./queue";
+import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
 import { buildResult, Result } from "../../shared/Result";
 import { computeRepoBlame } from "./blame";
 import lexing, { lexFile, LexingResult } from "./lexing";
+import { sleep } from "../../shared/utils";
 
 /**
  * Start the analysis system.
@@ -76,6 +78,10 @@ function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage) {
 	}
 	case AnalysisStage.Finalising: {
 		progress = { value: .9, stage };
+		break;
+	}
+	case AnalysisStage.Done: {
+		progress = { value: 1, stage };
 		break;
 	}
 	}
@@ -232,25 +238,24 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	
 	// Get complete file paths and lex the files.
 	let repoDir = path.join(getCacheDir(), job.data.repository.name);
-	//let lexingResults = await Promise.all(files.map(filePath => lexFile(repoDir, filePath)));
 	/*let lexingResults : LexingResult[] = [];
 	for (let file of files) {
-		console.log(`File ${file} being lexed lol`);
+		console.log(`File ${file} being lexed.`);
 		lexingResults.push(await lexFile(repoDir, file));
 	}
 	
 	
 	lexingResults.map(result => console.log(result.ok, result.path, result.tokens!));*/
 	// Integrate the lexer analysis with the file blames.
-	
+	// ...
 
+	// Process contributors.
+	// ...
+	
 	// Commit analysis to database.
 	// ...
 	reportJobProgress(job, AnalysisStage.Finalising);
-
-	done(null, {
-		result: 12345
-	});
+	done(null);
 }
 
 export default {

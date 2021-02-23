@@ -7,7 +7,7 @@
 import { MutationTree } from "vuex";
 
 // Modules
-import { Notification, NotificationObject} from "../../modules/Notifications";
+import { Notification, NotificationData, NotificationObject} from "../../modules/Notifications";
 
 export interface NotificationsState {
 	list: Notification[],
@@ -19,13 +19,9 @@ const state : NotificationsState = {
 	object: {} as NotificationObject
 };
 
-const getters = {
+const getters = { };
 
-};
-
-const actions = {
-
-};
+const actions = { };
 
 const mutations : MutationTree<NotificationsState> = {
 	add(state, notification : Notification) {
@@ -47,6 +43,13 @@ const mutations : MutationTree<NotificationsState> = {
 		state.list.splice(state.list.indexOf(notification), 1);
 		state.object[notification.id].removed = true;
 	},
+	updateNotificationProgress(state, data : any) {
+		// The notification does not exist, return.
+		if (!state.object[data.id] || state.object[data.id].data.type != "PROGRESS") return;
+
+		// Replace the data inside the notification with the new data.
+		state.object[data.id].data.progress = data.progress;
+	},
 	deleteData(state, notification: Notification) {
 		delete state.object[notification.id];
 	},
@@ -55,6 +58,12 @@ const mutations : MutationTree<NotificationsState> = {
 	},
 	setExpiryStatus(state, data) {
 		state.object[data.id].expiry.status = data.status;
+	},
+	setDismissable(state, data) {
+		state.object[data.id].data.dismissable = data.dismissable;
+	},
+	setDataExpiry(state, data) {
+		state.object[data.id].data.expiry = data.expiry;
 	}
 };
 

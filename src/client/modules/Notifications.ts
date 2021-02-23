@@ -5,14 +5,13 @@
 
 // Imports
 import Store from "../store";
-import Notifications from "../store/modules/notifications";
 
 // Interfaces
 export interface NotificationData {
 	type: "NORMAL" | "PROGRESS",
 	icon: string[],
 	title: string,
-	description: string,
+	description?: string,
 	dismissable: boolean,
 	expiry: boolean,
 	progress?: {

@@ -14,6 +14,7 @@
 			<h2>{{ $t("routes.dashboard.test") }}</h2>
 			<a @click="testAlert">Test alert</a>
 			<a @click="testProgress">Test progress notification</a>
+			<a @click="testAnalysis">Test analysis</a>
 		</div>
 	</div>
 </template>
@@ -29,9 +30,11 @@ import { i18n } from "../i18n";
 // Components
 import RepositoryListItem from "../components/RepositoryListItem.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
-import { waitForAuth } from "../modules/API";
+import { send, waitForAuth } from "../modules/API";
 import { addNotification, createAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
+import { Method } from "../../shared/Method";
+import { subscribeToJobProgress } from "../modules/Queue";
 
 export default Vue.extend({
 	components: {
@@ -55,6 +58,18 @@ export default Vue.extend({
 					status: "Cloning repo..."
 				}
 			});
+		},
+		async testAnalysis() {
+			// Ask for a ticket to subscribe to this repository's analysis.
+			let ticketResponse = await send(Method.PUT, "queue/repo", {
+				name: "frannyfx/panorama-test"
+			});
+
+			// If the request failed, show an error.
+			if (!ticketResponse.status.ok || !ticketResponse.result?.ticket) return createAlert("WARNING", "Failed", "Yada yada");
+			
+			// Use the ticket to subscribe to the events.
+			subscribeToJobProgress("frannyfx/panorama-test", ticketResponse.result!.jobId, ticketResponse.result!.ticket, this.$store.state.auth.accessToken);
 		},
 		getRepo(repo: Repository) {
 			console.log("Getting repo...", repo);

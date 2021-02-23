@@ -20,6 +20,7 @@ import queue from "../../../../../analysis/queue";
 import ticket, { TicketVerificationResult } from "../../../../../crypto/ticket";
 import { buildResponse, Codes } from "../../../API";
 import { checkAuth } from "../../../../../github";
+import { AnalysisStage, RepoJobProgress } from "../../../../../../shared/Queue";
 
 /**
  * Serialise and send a payload to a connected client.
@@ -42,7 +43,7 @@ function send(connection: SocketStream, data: Data) {
  * @param status The status of the job.
  * @param progress The current progress.
  */
-function sendJobProgress(connection: SocketStream, jobId: number, status: string, progress: number) {
+function sendJobProgress(connection: SocketStream, jobId: number, status: string, progress: RepoJobProgress) {
 	send(connection, buildResponse(Codes.OK, { jobId, status, progress }));
 }
 
@@ -88,9 +89,10 @@ let route : Route = {
 				return send(connection, buildResponse(Codes.NotFound));
 
 			// Subscribe to job events and immediately send the current progress.
+			// TODO: Prevent instant success from bugging out the progress reporting (sends zero instead of RepoJobProgress object).
 			sendJobProgress(connection, jobId, job!.status, job!.progress);
 			job.on("progress", progress => sendJobProgress(connection, jobId, job!.status, progress));
-			job.on("succeeded", () => sendJobProgress(connection, jobId, "succeeded", 1));
+			job.on("succeeded", () => sendJobProgress(connection, jobId, "succeeded", { value: 1, stage: AnalysisStage.Done }));
 			job.on("failed", () => sendJobProgress(connection, jobId, "failed", job!.progress));
 			job.on("retrying", () => sendJobProgress(connection, jobId, "retrying", job!.progress));
 			logger.success(`Subscribed to updates on job ${job.id}.`);

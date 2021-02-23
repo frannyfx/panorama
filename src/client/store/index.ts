@@ -10,7 +10,8 @@ import { Data } from "../../shared/Result";
 import { Repository } from "../modules/models/Repository";
 
 // Modules
-import Notifications from "./modules/notifications";
+import Notifications from "./modules/Notifications";
+import Repositories from "./modules/Repositories";
 
 // Use plugin
 Vue.use(Vuex);
@@ -83,7 +84,7 @@ const mutations : MutationTree<RootState> = {
 		state.user.name = user.name;
 		state.user.email = user.email;
 	},
-	setRepositories(state, repos: Repository[]) {
+	setRepositories(state, repos: Repository[]) {	// TODO: Move the repository data to the Repositories module.
 		// Remove all elements.
 		state.repos.loaded = true;
 		state.repos.list.splice(0, state.repos.list.length);
@@ -91,13 +92,16 @@ const mutations : MutationTree<RootState> = {
 	}
 };
 
-// Define debug constant
+// Define debug constant.
 const debug = process.env.NODE_ENV !== "production";
+
+// Export state.
 export default new Vuex.Store<RootState>({
 	state,
 	mutations,
 	modules: {
-		Notifications
+		Notifications,
+		Repositories
 	},
 	strict: debug
 });

@@ -30,13 +30,22 @@
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
 		"analysis": {
-			"title": "Analizzando archivio {0}...",
+			"title": "Analizzando {0}...",
 			"progress": {
 				"Starting": "Iniziando...",
 				"Cloning": "Scaricando archivio...",
 				"Lexing": "Analizzando codice...",
-				"Finalising": "Quasi fatto..."
+				"Finalising": "Quasi fatto...",
+				"Done": "Finito."
 			}
+		},
+		"jobProgressSubscriptionFailed": {
+			"title": "Caricamento del progresso analisi fallito.",
+			"description": "Qualcosa è andato storto, provare più tardi."
+		},
+		"analysisFailed": {
+			"title": "Analisi archivio fallita.",
+			"description": "Errore durante l'analisi di {0}. Provare più tardi."
 		}
 	},
 	"components": {

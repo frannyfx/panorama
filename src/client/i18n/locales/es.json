@@ -30,12 +30,13 @@
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		},
 		"analysis": {
-			"title": "Analizando repositorio {0}...",
+			"title": "Analizando {0}...",
 			"progress": {
 				"Starting": "Empezando...",
 				"Cloning": "Descargando el repositorio...",
 				"Lexing": "Analizando el código...",
-				"Finalising": "Casi terminado..."
+				"Finalising": "Casi terminado...",
+				"Done": "Terminado."
 			}
 		}
 	},
