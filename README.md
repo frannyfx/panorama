@@ -78,6 +78,7 @@ node dist/index.js
 ### Project
 - Francesco Compagnoni - Engineering
 - Dr Jeroen Keppens - Project supervisor
+- Dr Christian Urban - Thanks for his amazing help with lexing
 
 ### Notable works
 - [POSIX Lexing with Derivatives of Regular Expressions](https://core.ac.uk/download/pdf/73346332.pdf) by Fahad Ausaf, Roy Dyckhoff and Christian Urban.
