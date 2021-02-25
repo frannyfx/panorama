@@ -296,7 +296,7 @@ function decode(expressions: RExp[], bits: Bit[]) : Token[] {
 		}
 	}
 
-	return tokens;
+	return tokens.reverse();
 }
 
 /**
