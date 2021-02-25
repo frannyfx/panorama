@@ -4,6 +4,7 @@
  */
 
 // Modules
+import { AAlt, ACharSet, AOne, ARExp, ASeq, AStar, AZero, S, Z } from "./AnnotatedRegex";
 import { TokenType } from "./Lexer";
 import { Empty, Left, RecV, Right, Sequence, Stars, Value } from "./Value";
 
@@ -46,10 +47,17 @@ export abstract class RExp {
 	abstract derivative(char: string) : RExp;
 
 	/**
+	 * Return the corresponding ARExp for a regular expression.
+	 */
+	internalise() : ARExp {
+		throw new Error(`Unhandled internalise function for: '${this.constructor.name}'.`);
+	}
+
+	/**
 	 * The mkeps implementation for the current regular expression.
 	 */
 	mkeps() : Value {
-		throw new Error(`Unhandled regular expression for mkeps: '${this.constructor.name}'.`);
+		throw new Error(`Cannot call mkeps on non-nullable regular expression '${this.constructor.name}'.`);
 	}
 
 	/**
@@ -81,6 +89,10 @@ export class Zero extends RExp {
 		return new Zero();
 	}
 
+	internalise() : ARExp {
+		return new AZero();
+	}
+
 	toString() {
 		return "Zero";
 	}
@@ -100,6 +112,10 @@ export class One extends RExp {
 
 	mkeps() : Value {
 		return new Empty();
+	}
+
+	internalise() : ARExp {
+		return new AOne([]);
 	}
 
 	toString() {
@@ -126,6 +142,10 @@ export class Char extends RExp {
 		return new Zero();
 	}
 
+	internalise() : ARExp {
+		return new ACharSet([], (char) => this.char == char);
+	}
+
 	toString() {
 		return `Char(${this.char})`;
 	}
@@ -150,6 +170,10 @@ export class Alt extends RExp {
 
 	derivative(char: string) : RExp {
 		return new Alt(this.left.derivative(char), this.right.derivative(char));
+	}
+
+	internalise() : ARExp {
+		return new AAlt([], [this.left.internalise().fuse([new Z()]), this.right.internalise().fuse([new S()])]);
 	}
 
 	mkeps() : Value {
@@ -228,6 +252,10 @@ export class Seq extends RExp {
 		return new Seq(this.left.derivative(char), this.right);
 	}
 
+	internalise() : ARExp {
+		return new ASeq([], this.left.internalise(), this.right.internalise());
+	}
+
 	mkeps() : Value {
 		return new Sequence(this.left.mkeps(), this.right.mkeps());
 	}
@@ -294,6 +322,10 @@ export class Star extends RExp {
 		return new Seq(this.exp.derivative(char), new Star(this.exp));
 	}
 
+	internalise() : ARExp {
+		return new AStar([], this.exp.internalise());
+	}
+
 	mkeps() : Value {
 		return new Stars([]);
 	}
@@ -322,8 +354,37 @@ export class Range extends RExp {
 		return new Zero();
 	}
 
+	internalise() : ARExp {
+		return new ACharSet([], char => this.range.indexOf(char) != -1);
+	}
+
 	toString() {
 		return `Range(${this.range})`;
+	}
+}
+
+export class CharSet extends RExp {
+	charFunction: (_: string) => boolean;
+	constructor(charFunction: (_: string) => boolean) {
+		super();
+		this.charFunction = charFunction;
+	}
+
+	nullable() {
+		return false;
+	}
+
+	derivative(char: string) {
+		if (this.charFunction(char)) return new One();
+		return new Zero();
+	}
+
+	internalise() : ARExp {
+		return new ACharSet([], this.charFunction);
+	}
+
+	toString() {
+		return `CharSet(${this.charFunction.toString()})`;
 	}
 }
 
@@ -457,6 +518,10 @@ export class Rec extends RExp {
 
 	derivative(char: string) {
 		return this.exp.derivative(char);
+	}
+
+	internalise() : ARExp {
+		return this.exp.internalise();
 	}
 
 	mkeps() {

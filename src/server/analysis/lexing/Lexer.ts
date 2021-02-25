@@ -3,9 +3,12 @@
  * @author Francesco Compagnoni
  */
 
+// TODO: Refactor different lexers into their own files.
+
 // Modules
 const logger = require("../../utils/logger")("lexer");
-import { Alt, Char, NTimes, Optional, Plus, Range, Rec, RExp, Seq, Simplification, Star } from "./Regex";
+import { ARExp, Bit, C, S, Z } from "./AnnotatedRegex";
+import { Alt, Char, CharSet, NTimes, One, Optional, Plus, Range, Rec, RExp, Seq, Simplification, Star } from "./Regex";
 import { Character, Empty, Left, RecV, Right, Sequence, Stars, Value } from "./Value";
 
 // Enums
@@ -178,6 +181,125 @@ export function lexIterative(r: RExp, input: string) : Value {
 }
 
 /**
+ * Iteratively lex a string using a more advanced lexing method.
+ * @param r The regular expression to use to lex the string.
+ * @param input The input.
+ */
+export function lexAdvanced(r: RExp, input: string) {
+	// Convert regular expression to annotated regular expression.
+	let internalised : ARExp = r.internalise();
+
+	// Generate the derivatives based on the characters in the input.
+	let derivatives : ARExp[] = [];
+	for (var i = 0; i < input.length; i++) {
+		let regex = derivatives.length == 0 ? internalised : derivatives[i - 1];
+		derivatives.push(regex.derivative(input[i]).simplify());
+	}
+
+	// If the final derivative is not nullable, the lexing process failed.
+	let finalDerivative = derivatives[derivatives.length - 1];
+	if (!finalDerivative.nullable()) throw new Error("Invalid character in input.");
+
+	// Decode the final derivative.
+	let tokens = decode([r], finalDerivative.mkeps());
+	return tokens;
+}
+
+/**
+ * Bit decoding function.
+ */
+function decode(expressions: RExp[], bits: Bit[]) : Token[] {
+	// List of tokens to store values in.
+	let tokens : Token[] = [];
+
+	// Infinite loop prevention.
+	let lastExpression = "", lastBit = "";
+	while(expressions.length > 0 && bits.length > 0) {
+		// Prevent an infinite loop from occurring (this should not happen but it's here for debugging purposes).
+		if (expressions[0].toString() == lastExpression && bits[0].toString() == lastBit)
+			throw new Error("Infinite loop detected in decode function.");
+
+		lastExpression = expressions[0].toString();
+		lastBit = bits[0].toString();
+
+		// Get the current expression.
+		let expression = expressions[0];
+
+		// ONE - Remove the current expression.
+		if (expression.constructor == One) {
+			expressions = expressions.slice(1);
+			continue;
+		}
+
+		// ALT.
+		if (expression.constructor == Alt) {
+			let alt = <Alt>expression;
+
+			// Switch bits.
+			if (bits[0].constructor == Z) {
+				expressions = [alt.left].concat(expressions.slice(1));
+				bits = bits.slice(1);
+				continue;
+			}
+
+			if (bits[0].constructor == S) {
+				expressions = [alt.right].concat(expressions.slice(1));
+				bits = bits.slice(1);
+				continue;
+			}
+		}
+
+		// SEQ.
+		if (expression.constructor == Seq) {
+			let seq = <Seq>expression;
+			expressions = [seq.left, seq.right].concat(expressions.slice(1));
+			continue;
+		}
+
+		// STAR.
+		if (expression.constructor == Star) {
+			let star = <Star>expression;
+
+			if (bits[0].constructor == Z) {
+				expressions = [star.exp, star].concat(expressions.slice(1));
+				bits = bits.slice(1);
+				continue;
+			}
+
+			if (bits[0].constructor == S) {
+				expressions = expressions.slice(1);
+				bits = bits.slice(1);
+				continue;
+			}
+		}
+
+		// REC.
+		if (expression.constructor == Rec) {
+			let rec = <Rec>expression;
+			expressions = [rec.exp].concat(expressions.slice(1));
+			tokens.unshift({
+				type: rec.type,
+				match: ""
+			});
+		}
+
+		// Characters.
+		if (bits[0].constructor == C && (expression.constructor == Char || expression.constructor == CharSet || expression.constructor == Range)) {
+			// Get the character and remove the first expression and bit.
+			let charBit = <C>bits[0];
+			expressions = expressions.slice(1);
+			bits = bits.slice(1);
+
+			// Add the new character to the latest token.
+			tokens[0].match = charBit.char + tokens[0].match;
+			continue;
+		}
+	}
+
+	return tokens;
+}
+
+/**
  * Get the series of tokens from lexing the string including the line numbers where each token begins and ends.
  * @param r The regular expression to lex the string with.
  * @param input The string to lex.
@@ -205,7 +327,7 @@ export function getTokens(r: RExp, input: string) : Token[] {
 }
 
 /**
- * Test the performance of the two methods of lexing.
+ * Test the performance of different lexing methods.
  */
 export function testLexing() {
 	try {
@@ -233,9 +355,14 @@ export function testLexing() {
 			lex(language, string);
 			console.timeEnd(`recur_${i}`);
 
+			console.time(`advanced_${i}`);
+			lexAdvanced(language, string);
+			console.timeEnd(`advanced_${i}`);
+
 			// Add new line.
 			console.log("");
 		}
+		
 	} catch (e) {
 		logger.error(`An error occurred while running performance test: ${e}.`);
 	}

@@ -22,6 +22,7 @@ import { buildResult, Result } from "../../shared/Result";
 import { computeRepoBlame } from "./blame";
 import lexing, { lexFile, LexingResult } from "./lexing";
 import { sleep } from "../../shared/utils";
+import { testLexing } from "./lexing/Lexer";
 
 /**
  * Start the analysis system.
@@ -35,8 +36,10 @@ export async function start() {
 
 	// Load lexers.
 	await lexing.registerLexers();
-	
 
+	// Test lexing.
+	testLexing();
+	
 	// Get queue.
 	let repoQueue = queue.getRepoQueue();
 	if (!repoQueue) throw new Error("Unable to get queue.");
