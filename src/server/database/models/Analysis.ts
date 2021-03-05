@@ -32,6 +32,11 @@ async function insert(analysis: DatabaseAnalysis) : Promise<DatabaseAnalysis> {
 	return analysis;
 }
 
+/**
+ * Updates an analysis in the Analysis table.
+ * @param analysis The updated analysis data.
+ * @returns Whether the update was successful.
+ */
 async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 	// Get connection.
 	let connection = await getConnection();

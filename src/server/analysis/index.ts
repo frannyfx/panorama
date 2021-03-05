@@ -27,7 +27,7 @@ import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item
 
 // Models
 import Analysis, { DatabaseAnalysis } from "../database/models/Analysis";
-
+import DatabaseAnalysedItem from "../database/models/AnalysedItem";
 /**
  * Start the analysis system.
  */
@@ -268,12 +268,14 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Aggregate analysis data into subfolders.
 	let folderEntries : AnalysedItem[] = generateFolderEntries(analysisResults);
-	analysisResults.concat(folderEntries);
+	analysisResults.push(...folderEntries);
 	
 	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.name}'.`);
 
 	// Commit analysis to database.
 	reportJobProgress(job, AnalysisStage.Finalising);
+	DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults);
+	
 
 	// Set the job completion date and call the done callback.
 	analysis.completedAt = new Date();
