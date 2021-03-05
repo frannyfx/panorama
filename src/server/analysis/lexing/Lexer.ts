@@ -1,17 +1,15 @@
 /**
- * @file Implementation of Christian Urban's POSIX lexer using derivatives of regular expressions.
+ * @file Native lexer based on the JavaScript regular expression engine.
  * @author Francesco Compagnoni
  */
 
-// TODO: Refactor different lexers into their own files.
-
 // Modules
 const logger = require("../../utils/logger")("lexer");
-import { ARExp, Bit, C, S, Z } from "./AnnotatedRegex";
-import { Alt, Char, CharSet, NTimes, One, Optional, Plus, Range, Rec, RExp, Seq, Simplification, Star } from "./Regex";
-import { Character, Empty, Left, RecV, Right, Sequence, Stars, Value } from "./Value";
 
 // Enums
+/**
+ * The type of code that a token has matched.
+ */
 export enum TokenType {
 	Documentation,
 	Code,
@@ -19,6 +17,9 @@ export enum TokenType {
 };
 
 // Interfaces
+/**
+ * A matched token containing its type, string matched and position in the text.
+ */
 export interface Token {
 	type: TokenType,
 	match: string,
@@ -28,342 +29,158 @@ export interface Token {
 	}
 };
 
-export interface Lexer {
-	extensions: string[],
-	expression: RExp
+/**
+ * Linking a token type to a regular expression.
+ */
+export interface TokenDefinition {
+	type: TokenType,
+	expression: RegExp
 };
 
 /**
- * Inject characters of the string back into the values.
- * @param r The regular expression.
- * @param c The character to inject.
- * @param v The value in which to inject the character.
+ * Interface that lexers must export.
  */
-export function inject(r: RExp, c: string, v: Value) : Value {
-	if (r.constructor == Char && v.constructor == Empty)
-		return new Character(c);
+export interface Lexer {
+	extensions: string[],
+	definitions: TokenDefinition[]
+};
 
-	if (r.constructor == Alt) {
-		let alt = <Alt>r;
-		if (v.constructor == Left) {
-			let left = <Left>v;
-			return new Left(inject(alt.left, c, left.value));
-		}
+/**
+ * The match result for a specific token type.
+ */
+interface MatchResult {
+	type: TokenType,
+	match: RegExpMatchArray | null
+};
+
+/**
+ * A group of tokens spanning various lines.
+ */
+export interface TokenGroup {
+	start: number,
+	end: number,
+	lineData: Set<number>
+}
+
+/**
+ * TypeScript type checker for lexers.
+ * @param lexer The object to validate as a lexer.
+ */
+export function isLexer(lexer: any): lexer is Lexer {
+	return true; // TODO: Do proper type checking.
+}
+
+
+/**
+ * Break a string down into tokens.
+ * @param lexer The lexer containing the rules on how to lex the input.
+ * @param input The input to be lexed.
+ */
+export function lex(lexer: Lexer, input: string) : Token[] {
+	// Create an list to store the lexed tokens.
+	let tokens : Token[] = [];
+
+	// The current character being processed.
+	var i = 0;
+
+	// Calculate line number as the string is being lexed.
+	var lineNumber = 1;
+
+	// Loop through the entire string.
+	while (i < input.length) {
+		// Slice the string by the current index.
+		let inputString = input.slice(i);
+
+		// Run all the regular expressions.
+		let results : MatchResult[] = lexer.definitions.map(definition => {
+			return {
+				type: definition.type,
+				match: definition.expression.exec(inputString)
+			};
+		});
 		
-		if (v.constructor == Right) {
-			let right = <Right>v;
-			return new Right(inject(alt.right, c, right.value));
-		}
-	}
+		// Check if any matches were successful.
+		let successfulResults = results.filter(result => result.match != null && result.match[0].length != 0);
+		if (successfulResults.length == 0) throw new Error(`Unexpected symbol ${input[i]} at index ${i}.`);
+		
+		// Sort successful matches by longest, following the maximal munch principle.
+		let bestMatch = successfulResults.sort((a : MatchResult, b: MatchResult) => b.match![0].length - a.match![0].length)[0];
 
-	if (r.constructor == Seq) {
-		let seq = <Seq>r;
-		if (v.constructor == Sequence) {
-			let sequence = <Sequence>v;
-			return new Sequence(inject(seq.left, c, sequence.value1), sequence.value2);
-		}
+		// Count the number of new lines in the match for line number calculations.
+		let numLines = (bestMatch.match![0].match(/\n/g)||[]).length;
 
-		if (v.constructor == Left) {
-			let left = <Left>v;
-			if (left.value.constructor == Sequence) {
-				let sequence = <Sequence>left.value;
-				return new Sequence(inject(seq.left, c, sequence.value1), sequence.value2);
+		// Add token to list of tokens.
+		tokens.push({
+			type: bestMatch.type,
+			match: bestMatch.match![0],
+			position: {
+				start: lineNumber,
+				end: lineNumber + numLines
 			}
-		}
+		});
 
-		if (v.constructor == Right) {
-			let right = <Right>v;
-			return new Sequence(seq.left.mkeps(), inject(seq.right, c, right.value));
-		}
+		// Increment the character pointer by the number of characters matched, skipping the characters that were matched.
+		i += bestMatch.match![0].length;
+
+		// Increment the line number by the number of new line characters in the matched token.
+		lineNumber += numLines;
 	}
 
-	if (r.constructor == Star) {
-		let star = <Star>r;
-		if (v.constructor == Sequence) {
-			let sequence = <Sequence>v;
-			if (sequence.value2.constructor == Stars) {
-				let stars = <Stars>sequence.value2;
-				return new Stars([inject(star.exp, c, sequence.value1)].concat(stars.values));
-			}
-		}
-	}
-
-	if (r.constructor == Rec) {
-		let rec = <Rec>r;
-		return new RecV(rec.type, inject(rec.exp, c, v));
-	}
-
-	if (r.constructor == Range)
-		return new Character(c);
-
-	if (r.constructor == Plus) {
-		let plus = <Plus>r;
-		if (v.constructor == Sequence) {
-			let sequence = <Sequence>v;
-			if (sequence.value2.constructor == Stars) {
-				let stars = <Stars>sequence.value2;
-				return new Stars([inject(plus.exp, c, sequence.value1)].concat(stars.values));
-			}
-		}
-	}
-
-	if (r.constructor == NTimes) {
-		let nTimes = <NTimes>r;
-		if (v.constructor == Sequence) {
-			let sequence = <Sequence>v;
-			if (sequence.value2.constructor == Stars) {
-				let stars = <Stars>sequence.value2;
-				return new Stars([inject(nTimes.exp, c, sequence.value1)].concat(stars.values));
-			}
-		}
-	}
-
-	if (r.constructor == Optional) {
-		let optional = <Optional>r;
-		return inject(optional.exp, c, v);
-	}
-
-	throw new Error(`Unhandled combination of regular expression, character and value in inject function: (${r.constructor.name}, ${c}, ${v.constructor.name}).`);
-}
-
-/**
- * Recursively lex a string.
- * @deprecated
- * @param r The regular expression to use to lex the string.
- * @param input The string to lex.
- */
-export function lex(r: RExp, input: string) : Value {
-	// Base case.
-	if (input.length == 0) {
-		if (r.nullable()) {
-			let result = r.mkeps();
-			return result;
-		} else throw new Error("Invalid character in input. " + input);	
-	}
-
-	// Simplify and lex.
-	let simplification : Simplification = r.derivative(input[0]).simplify();
-	return inject(r, input[0], simplification.simplify(lex(simplification.regex, input.substr(1))));
-}
-
-/**
- * Iteratively lex a string.
- * @param r The regular expression to use to lex the string.
- * @param input The input.
- */
-export function lexIterative(r: RExp, input: string) : Value {
-	// Generate the derivatives based on the characters in the input.
-	let simplifications : Simplification[] = [];
-	for (var i = 0; i < input.length; i++) {
-		let regex = simplifications.length == 0 ? r : simplifications[i - 1].regex;
-		simplifications.push(regex.derivative(input[i]).simplify());
-	}
-
-	// Store an array of values.
-	let values : Value[] = [];
-
-	// If the final simplified regex is not nullable, the input is invalid.
-	if (simplifications[simplifications.length - 1].regex.nullable())
-		values.push(simplifications[simplifications.length - 1].regex.mkeps());
-	else throw new Error("Invalid character in input.");
-
-	// Apply the injections.
-	for (var i = simplifications.length - 1; i >= 0; i--) {
-		// Apply the current simplification to the last value added.
-		let simplified = simplifications[i].simplify(values[values.length - 1]);
-
-		// Inject the current character into the previous regex.
-		values.push(inject(i == 0 ? r : simplifications[i - 1].regex, input[i], simplified));
-	}
-
-	// Return the final value.
-	return values[values.length - 1];
-}
-
-/**
- * Iteratively lex a string using a more advanced lexing method.
- * @param r The regular expression to use to lex the string.
- * @param input The input.
- */
-export function lexAdvanced(r: RExp, input: string) {
-	// Convert regular expression to annotated regular expression.
-	let internalised : ARExp = r.internalise();
-
-	// Generate the derivatives based on the characters in the input.
-	let derivatives : ARExp[] = [];
-	for (var i = 0; i < input.length; i++) {
-		let regex = derivatives.length == 0 ? internalised : derivatives[i - 1];
-		derivatives.push(regex.derivative(input[i]).simplify());
-	}
-
-	// If the final derivative is not nullable, the lexing process failed.
-	let finalDerivative = derivatives[derivatives.length - 1];
-	if (!finalDerivative.nullable()) throw new Error("Invalid character in input.");
-
-	// Decode the final derivative.
-	let tokens = decode([r], finalDerivative.mkeps());
 	return tokens;
 }
 
 /**
- * Bit decoding function.
+ * Group tokens together based on the lines in which they appear.
+ * @param tokens The tokens to put into groups.
  */
-function decode(expressions: RExp[], bits: Bit[]) : Token[] {
-	// List of tokens to store values in.
-	let tokens : Token[] = [];
+export function generateTokenGroups(tokens: Token[]) : TokenGroup[] {
+	let groups : TokenGroup[] = [];
+	let filteredTokens = tokens.filter(token => token.type != TokenType.Whitespace);
+	for (var i = 0; i < filteredTokens.length; i++) {
+		// Get the current token.
+		let token = filteredTokens[i];
+		let nextToken : Token | null = i < filteredTokens.length - 1 ? filteredTokens[i + 1] : null;
 
-	// Infinite loop prevention.
-	let lastExpression = "", lastBit = "";
-	while(expressions.length > 0 && bits.length > 0) {
-		// Prevent an infinite loop from occurring (this should not happen but it's here for debugging purposes).
-		if (expressions[0].toString() == lastExpression && bits[0].toString() == lastBit)
-			throw new Error("Infinite loop detected in decode function.");
-
-		lastExpression = expressions[0].toString();
-		lastBit = bits[0].toString();
-
-		// Get the current expression.
-		let expression = expressions[0];
-
-		// ONE - Remove the current expression.
-		if (expression.constructor == One) {
-			expressions = expressions.slice(1);
+		// Just add the first item.
+		if (groups.length == 0) {
+			groups.push({
+				start: token.position!.start,
+				end: token.position!.end,
+				lineData: new Set([token.type])
+			});
 			continue;
 		}
 
-		// ALT.
-		if (expression.constructor == Alt) {
-			let alt = <Alt>expression;
+		// Calculate the number of lines the token takes up.
+		let tokenLength = (token.position!.end - token.position!.start) + 1;
+		let lastGroup : TokenGroup = groups[groups.length - 1];
 
-			// Switch bits.
-			if (bits[0].constructor == Z) {
-				expressions = [alt.left].concat(expressions.slice(1));
-				bits = bits.slice(1);
-				continue;
+		// The current token starts on the same line as the previous group.
+		if (token.position!.start == lastGroup.end) {
+			// Add the first line part to the last group.
+			lastGroup.lineData.add(token.type);
+
+			// Create new group to house the new section.
+			if (tokenLength > 1) {
+				groups.push({
+					start: token.position!.start + 1,
+					end: token.position!.end,
+					lineData: new Set([token.type])
+				});
 			}
-
-			if (bits[0].constructor == S) {
-				expressions = [alt.right].concat(expressions.slice(1));
-				bits = bits.slice(1);
-				continue;
-			}
-		}
-
-		// SEQ.
-		if (expression.constructor == Seq) {
-			let seq = <Seq>expression;
-			expressions = [seq.left, seq.right].concat(expressions.slice(1));
-			continue;
-		}
-
-		// STAR.
-		if (expression.constructor == Star) {
-			let star = <Star>expression;
-
-			if (bits[0].constructor == Z) {
-				expressions = [star.exp, star].concat(expressions.slice(1));
-				bits = bits.slice(1);
-				continue;
-			}
-
-			if (bits[0].constructor == S) {
-				expressions = expressions.slice(1);
-				bits = bits.slice(1);
-				continue;
-			}
-		}
-
-		// REC.
-		if (expression.constructor == Rec) {
-			let rec = <Rec>expression;
-			expressions = [rec.exp].concat(expressions.slice(1));
-			tokens.unshift({
-				type: rec.type,
-				match: ""
+		} else if (lastGroup.lineData.has(token.type) && lastGroup.lineData.size == 1 && token.position!.start == lastGroup.end + 1 && 
+				(!nextToken || nextToken!.type == token.type || nextToken.position!.start != token.position!.end)) { // Perform lookahead to avoid wrong attribution of token types.
+			// Expand the previous group if it only contains the current token type and we're on the next line.
+			lastGroup.end = token.position!.end;
+		} else {
+			// The token starts after the end of the previous group.
+			groups.push({
+				start: token.position!.start,
+				end: token.position!.end,
+				lineData: new Set([token.type])
 			});
 		}
-
-		// Characters.
-		if (bits[0].constructor == C && (expression.constructor == Char || expression.constructor == CharSet || expression.constructor == Range)) {
-			// Get the character and remove the first expression and bit.
-			let charBit = <C>bits[0];
-			expressions = expressions.slice(1);
-			bits = bits.slice(1);
-
-			// Add the new character to the latest token.
-			tokens[0].match = charBit.char + tokens[0].match;
-			continue;
-		}
 	}
-
-	return tokens.reverse();
-}
-
-/**
- * Get the series of tokens from lexing the string including the line numbers where each token begins and ends.
- * @param r The regular expression to lex the string with.
- * @param input The string to lex.
- */
-export function getTokens(r: RExp, input: string) : Token[] {
-	let result = lexIterative(r, input).env();
-
-	// Calculate line numbers.
-	var currentLineNumber = 1;
-	result.map(token => {
-		// Find number of new-line characters in the token.
-		let numLines = (token.match.match(/\n/g)||[]).length;
-
-		// Write the position to the token.
-		token.position = {
-			start: currentLineNumber,
-			end: currentLineNumber + numLines
-		};
-
-		// Update the counter.
-		currentLineNumber += numLines;
-	});
-
-	return result;
-}
-
-/**
- * Test the performance of different lexing methods.
- */
-export function testLexing() {
-	try {
-		logger.info("Running performance test...");
-		// Set up test language.
-		let language : RExp = new Rec(TokenType.Documentation, new Seq(new Seq(new Char("/"), new Char("*")), new Seq(
-			new Star(new Char("1")),
-			new Seq(
-				new Char("*"), new Char("/")
-			))
-		));
-
-		// Loop through lengths of strings to match.
-		for (var i = 0; i <= 2000; i += 250) {
-			// Make the test string.
-			let string = `/*${"1".repeat(i)}*/`;
-
-			// Test iterative.
-			console.time(`iter_${i}`);
-			lexIterative(language, string);
-			console.timeEnd(`iter_${i}`);
-
-			// Test recursive.
-			console.time(`recur_${i}`);
-			lex(language, string);
-			console.timeEnd(`recur_${i}`);
-
-			console.time(`advanced_${i}`);
-			lexAdvanced(language, string);
-			console.timeEnd(`advanced_${i}`);
-
-			// Add new line.
-			console.log("");
-		}
-		
-	} catch (e) {
-		logger.error(`An error occurred while running performance test: ${e}.`);
-	}
+	
+	return groups;
 }

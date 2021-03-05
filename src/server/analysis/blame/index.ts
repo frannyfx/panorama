@@ -10,97 +10,45 @@ import Git from "nodegit";
 const logger = require("../../utils/logger")("blame");
 
 // Interfaces
-interface LineHunk {
-	commit: string,
-	startLine: number,
-	endLine: number
-};
-
-interface BlameContributor {
-	name: string,
-	email: string,
-	lines: {
-		count: number,
-		percentage?: number,
-		hunks: LineHunk[]
-	},
-};
-
-interface ContributorMap {
-	[key: string]: BlameContributor
+/**
+ * A chunk of code written by a specific contributor.
+ */
+export interface BlameGroup {
+	start: number,
+	end: number,
+	contributorId: string
 }
 
-interface FileBlame {
-	file: string,
-	contributors: ContributorMap,
-
-};
-
 /**
- * Calculate blame and percentages for a specific file.
- * @param repository The repository to process the file from.
- * @param file The path of the file to process.
+ * Get the list of blame groups.
+ * @param repository The repository to get the blames form.
+ * @param file The relative path of the file.
  */
-async function blameFile(repository: Git.Repository, file: string) : Promise<FileBlame> {
+export async function generateBlameGroups(repository: Git.Repository, file: string) : Promise<BlameGroup[]> {
+	// Get blames.
 	let blame = await Git.Blame.file(repository, file);
 
 	// Map contributor emails to BlameContributors.
-	let contributors : ContributorMap = {};
-	var linesProcessed = 0;
-
+	let blameGroups : BlameGroup[] = [];
 	for (var i = 0; i < blame.getHunkCount(); i++) {
 		// Get hunk data.
 		let hunk = blame.getHunkByIndex(i);
-		let commitId = hunk.origCommitId().toString();
-		let startLine = hunk.finalStartLineNumber();
+		let start = hunk.finalStartLineNumber();
 		let lineCount = hunk.linesInHunk();
-		let endLine = startLine + lineCount - 1;
+		let end = start + lineCount - 1;
 
-		// Update num lines processed.
-		linesProcessed += lineCount;
-
-		// Put hunk data in a LineHunk object.
-		let lineHunk : LineHunk = {
-			commit: commitId,
-			startLine, endLine
-		};
-		
 		// Get contributor data.
-		let name = hunk.finalSignature().name();
-		let email = hunk.finalSignature().email();
+		let contributorId = hunk.finalSignature().email();
 
-		// Look up contributor or create new contributor.
-		let contributor = contributors[email] ? contributors[email] : {
-			name, email, lines: {
-				count: 0,
-				percentage: 0,
-				hunks: []
-			}
-		};
+		// Get the previous group.
+		let previousGroup : BlameGroup | null = blameGroups.length > 0 ? blameGroups[blameGroups.length - 1] : null;
 
-		// Update contributor data.
-		contributor.lines.count += lineCount;
-		contributor.lines.hunks.push(lineHunk);
-		contributors[email] = contributor;
+		// Try to merge with the previous group if appropriate.
+		if (previousGroup && previousGroup.end == start - 1 && previousGroup.contributorId == contributorId) blameGroups[blameGroups.length - 1].end = end;
+		else blameGroups.push({
+			start, end, contributorId
+		});		
 	}
 
-	// Calculate the percentages.
-	Object.keys(contributors).map((email : string) => {
-		contributors[email].lines.percentage = contributors[email].lines.count / linesProcessed;
-	});
-
-	return {
-		file,
-		contributors: contributors
-	};
-}
-
-/**
- * Compute blames for all the files specified in the list for a given repository.
- * @param repository The repository to generate the blames for.
- * @param files The files to be processed.
- */
-export async function computeRepoBlame(repository: Git.Repository, files: string[]) : Promise<FileBlame[]>{
-	let fileBlames = await Promise.all(files.map(file => blameFile(repository, file)));
-	return fileBlames;
+	return blameGroups;
 }

@@ -8,6 +8,7 @@ import { promises as fs } from "fs";
 import path from "path";
 import BeeQueue from "bee-queue";
 import Git, { Branch } from "nodegit";
+import util from "util";
 
 // Config
 import loadConfig, { Config } from "../Config";
@@ -19,10 +20,12 @@ import cache, { getCacheDir, getRepository, insertRepository, removeRepository }
 import queue, { RepoJob, RepoJobResult } from "./queue";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
 import { buildResult, Result } from "../../shared/Result";
-import { computeRepoBlame } from "./blame";
-import lexing, { lexFile, LexingResult } from "./lexing";
-import { sleep } from "../../shared/utils";
-import { testLexing } from "./lexing/Lexer";
+import { generateBlameGroups } from "./blame";
+import lexing, { getRegisteredLexers, lexFile } from "./lexing";
+import { generateTokenGroups } from "./lexing/Lexer";
+import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item";
+
+
 
 /**
  * Start the analysis system.
@@ -36,9 +39,6 @@ export async function start() {
 
 	// Load lexers.
 	await lexing.registerLexers();
-
-	// Test lexing.
-	testLexing();
 	
 	// Get queue.
 	let repoQueue = queue.getRepoQueue();
@@ -217,6 +217,9 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	// Report progress that the job is starting.
 	reportJobProgress(job, AnalysisStage.Starting);
 
+	// Get contributor GitHub IDs to use as a lookup table.
+	// ...
+
 	// Get the repository.
 	let repository = await getJobRepository(job);
 	if (!repository) return done(new Error("Could not retrieve the repository."));
@@ -229,34 +232,36 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let files = await getRepoFiles(repository);
 	if (!files) return done(new Error("Could not analyse repository files."));
 
-	// Process the files using Git blame.
 	// TODO: Filter .panoramaignore files.
-	let fileBlames = await computeRepoBlame(repository, files);
-	/*fileBlames.map(blame => {
-		console.log(blame.file, blame.contributors);
-		Object.keys(blame.contributors).map(key => {
-			console.log(blame.contributors[key].lines);
-		})
-	});*/
-	
-	// Get complete file paths and lex the files.
+	// Lex and process blame on files, combining the analysis.
 	let repoDir = path.join(getCacheDir(), job.data.repository.name);
-	/*let lexingResults : LexingResult[] = [];
+	let analysisResults : AnalysedItem[] = [];
 	for (let file of files) {
-		console.log(`File ${file} being lexed.`);
-		lexingResults.push(await lexFile(repoDir, file));
-	}
-	
-	
-	lexingResults.map(result => console.log(result.ok, result.path, result.tokens!));*/
-	// Integrate the lexer analysis with the file blames.
-	// ...
+		let result = await lexFile(repoDir, file);
 
-	// Process contributors.
-	// ...
+		// If the lexing was successful, generate token and blame groups.
+		if (result.ok) {
+			let tokenGroups = await generateTokenGroups(result.tokens!);
+			let blame = await generateBlameGroups(repository, file);
+
+			// Integrate the two analysis results together
+			let analysis = processFileAnalysis(file, tokenGroups, blame);
+			analysisResults.push(analysis);
+			//console.log(util.inspect(analysis, false, null, true));
+		}
+	}
+
+	logger.success(`Analysed ${analysisResults.length} files from repository '${job.data.repository.name}'.`);
+
+	// Aggregate analysis data into subfolders.
+	let folderEntries : AnalysedItem[] = generateFolderEntries(analysisResults);
+	analysisResults.concat(folderEntries);
 	
+	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.name}'.`);
+
 	// Commit analysis to database.
 	// ...
+	
 	reportJobProgress(job, AnalysisStage.Finalising);
 	done(null);
 }

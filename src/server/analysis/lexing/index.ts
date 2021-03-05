@@ -9,7 +9,7 @@ import path from "path";
 
 // Modules
 const logger = require("../../utils/logger")("lexing");
-import { Lexer, getTokens, Token } from "./Lexer";
+import { Lexer, Token, lex, isLexer } from "./Lexer";
 import { walkDir } from "../../utils";
 import getRoot from "../../utils/root";
 
@@ -26,20 +26,13 @@ export interface LexingResult {
 	ok: boolean,
 	path: string,
 	extension?: string,
-	tokens?: Token[]
+	tokens?: Token[],
+	numLines?: number
 };
 
 // Constants
 const jsRegex = /([a-zA-Z0-9\s_\\.\-\(\):])+(.js)$/;
 const registeredLexers : LexerMap = {};
-
-/**
- * TypeScript type checker for lexers.
- * @param lexer The object to validate as a lexer.
- */
-function isLexer(lexer: any): lexer is Lexer {
-	return lexer; // TODO: Validate the lexers.
-}
 
 /**
  * Register the lexers in the given folders.
@@ -51,11 +44,19 @@ export async function registerLexers() {
 
 	// Import lexers.
 	let lexers : Lexer[] = (await Promise.all(lexerPaths.map(async (lexerPath : string) => (await import(lexerPath)).default))).filter(lexer => isLexer(lexer));
-	
+
 	// Register the lexers.
 	lexers.map(lexer => {
 		lexer.extensions.map(extension => registeredLexers[extension] = lexer);
 	});
+}
+
+/**
+ * Get the map of registered lexers.
+ * @deprecated
+ */
+export function getRegisteredLexers() : LexerMap {
+	return registeredLexers;
 }
 
 /**
@@ -84,10 +85,13 @@ export async function lexFile(repoPath: string, filePath: string) : Promise<Lexi
 	}
 
 	try {
+		let result = lex(registeredLexers[extension], contents);
+
 		return {
 			ok: true,
 			path: filePath, extension,
-			tokens: getTokens(registeredLexers[extension].expression, contents)
+			tokens: result,
+			numLines: result.length > 0 ? result[result.length - 1].position!.end : 0
 		};
 	} catch (e) {
 		logger.error(`Unable to lex file '${path}': ${e}`);
