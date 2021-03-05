@@ -22,6 +22,11 @@ import cache from "../../../../../analysis/cache";
 import { getRepository, Repository } from "../../../../../github";
 import ticket from "../../../../../crypto/ticket";
 
+// Models
+import DatabaseAnalysis from "../../../../../database/models/Analysis";
+import DatabaseRepository from "../../../../../database/models/Repository";
+import DatabaseUser from "../../../../../database/models/User";
+
 let route : Array<Route> = [{
 	method: Method.PUT,
 	url: "/api/queue/repo",
@@ -38,6 +43,39 @@ let route : Array<Route> = [{
 
 		// Create job.
 		try {
+			// Insert data into the database and return a server error if any of those inserts fail.
+			// TODO: MySQL transaction.
+			// TODO: Just use throw for the errors since we're in a try/catch block.
+			// - Requesting user.
+			if (!(await DatabaseUser.insertOrUpdate({
+				userId: request.auth!.payload!.id,
+				login: request.auth!.payload!.login,
+				lastAccess: new Date()
+			}))) return send(response, Codes.ServerError);
+			
+			// - Repository owner.
+			if (!(await DatabaseUser.insertOrUpdate({
+				userId: repositoryResult.result!.owner.id,
+				login: repositoryResult.result!.owner.login
+			}))) return send(response, Codes.ServerError);
+
+			// - Repository.
+			if (!(await DatabaseRepository.insertOrUpdate({
+				repositoryId: repositoryResult.result!.id,
+				name: repositoryResult.result!.name,
+				ownerId: repositoryResult.result!.owner.id,
+				lastAnalysis: new Date()
+			}))) return send(response, Codes.ServerError);
+
+			// - Analysis
+			let databaseAnalysis = await DatabaseAnalysis.insert({
+				repositoryId: repositoryResult.result!.id,
+				requestedBy: request.auth!.payload!.id,
+				queuedAt: new Date()
+			});
+
+			if (!databaseAnalysis.analysisId) return send(response, Codes.ServerError);
+
 			// Create repository item with only the necessary data.
 			let repository : Repository = {
 				id: repositoryResult.result!.id,
@@ -49,6 +87,7 @@ let route : Array<Route> = [{
 			// Add the job to the queue.
 			let job = await queue.getRepoQueue()!.createJob({
 				repository,
+				analysis: databaseAnalysis,
 				access_token: request.auth!.token!
 			}).save();
 
@@ -60,7 +99,7 @@ let route : Array<Route> = [{
 
 			// TODO: Handle failed job ticket generation.
 
-			// Send ID.
+			// Send the job ID and the ticket to the user.
 			send(response, Codes.OK, {
 				jobId: job.id,
 				ticket: jobTicket

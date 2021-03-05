@@ -25,7 +25,8 @@ import lexing, { getRegisteredLexers, lexFile } from "./lexing";
 import { generateTokenGroups } from "./lexing/Lexer";
 import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item";
 
-
+// Models
+import Analysis, { DatabaseAnalysis } from "../database/models/Analysis";
 
 /**
  * Start the analysis system.
@@ -214,9 +215,21 @@ function getRepoFiles(repository: Git.Repository) : Promise<string[] | null> {
 export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) {
 	logger.info(`Analysing repository '${job.data.repository.name}'.`);
 
-	// Report progress that the job is starting.
-	reportJobProgress(job, AnalysisStage.Starting);
+	// Fix badly parsed date (BeeQueue serialisation error due to Redis? TODO: Look into this).
+	let analysis : DatabaseAnalysis = {
+		analysisId: job.data.analysis.analysisId,
+		repositoryId: job.data.analysis.repositoryId,
+		requestedBy: job.data.analysis.requestedBy,
+		queuedAt: new Date(job.data.analysis.queuedAt)
+	};
 
+	// Update the database analysis model.
+	analysis.startedAt = new Date();
+	Analysis.update(analysis);
+
+	// Report to the user that the job is starting.
+	reportJobProgress(job, AnalysisStage.Starting);
+	
 	// Get contributor GitHub IDs to use as a lookup table.
 	// ...
 
@@ -260,9 +273,11 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.name}'.`);
 
 	// Commit analysis to database.
-	// ...
-	
 	reportJobProgress(job, AnalysisStage.Finalising);
+
+	// Set the job completion date and call the done callback.
+	analysis.completedAt = new Date();
+	Analysis.update(analysis);
 	done(null);
 }
 

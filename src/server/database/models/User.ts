@@ -10,16 +10,33 @@ import { getConnection } from "../";
 export interface DatabaseUser {
 	userId: number,
 	login: string,
-	lastAccess: Date
+	lastAccess?: Date
 };
 
 /**
  * Insert a user into the database.
  * @param user The user to insert.
  */
-export async function insert(user: DatabaseUser) {
-	let database = await getConnection();
-	// ...	
-	/*let userId = database!.insert(user);
-	return userId;*/
+export async function insertOrUpdate(user: DatabaseUser) : Promise<boolean> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return false;
+
+	// Check if the user already exists.
+	let userResult = await connection("User").select("userId").where({userId: user.userId}).limit(1);
+	if (userResult.length == 0)
+		await connection("User").insert(user);
+	else {
+		// Update the existing user.
+		await connection("User").where({ userId: user.userId }).update({
+			login: user.login,
+			lastAccess: user.lastAccess
+		});
+	}
+
+	return true;
 }
+
+export default {
+	insertOrUpdate
+};

@@ -9,6 +9,7 @@ import redis, { RedisClient } from "redis";
 
 // Config
 import loadConfig, { Config } from "../Config";
+import { DatabaseAnalysis } from "../database/models/Analysis";
 import { Repository } from "../github";
 const config : Config = loadConfig();
 
@@ -18,6 +19,7 @@ const logger = require("../utils/logger")("queue");
 // Interfaces
 export interface RepoJob {
 	repository: Repository,
+	analysis: DatabaseAnalysis,
 	access_token: string
 };
 
