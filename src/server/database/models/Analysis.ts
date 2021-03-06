@@ -7,6 +7,9 @@
 import { getConnection } from "../";
 
 // Interfaces
+/**
+ * The interface matching the Analysis table in the database.
+ */
 export interface DatabaseAnalysis {
 	analysisId?: number,
 	repositoryId: number,

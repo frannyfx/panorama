@@ -7,6 +7,9 @@
 import { getConnection } from "../";
 
 // Interfaces
+/**
+ * The interface matching the Repository table in the database.
+ */
 export interface DatabaseRepository {
 	repositoryId: number,
 	name: string,

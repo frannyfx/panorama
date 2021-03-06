@@ -260,7 +260,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 			// Integrate the two analysis results together
 			let analysis = processFileAnalysis(file, tokenGroups, blame);
 			analysisResults.push(analysis);
-			//console.log(util.inspect(analysis, false, null, true));
+			console.log(util.inspect(analysis, false, null, true));
 		}
 	}
 

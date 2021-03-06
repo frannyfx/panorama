@@ -31,6 +31,7 @@ export interface Repository {
  * @param url 
  * @param payload 
  * @param auth 
+ * @deprecated
  */
 export async function send(method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload: Object | undefined = undefined, access_token: string | undefined = undefined, auth: AxiosBasicCredentials | undefined = undefined) : Promise<Result> {
 	try {
@@ -60,6 +61,7 @@ export async function send(method: "GET" | "POST" | "PUT" | "DELETE", url: strin
 /**
  * 
  * @param accessToken 
+ * @deprecated
  */
 export async function checkAuth(accessToken: string) : Promise<Result> {
 	// Get data associated with the access token from GitHub.
@@ -73,6 +75,7 @@ export async function checkAuth(accessToken: string) : Promise<Result> {
 /**
  * 
  * @param code 
+ * @deprecated
  */
 export async function getAccessToken(code: string) : Promise<Result> {
 	// Get response data.
@@ -100,6 +103,13 @@ export async function getAccessToken(code: string) : Promise<Result> {
 	return buildResult(true, result);
 }
 
+/**
+ * 
+ * @param name 
+ * @param access_token 
+ * @returns 
+ * @deprecated
+ */
 export async function getRepository(name: string, access_token: string) : Promise<Result> {
 	// Get response data.
 	let response = await send("GET", `https://api.github.com/repos/${name}`, undefined, access_token);

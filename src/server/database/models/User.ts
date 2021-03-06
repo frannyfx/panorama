@@ -7,6 +7,9 @@
 import { getConnection } from "../";
 
 // Interfaces
+/**
+ * The interface matching the User table in the database.
+ */
 export interface DatabaseUser {
 	userId: number,
 	login: string,
