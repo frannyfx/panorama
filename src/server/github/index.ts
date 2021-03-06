@@ -5,6 +5,9 @@
 
 // Imports
 import axios, { AxiosBasicCredentials } from "axios";
+import { Octokit } from "@octokit/rest";
+import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
+import { GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
 
 // Config
 import loadConfig, { Config } from "../Config";
@@ -14,114 +17,82 @@ const config : Config = loadConfig();
 import { Method } from "../../shared/Method";
 import { Result, buildResult, Data } from "../../shared/Result";
 
-// Constants
-// ...
+// Types
+let octokitForTypes = new Octokit();
+export type Repository = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.get>;
+export type User = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.users.getAuthenticated>;
 
-// Interfaces
-export interface Repository {
-	id: number,
-	name: string,
-	size: number,
-	updated_at: Date
-};
+// Constants
+const octokitAuth = createOAuthAppAuth({
+	clientId: config.github!.clientId,
+	clientSecret: config.github!.clientSecret
+});
+
+// Variables
+var octokitInstance : Octokit | null = null;
 
 /**
- * 
- * @param method 
- * @param url 
- * @param payload 
- * @param auth 
- * @deprecated
+ * Get the current instance of Octokit.
  */
-export async function send(method: "GET" | "POST" | "PUT" | "DELETE", url: string, payload: Object | undefined = undefined, access_token: string | undefined = undefined, auth: AxiosBasicCredentials | undefined = undefined) : Promise<Result> {
+async function getOctokit() : Promise<Octokit> {
+	if (!octokitInstance) octokitInstance = new Octokit({ auth: await octokitAuth({ type: "oauth-app" }) });
+	return octokitInstance;
+}
+
+/**
+ * Check a user's authentication token.
+ * @param accessToken The access token whose auth needs to bechecked.
+ * @returns A result containing the user's information.
+ */
+export async function checkAuth(accessToken: string) : Promise<Result<User>> {
+	let octokit = new Octokit({
+		auth: accessToken
+	});
+
+	let result = await octokit.users.getAuthenticated();
+	return buildResult(result.status == 200, result.data);
+}
+
+/**
+ * Complete the authentication process with GitHub.
+ * @param code The code received by the user.
+ * @returns A result containing the access token.
+ */
+export async function getAccessToken(code: string) : Promise<Result<string>> {
 	try {
-		// Build headers.
-		let headers : Data = {
-			Accept: "application/json"
-		};
-
-		if (!auth && access_token) headers.Authorization = `Bearer ${access_token}`;
-
-		// Send request.
-		let result = await axios({
-			method,
-			auth,
-			headers,
-			url,
-			data: payload,
-			responseType: "json"
+		let authentication = await octokitAuth({
+			type: "token",
+			code
 		});
 
-		return buildResult(true, result.data);
+		return buildResult(true, (<Data>authentication).token);
 	} catch (e) {
-		return buildResult(false, e.response);
+		return buildResult(false);
 	}
 }
 
 /**
- * 
- * @param accessToken 
- * @deprecated
+ * Get a repository.
+ * @param name The full name of the repository.
+ * @param accessToken The user's access token.
+ * @returns A result containing the requested repository.
  */
-export async function checkAuth(accessToken: string) : Promise<Result> {
-	// Get data associated with the access token from GitHub.
-	let response = await send("GET", "https://api.github.com/user", undefined, accessToken);
-
-	// Check if an error has occurred in checking the auth.
-	if (!response.status.ok) return buildResult(false);
-	return buildResult(true, response.result);
-}
-
-/**
- * 
- * @param code 
- * @deprecated
- */
-export async function getAccessToken(code: string) : Promise<Result> {
-	// Get response data.
-	let response = await send("POST", "https://github.com/login/oauth/access_token", {
-		client_id: config.github?.clientId,
-		client_secret: config.github?.clientSecret,
-		code
+export async function getRepository(name: string, accessToken: string) : Promise<Result<Repository>> {
+	// Build new Octokit with the provided access token.
+	let octokit = new Octokit({
+		auth: accessToken
 	});
 
-	// Check if an error has occurred.
-	if (!response.status.ok)
-		return buildResult(false);
+	// Get owner and repo name.
+	let split = name.split("/");
+	if (split.length != 2) return buildResult(false);
 
-	// Check if GitHub returned an error.
-	if (response.result?.error)
-		return buildResult(false, undefined, response.result?.error);
 
-	// Return the token.
-	let result = {
-		accessToken: response.result?.access_token,
-		scope: response.result?.scope,
-		tokenType: response.result?.token_type
-	};
-
-	return buildResult(true, result);
-}
-
-/**
- * 
- * @param name 
- * @param access_token 
- * @returns 
- * @deprecated
- */
-export async function getRepository(name: string, access_token: string) : Promise<Result> {
-	// Get response data.
-	let response = await send("GET", `https://api.github.com/repos/${name}`, undefined, access_token);
-
-	// Check if an error has occurred.
-	if (!response.status.ok)
-		return buildResult(false);
-
-	// Check if GitHub returned an error.
-	if (response.result?.message)
-		return buildResult(false, undefined, response.result?.message);
-
-	// Return the repository data.
-	return buildResult(true, response.result);
+	// Get repository.
+	let result = await octokit.repos.get({
+		owner: split[0],
+		repo: split[1]
+	});
+	
+	return buildResult(result.status == 200, result.data);
 }

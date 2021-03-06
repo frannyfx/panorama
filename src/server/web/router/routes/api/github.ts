@@ -48,7 +48,7 @@ let route : Array<Route> = [{
 		// Get access token and return it.
 		let result = await getAccessToken(request.params!.code);
 		if (!result.status.ok) return send(response, Codes.GenericError);
-		send(response, Codes.OK, result.result);
+		send(response, Codes.OK, { accessToken: result.result });
 	}
 }];
 

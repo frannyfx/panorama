@@ -9,12 +9,12 @@ export interface Data {
 };
 
 // Result interface.
-export interface Result {
+export interface Result<T = Data | undefined>{
 	status: {
 		ok: boolean,
 		message?: string
 	},
-	result?: Data
+	result?: T
 }
 
 /**
@@ -41,7 +41,7 @@ export function isResult(obj: any): obj is Result {
  * @param result The payload.
  * @param message A string associated with the possible error.
  */
-export function buildResult(ok: boolean, result: Data | undefined = undefined, message: string | undefined = undefined) : Result {
+export function buildResult<T = Data | undefined>(ok: boolean, result: T | undefined = undefined, message: string | undefined = undefined) : Result<T> {
 	return {
 		status: {
 			ok,

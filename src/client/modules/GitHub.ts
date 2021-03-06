@@ -21,7 +21,7 @@ var instance : Octokit | null = null;
 /**
  * Get the current instance of Octokit.
  */
-async function getOctokit() : Promise<Octokit> {
+function getOctokit() : Octokit {
 	// Return instance if it already exists.
 	if (instance) return instance;
 
@@ -34,7 +34,7 @@ async function getOctokit() : Promise<Octokit> {
 
 
 export async function getProfile() : Promise<Result> {
-	let result = await (await getOctokit()).users.getAuthenticated();
+	let result = await getOctokit().users.getAuthenticated();
 	
 	return {
 		status: {
@@ -50,7 +50,7 @@ export function getRedirectURI() : string {
 
 export async function getRepositories() : Promise<Repository[]> {
 	// Get repos.
-	let result = await (await getOctokit()).repos.listForAuthenticatedUser({
+	let result = await getOctokit().repos.listForAuthenticatedUser({
 		per_page: 10,
 		affiliation: "owner,collaborator",
 		sort: "updated",
@@ -62,7 +62,7 @@ export async function getRepositories() : Promise<Repository[]> {
 	// Get contributors.
 	let reposWithContributors : Repository[] = await Promise.all(result.data.map(async repo => {
 		// Get contributors and convert them to User instances.
-		let contributorsResult = await (await getOctokit()).repos.listContributors({
+		let contributorsResult = await getOctokit().repos.listContributors({
 			owner: repo.owner!.login,
 			repo: repo.name,
 			per_page: 5
@@ -78,7 +78,7 @@ export async function getRepositories() : Promise<Repository[]> {
 
 export async function getFiles(repository: Repository, path: string) : Promise<File[]> {
 	// Get files.
-	let result = await (await getOctokit()).repos.getContent({
+	let result = await getOctokit().repos.getContent({
 		owner: repository.owner.login,
 		repo: repository.name,
 		path

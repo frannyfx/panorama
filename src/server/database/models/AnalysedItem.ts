@@ -125,12 +125,15 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
 	if (!connection) return false;
 
 	// Create a list to hold the chunks.
+	/*
 	let convertedChunks : DatabaseAnalysedItemChunk[] = [];
 	analysedItems.filter(item => item.isFile).map(item => {
 		for (let chunk in item.analysis || []) {
 
 		}
-	});
+	});*/
+
+	return true;
 }
 
 /**

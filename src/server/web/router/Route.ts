@@ -11,6 +11,7 @@ import Joi from "joi";
 // Modules
 import { Method } from "../../../shared/Method";
 import { Data } from "../../../shared/Result";
+import { User } from "../../github";
 
 // The interface for the processed request payload.
 export interface Request {
@@ -26,7 +27,7 @@ export interface Request {
 export interface Auth {
 	ok: boolean,
 	token?: string,
-	payload?: Data
+	payload?: User
 }
 
 // The interface for the route handler function.

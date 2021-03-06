@@ -19,7 +19,7 @@ const logger = require("../utils/logger")("analysis");
 import cache, { getCacheDir, getRepository, insertRepository, removeRepository } from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
-import { buildResult, Result } from "../../shared/Result";
+import { buildResult, Data, Result } from "../../shared/Result";
 import { generateBlameGroups } from "./blame";
 import lexing, { getRegisteredLexers, lexFile } from "./lexing";
 import { generateTokenGroups } from "./lexing/Lexer";
@@ -103,11 +103,11 @@ async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
 		reportJobProgress(job, AnalysisStage.Cloning);
 
 		// Create repository path.
-		let repositoryPath = path.join(getCacheDir(), job.data.repository.name);
+		let repositoryPath = path.join(getCacheDir(), job.data.repository.full_name);
 		await fs.mkdir(repositoryPath, { recursive: true});
 
 		// Clone the repository.
-		let repository = await Git.Clone.clone(`https://github.com/${job.data.repository.name}.git`, repositoryPath, {
+		let repository = await Git.Clone.clone(`https://github.com/${job.data.repository.full_name}.git`, repositoryPath, {
 			fetchOpts: {
 				callbacks: {
 					credentials: () => Git.Cred.userpassPlaintextNew(job.data.access_token, "x-oauth-basic"),
@@ -134,7 +134,7 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 	// Attempt to fetch repo from cache.
 	let cachedRepository = await getRepository(job.data.repository.id);
 	if (cachedRepository) {
-		logger.info(`Repository '${job.data.repository.name}' found in cache.`);
+		logger.info(`Repository '${job.data.repository.full_name}' found in cache.`);
 		
 		// Open the repository.
 		try {
@@ -160,7 +160,7 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 
 	// Cache miss: clone repo.
 	reportJobProgress(job, AnalysisStage.Cloning);
-	logger.info(`Repository '${job.data.repository.name}' not found in cache.`);
+	logger.info(`Repository '${job.data.repository.full_name}' not found in cache.`);
 
 	// Clone the repository.
 	let cloneResult = await cloneRepository(job);
@@ -171,9 +171,9 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 	// Save the cloned repository info to the cache.
 	let cachedItem = await insertRepository({
 		id: job.data.repository.id,
-		name: job.data.repository.name,
+		name: job.data.repository.full_name,
 		path: cloneResult.result!.path,
-		updated_at: job.data.repository.updated_at,
+		updated_at: new Date(job.data.repository.updated_at),
 		analysed_at: new Date(),
 		size: job.data.repository.size
 	});
@@ -213,7 +213,7 @@ function getRepoFiles(repository: Git.Repository) : Promise<string[] | null> {
  * @param done Callback for when the job is complete.
  */
 export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) {
-	logger.info(`Analysing repository '${job.data.repository.name}'.`);
+	logger.info(`Analysing repository '${job.data.repository.full_name}'.`);
 
 	// Fix badly parsed date (BeeQueue serialisation error due to Redis? TODO: Look into this).
 	let analysis : DatabaseAnalysis = {
@@ -239,7 +239,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Set stage to lexing.
 	reportJobProgress(job, AnalysisStage.Lexing);
-	logger.info(`Lexing code from repository '${job.data.repository.name}'.`);
+	logger.info(`Lexing code from repository '${job.data.repository.full_name}'.`);
 
 	// Get the from the repository.
 	let files = await getRepoFiles(repository);
@@ -247,7 +247,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// TODO: Filter .panoramaignore files.
 	// Lex and process blame on files, combining the analysis.
-	let repoDir = path.join(getCacheDir(), job.data.repository.name);
+	let repoDir = path.join(getCacheDir(), job.data.repository.full_name);
 	let analysisResults : AnalysedItem[] = [];
 	for (let file of files) {
 		let result = await lexFile(repoDir, file);
@@ -264,13 +264,13 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		}
 	}
 
-	logger.success(`Analysed ${analysisResults.length} files from repository '${job.data.repository.name}'.`);
+	logger.success(`Analysed ${analysisResults.length} files from repository '${job.data.repository.full_name}'.`);
 
 	// Aggregate analysis data into subfolders.
 	let folderEntries : AnalysedItem[] = generateFolderEntries(analysisResults);
 	analysisResults.push(...folderEntries);
 	
-	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.name}'.`);
+	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.full_name}'.`);
 
 	// Commit analysis to database.
 	reportJobProgress(job, AnalysisStage.Finalising);

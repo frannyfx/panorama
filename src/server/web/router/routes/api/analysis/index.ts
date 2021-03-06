@@ -19,7 +19,7 @@ import { Request, Route } from "../../../Route";
 import { Codes, send } from "../../../API";
 import queue from "../../../../../analysis/queue";
 import cache from "../../../../../analysis/cache";
-import { getRepository, Repository } from "../../../../../github";
+import { getRepository } from "../../../../../github";
 import ticket from "../../../../../crypto/ticket";
 
 // Models
@@ -55,15 +55,15 @@ let route : Array<Route> = [{
 			
 			// - Repository owner.
 			if (!(await DatabaseUser.insertOrUpdate({
-				userId: repositoryResult.result!.owner.id,
-				login: repositoryResult.result!.owner.login
+				userId: repositoryResult.result!.owner!.id,
+				login: repositoryResult.result!.owner!.login
 			}))) return send(response, Codes.ServerError);
 
 			// - Repository.
 			if (!(await DatabaseRepository.insertOrUpdate({
 				repositoryId: repositoryResult.result!.id,
 				name: repositoryResult.result!.name,
-				ownerId: repositoryResult.result!.owner.id,
+				ownerId: repositoryResult.result!.owner!.id,
 				lastAnalysis: new Date()
 			}))) return send(response, Codes.ServerError);
 
@@ -76,17 +76,9 @@ let route : Array<Route> = [{
 
 			if (!databaseAnalysis.analysisId) return send(response, Codes.ServerError);
 
-			// Create repository item with only the necessary data.
-			let repository : Repository = {
-				id: repositoryResult.result!.id,
-				name: repositoryResult.result!.full_name,
-				size: repositoryResult.result!.size,
-				updated_at: new Date(repositoryResult.result!.updated_at)
-			};
-
 			// Add the job to the queue.
 			let job = await queue.getRepoQueue()!.createJob({
-				repository,
+				repository: repositoryResult.result!,
 				analysis: databaseAnalysis,
 				access_token: request.auth!.token!
 			}).save();
