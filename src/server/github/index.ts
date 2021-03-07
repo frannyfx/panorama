@@ -21,6 +21,9 @@ import { Result, buildResult, Data } from "../../shared/Result";
 let octokitForTypes = new Octokit();
 export type Repository = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.get>;
 export type User = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.users.getAuthenticated>;
+export type Contributors = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.listContributors>;
+
+
 
 // Constants
 const octokitAuth = createOAuthAppAuth({
@@ -87,7 +90,6 @@ export async function getRepository(name: string, accessToken: string) : Promise
 	let split = name.split("/");
 	if (split.length != 2) return buildResult(false);
 
-
 	// Get repository.
 	let result = await octokit.repos.get({
 		owner: split[0],
@@ -95,4 +97,40 @@ export async function getRepository(name: string, accessToken: string) : Promise
 	});
 	
 	return buildResult(result.status == 200, result.data);
+}
+
+export async function getRepositoryContributors(name: string, accessToken: string) : Promise<Result<Contributors>> {
+	// Build new Octokit with the provided access token.
+	let octokit = new Octokit({
+		auth: accessToken
+	});
+
+	// Get owner and repo name.
+	let split = name.split("/");
+	if (split.length != 2) return buildResult(false);
+
+	let result = await octokit.repos.listContributors({
+		owner: split[0],
+		repo: split[1]
+	});
+
+	return buildResult(result.status == 200, result.data);
+}
+
+export async function getCommitAuthor(owner: string, repo: string, ref: string, accessToken: string) : Promise<Result> {
+	// Build new Octokit with the provided access token.
+	let octokit = new Octokit({
+		auth: accessToken
+	});
+
+	// Get commit
+	try {
+		let result = await octokit.repos.getCommit({
+			owner, repo, ref
+		});
+	
+		return buildResult(result.status == 200, result.status == 200 && result.data.author ? result.data.author : undefined);
+	} catch (e) {
+		return buildResult(false);
+	}
 }

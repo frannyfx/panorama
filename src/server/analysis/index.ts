@@ -20,7 +20,7 @@ import cache, { getCacheDir, getRepository, insertRepository, removeRepository }
 import queue, { RepoJob, RepoJobResult } from "./queue";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
 import { buildResult, Data, Result } from "../../shared/Result";
-import { generateBlameGroups } from "./blame";
+import { ContributorMap, generateBlameGroups } from "./blame";
 import lexing, { getRegisteredLexers, lexFile } from "./lexing";
 import { generateTokenGroups } from "./lexing/Lexer";
 import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item";
@@ -28,6 +28,7 @@ import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item
 // Models
 import Analysis, { DatabaseAnalysis } from "../database/models/Analysis";
 import DatabaseAnalysedItem from "../database/models/AnalysedItem";
+import { getRepositoryContributors } from "../github";
 /**
  * Start the analysis system.
  */
@@ -231,7 +232,8 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	reportJobProgress(job, AnalysisStage.Starting);
 	
 	// Get contributor GitHub IDs to use as a lookup table.
-	// ...
+	//let contributors = await getRepositoryContributors(job.data.repository.full_name, job.data.access_token);
+	//console.log(contributors);
 
 	// Get the repository.
 	let repository = await getJobRepository(job);
@@ -241,42 +243,49 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	reportJobProgress(job, AnalysisStage.Lexing);
 	logger.info(`Lexing code from repository '${job.data.repository.full_name}'.`);
 
-	// Get the from the repository.
+	// Get the files from the repository.
+	// TODO: Filter .panoramaignore files.
 	let files = await getRepoFiles(repository);
 	if (!files) return done(new Error("Could not analyse repository files."));
 
-	// TODO: Filter .panoramaignore files.
-	// Lex and process blame on files, combining the analysis.
+	// Get the repo directory.
 	let repoDir = path.join(getCacheDir(), job.data.repository.full_name);
+
+	// Create list to hold the results of the analysis of each file.
 	let analysisResults : AnalysedItem[] = [];
+
+	// Create cache which maps contributor emails to their profiles.
+	let contributorMap : ContributorMap = {};
+
+	// Lex and process blame on files, combining the analysis.
 	for (let file of files) {
+		// Run lexing.
 		let result = await lexFile(repoDir, file);
 
 		// If the lexing was successful, generate token and blame groups.
 		if (result.ok) {
 			let tokenGroups = await generateTokenGroups(result.tokens!);
-			let blame = await generateBlameGroups(repository, file);
+			let blameGroups = await generateBlameGroups(job.data.repository.owner!.login, job.data.repository.name, job.data.access_token, repository, file, contributorMap);
 
 			// Integrate the two analysis results together
-			let analysis = processFileAnalysis(file, tokenGroups, blame);
+			let analysis = processFileAnalysis(file, tokenGroups, blameGroups);
 			analysisResults.push(analysis);
-			console.log(util.inspect(analysis, false, null, true));
-		}
+			//console.log(util.inspect(analysis, false, null, true));
+		} else logger.warn(`Lexing '${file}' from '${job.data.repository.full_name}' failed.`);
 	}
 
+	// Log a successful analysis.
 	logger.success(`Analysed ${analysisResults.length} files from repository '${job.data.repository.full_name}'.`);
 
 	// Aggregate analysis data into subfolders.
 	let folderEntries : AnalysedItem[] = generateFolderEntries(analysisResults);
 	analysisResults.push(...folderEntries);
-	
 	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.full_name}'.`);
 
 	// Commit analysis to database.
 	reportJobProgress(job, AnalysisStage.Finalising);
-	DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults);
+	//DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults);
 	
-
 	// Set the job completion date and call the done callback.
 	analysis.completedAt = new Date();
 	Analysis.update(analysis);
