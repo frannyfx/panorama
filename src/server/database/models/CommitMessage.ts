@@ -8,7 +8,7 @@ import { getConnection } from "../";
 
 // Interfaces
 /**
- * The interface matching the User table in the database.
+ * The interface matching the CommitMessage table in the database.
  */
 export interface CommitMessage {
 	commitId: string,
@@ -16,8 +16,8 @@ export interface CommitMessage {
 };
 
 /**
- * Insert a user into the database.
- * @param user The user to insert.
+ * Insert many commit messages into the database.
+ * @param messages The messages to insert.
  */
 export async function insert(messages: CommitMessage[]) : Promise<boolean> {
 	// Get connection.

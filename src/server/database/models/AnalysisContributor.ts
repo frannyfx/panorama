@@ -11,7 +11,7 @@ import { DatabaseUser, insertOrUpdate as insertOrUpdateUser } from "./User";
 
 // Interfaces
 /**
- * The interface matching the User table in the database.
+ * The interface matching the AnalysisContributor in the database.
  */
 export interface DatabaseAnalysisContributor {
 	analysisId: number,
@@ -20,7 +20,8 @@ export interface DatabaseAnalysisContributor {
 
 /**
  * Insert an AnalysisContributor and potentially insert a user into the database.
- * @param user The user to insert.
+ * @param analysisId The parent analysis of the contributor.
+ * @param user The user model.
  */
 export async function insertOrUpdate(analysisId: number, user: DatabaseUser) : Promise<boolean> {
 	// Get connection.
