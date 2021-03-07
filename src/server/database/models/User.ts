@@ -33,7 +33,7 @@ export async function insertOrUpdate(user: DatabaseUser) : Promise<boolean> {
 		// Update the existing user.
 		await connection("User").where({ userId: user.userId }).update({
 			login: user.login,
-			lastAccess: user.lastAccess
+			lastAccess: user.lastAccess ? user.lastAccess : undefined
 		});
 	}
 

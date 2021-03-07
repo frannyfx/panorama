@@ -29,6 +29,8 @@ import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item
 import Analysis, { DatabaseAnalysis } from "../database/models/Analysis";
 import DatabaseAnalysedItem from "../database/models/AnalysedItem";
 import { getRepositoryContributors } from "../github";
+import { insertOrUpdate } from "../database/models/AnalysisContributor";
+import { dedupe } from "../../shared/utils";
 /**
  * Start the analysis system.
  */
@@ -230,10 +232,6 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Report to the user that the job is starting.
 	reportJobProgress(job, AnalysisStage.Starting);
-	
-	// Get contributor GitHub IDs to use as a lookup table.
-	//let contributors = await getRepositoryContributors(job.data.repository.full_name, job.data.access_token);
-	//console.log(contributors);
 
 	// Get the repository.
 	let repository = await getJobRepository(job);
@@ -282,14 +280,34 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	analysisResults.push(...folderEntries);
 	logger.success(`Generated ${folderEntries.length} sub-folder aggregates from repository '${job.data.repository.full_name}'.`);
 
-	// Commit analysis to database.
+	// Finish up...
 	reportJobProgress(job, AnalysisStage.Finalising);
-	//DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults);
-	
-	// Set the job completion date and call the done callback.
-	analysis.completedAt = new Date();
-	Analysis.update(analysis);
-	done(null);
+
+	// Commit analysis to database.
+	// - Remove duplicates from contributors.
+	let contributors = dedupe(Object.keys(contributorMap).map(email => contributorMap[email]).filter(contributor => contributor && contributor.id), (a, b) => a.id === b.id);
+	try {
+		// - Insert contributors. (TODO: Do this as a bulk MySQL query).
+		contributors.map(contributor => {
+			insertOrUpdate(analysis.analysisId!, {
+				userId: contributor.id,
+				login: contributor.login
+			});
+		});
+
+		// - Insert analysis data.
+		DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults, contributorMap);
+
+		// Set the job completion date.
+		analysis.completedAt = new Date();
+		Analysis.update(analysis);
+
+		// Call the job completion callback returning the analysis ID.
+		logger.success(`Successfully completed analysis ${analysis.analysisId!} of '${job.data.repository.full_name}'.`);
+		done(null, { analysisId: analysis.analysisId! });
+	} catch (e) {
+		done(new Error("Database insertion failed."));
+	}
 }
 
 export default {

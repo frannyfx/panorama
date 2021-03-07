@@ -10,3 +10,7 @@
 export function sleep(length: number) : Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, length));	
 }
+
+export function dedupe(list: any[], comparator: (a: any, b: any) => boolean) {
+	return list.filter((v, i, a) => a.findIndex(t => comparator(t, v)) === i);
+}

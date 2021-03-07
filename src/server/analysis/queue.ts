@@ -24,7 +24,7 @@ export interface RepoJob {
 };
 
 export interface RepoJobResult {
-	result: number
+	analysisId: number
 };
 
 // Connection and queue
