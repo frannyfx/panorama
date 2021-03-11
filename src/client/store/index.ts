@@ -55,27 +55,30 @@ const state : RootState = {
 
 // Store mutations.
 const mutations : MutationTree<RootState> = {
-	setLoading(state, loading : boolean) {
+	setLoading(state : RootState, loading : boolean) {
 		state.loading = loading;
 	},
-	setAuthLoaded(state, loaded: boolean) {
+	setAuthLoaded(state : RootState, loaded: boolean) {
 		state.auth.loaded = loaded;
 	},
-	setAuthStatus(state, status : boolean) {
+	setAuthStatus(state : RootState, status : boolean) {
 		state.auth.status = status;
 	},
-	setClientId(state, clientId: string) {
+	setClientId(state : RootState, clientId: string) {
 		state.auth.clientId = clientId;
 	},
-	setAccessToken(state, accessToken: string) {
+	setAccessToken(state : RootState, accessToken: string) {
 		state.auth.accessToken = accessToken;
 	},
-	setUser(state, user: Data) {
+	setUser(state : RootState, user: Data) {
 		state.user.id = user.id;
 		state.user.login = user.login;
 		state.user.avatarUrl = user.avatar_url;
 		state.user.name = user.name;
 		state.user.email = user.email;
+	},
+	clear(state : RootState) {
+		// TODO: ...
 	}
 };
 

@@ -47,7 +47,7 @@ const mutations : MutationTree<ModalsState> = {
 		delete state.object[modal.id];
 	},
 	clear(state : ModalsState) {
-		// ...
+		// TODO: ...
 	}
 };
 
