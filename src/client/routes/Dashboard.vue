@@ -117,6 +117,7 @@ export default Vue.extend({
 					if (actionId != "OK") return;
 					
 					// Otherwise, push the repo onto the router and analyse it.
+					// TODO: Send analysis request.
 					this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
 				});
 			} else {
@@ -131,6 +132,7 @@ export default Vue.extend({
 				return;
 			}
 
+			// Add the loaded repositories to the store.
 			this.$store.commit("Repositories/add", { repositories: repos, page: this.$store.state.Repositories.page + 1 });
 		}
 	},
@@ -169,12 +171,6 @@ export default Vue.extend({
 		next(vm => {
 			vm.$store.commit("setLoading", false);
 		});
-	},
-	async beforeRouteUpdate (to, from, next) {
-		console.log("Dashboard route update", to, from);
-	},
-	mounted: async function () {
-
 	}
 });
 </script>
