@@ -13,7 +13,8 @@
 			"title": "Panel de control",
 			"activity": "Actividades",
 			"repositories": "Repositorios",
-			"test": "Test"
+			"test": "Test",
+			"viewMore": "Ver más"
 		},
 		"signIn": {
 			"title": "Acceder",
@@ -27,6 +28,10 @@
 		},
 		"profileFetchFailed": {
 			"title": "No ha sido posible encontrar tu perfil.",
+			"description": "Algo ha fallado. Por favor intentar otra vez."
+		},
+		"repoFetchFailed": {
+			"title": "No ha sido posible encontrar tus repositorios.",
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		},
 		"analysis": {
@@ -52,29 +57,29 @@
 		"templates": {
 			"OK": {
 				"actions": {
-					"ok": "Okay"
+					"ok": "OK"
 				}
 			},
 			"OK_CANCEL": {
 				"actions": {
-					"ok": "Okay",
-					"cancel": "Cancel"
+					"ok": "OK",
+					"cancel": "Anular"
 				}
 			},
 			"OK_CANCEL_DESTRUCTIVE": {
 				"actions": {
-					"ok": "Okay",
-					"cancel": "Cancel"
+					"ok": "OK",
+					"cancel": "Anular"
 				}
 			}
 		},
 		"custom": {
 			"repoNotAnalysed": {
-				"title": "Not analysed",
-				"description": "The repository <b>{0}</b> has not yet been analysed. Would you like to analyse it?",
+				"title": "Repositorio no analizado",
+				"description": "El repositorio <b>{0}</b> aún no ha sido analizado. ¿Te gustaría analizarlo?",
 				"actions": {
-					"analyseRepo": "Analyse repo",
-					"cancel": "Cancel"
+					"analyseRepo": "Analizar repositorio",
+					"cancel": "Anular"
 				}
 			}
 		}
@@ -85,7 +90,8 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Actualizado {0}.",
-			"lastAnalysed": "Analisado {0}.",
+			"analysed": "Analizado",
+			"notAnalysed": "No analizado",
 			"noContributors": "Sin collaboradores.",
 			"public": "Público",
 			"private": "Privado"

@@ -90,7 +90,6 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Last updated {0}.",
-			"lastAnalysed": "Last analysed {0}.",
 			"analysed": "Analysed",
 			"notAnalysed": "Not analysed",
 			"noContributors": "No contributors.",

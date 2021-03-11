@@ -85,13 +85,14 @@ export default Vue.extend({
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
+		flex-shrink: 1;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
 
 		.title {
 			font-size: 1em;
 			font-weight: 600;
-			overflow: hidden;
-			white-space: nowrap;
-			text-overflow: ellipsis;
 			display: flex;
 			flex-direction: row;
 			align-items: center;
@@ -108,6 +109,9 @@ export default Vue.extend({
 
 			.name {
 				font-weight: 700;
+				overflow: hidden;
+				white-space: nowrap;
+				text-overflow: ellipsis;
 			}
 
 			.analysed {
@@ -158,6 +162,7 @@ export default Vue.extend({
 		align-items: center;
 		justify-content: flex-end;
 		flex-grow: 0;
+		flex-shrink: 0;
 
 		color: #aaa;
 		font-size: 0.9em;

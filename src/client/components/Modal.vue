@@ -52,6 +52,10 @@ export default Vue.extend({
 	.modal {
 		position: absolute;
 		top: 0; left: 0; right: 0; bottom: 0;
+
+		@include sm {
+			margin: 0px 10px;
+		}
 	}
 
 	.modal-content {
@@ -71,6 +75,10 @@ export default Vue.extend({
 		border-radius: 10px;
 		text-align: center;
 		box-shadow: 0 22px 70px 4px rgba(0, 0, 0, 0.3);
+
+		@include sm {
+			width: 100%;
+		}
 
 		> .icon {
 			font-size: 2em;

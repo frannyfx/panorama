@@ -13,7 +13,8 @@
 			"title": "Pannello di controllo",
 			"activity": "Attività",
 			"repositories": "Archivi",
-			"test": "Test"
+			"test": "Test",
+			"viewMore": "Mostra di più"
 		},
 		"signIn": {
 			"title": "Accesso",
@@ -27,6 +28,10 @@
 		},
 		"profileFetchFailed": {
 			"title": "Caricamento del profilo fallito.",
+			"description": "Qualcosa è andato storto, provare più tardi."
+		},
+		"repoFetchFailed": {
+			"title": "Caricamento degli archivi fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
 		"analysis": {
@@ -85,6 +90,8 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Aggiornato {0}.",
+			"analysed": "Analizzato",
+			"notAnalysed": "Non analizzato",
 			"noContributors": "Nessun collaboratore.",
 			"public": "Pubblico",
 			"private": "Privato"
