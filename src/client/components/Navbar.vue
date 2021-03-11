@@ -5,7 +5,7 @@
 				<font-awesome-icon icon="eye"/>
 			</a>
 			<div class="nav-content">
-				<a class="profile">
+				<a class="profile" :href="`https://github.com/${$store.state.user.login}/`" target="_blank">
 					<div class="profile-picture">
 						<div class="image" :style="{'background-image': this.$store.state.user.avatarUrl != '' ? `url('${this.$store.state.user.avatarUrl}')` : ''}">
 							<font-awesome-icon v-if="this.$store.state.user.avatarUrl == ''" icon="user"/>
