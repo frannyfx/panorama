@@ -12,7 +12,8 @@ Panorama has the following requirements:
 
 ## ⚙️ Compiling
 You should build the frontend component first, as the script will also transfer the necessary files to the compilation directory.
-It's worth noting that these instructions assume a Unix ( macOS/ 🐧 Linux) environment, so your mileage may vary.
+
+It's worth noting that these instructions assume a  macOS or 🐧 Linux environment, so your mileage may vary.
 
 ### Frontend
 To compile the frontend using Webpack, which will also take care of compiling the TypeScript code, simply run:
