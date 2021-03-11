@@ -83,6 +83,9 @@ export async function getRepositories(page: number = 1) : Promise<Repository[] |
 		return toRepository(repo, contributors);
 	}));
 
+	// TODO: Get latest analysis ID for each repository.
+	// ...
+
 	reposWithContributors.sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());
 	return reposWithContributors;
 }
