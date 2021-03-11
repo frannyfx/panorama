@@ -5,6 +5,7 @@
 $deep: #192B5D;
 $blue: #3960A1;
 $grey-blue: #758296;
+$white-blue: #c8cfdb;
 $red: #a1394c;
 $grey-red: #96757e;
 
@@ -162,8 +163,8 @@ a {
 
 /* --- */
 .credits-enter-active, .credits-leave-active {
-	transition: bottom 0.5s, opacity 0.5s;
-	transition-delay: 0.6s;
+	transition: bottom .5s, opacity .5s;
+	transition-delay: .6s;
 }
 
 .credits-enter, .credits-leave-to {
@@ -174,6 +175,21 @@ a {
 .credits-enter-to, .credits-leave {
 	opacity: 1;
 	bottom: 0;
+}
+
+/* --- */
+.list-enter-active, .list-leave-active {
+	transition: max-height .5s, opacity .5s;
+	overflow: hidden;
+}
+
+.list-enter, .list-leave-to {
+	opacity: 0;
+	max-height: 0px;
+}
+
+.list-enter-to, .list-leave {
+	max-height: 70px;
 }
 
 /* Backgrounds */
@@ -244,4 +260,31 @@ button {
 	user-select: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
+}
+
+/* Lists */
+.list-item {
+	cursor: pointer;
+	border-top: 1px solid rgba(black, .1);
+	transition: background-color 0.3s;
+
+	&.first {
+		border-top: none !important;
+	}
+
+	&:hover {
+		background-color: rgba($blue, .05);
+	}
+
+	> :first-child {
+		margin-left: 30px;
+	}
+
+	> :last-child {
+		margin-right: 30px;
+	}
+
+	> *:not(:last-child) {
+		margin-right: 30px;
+	}
 }

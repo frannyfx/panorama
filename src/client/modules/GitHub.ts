@@ -10,6 +10,7 @@ import { AuthInterface } from "@octokit/types";
 
 // Modules
 import Store from "../store";
+import Config from "../config";
 import { Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
 import { User } from "./models/User";
@@ -56,17 +57,18 @@ export function getRedirectURI() : string {
  * Get the list of repositories.
  * @returns The list of repositories the user has access to.
  */
-export async function getRepositories(page: number = 1) : Promise<Repository[]> {
+export async function getRepositories(page: number = 1) : Promise<Repository[] | null> {
 	// Get repos.
-	// TODO: Implement paging.
 	let result = await getOctokit().repos.listForAuthenticatedUser({
-		per_page: 10,
+		page,
+		per_page: Config.repositories.pageSize,
 		affiliation: "owner,collaborator",
 		sort: "updated",
 		direction: "desc"
 	});
 
-	if (result.status != 200) return [];
+	// Return null if we failed to fetch the repositories.
+	if (result.status != 200) return null;
 
 	// Get contributors.
 	let reposWithContributors : Repository[] = await Promise.all(result.data.map(async repo => {

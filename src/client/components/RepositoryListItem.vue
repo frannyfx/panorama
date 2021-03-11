@@ -1,27 +1,29 @@
 <template>
-	<div class="repo" :class="{ 'first': index == 0 }">
-		<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('components.repositoryListItem.private') : $t('components.repositoryListItem.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
-		<div class="details">
-			<div class="title">
-				<span class="owner">{{repo.owner.login}}</span>
-				<span class="slash">/</span>
-				<span class="name">{{repo.name}}</span>
-			</div>
-			<div class="subtitle" v-html="$t('components.repositoryListItem.lastUpdated', [`<span class='strong'>${updatedAt}</span>`])">
-			</div>
-		</div>
-		<div class="contributors hide-small">
-			<div class="contributors-row" v-if="repo.contributors.length > 0">
-				<div v-tooltip="{ theme: 'panorama', content: contributor.login }" v-for="(contributor, index) in repo.contributors" :key="contributor.id" class="contributor"  :style="{ 'z-index': 5 - index }">
-					<div class="image" :style="{'background-image': `url('${contributor.avatarUrl}')`}"></div>
+	<div class="repo-wrapper">
+		<div class="repo list-item" :class="{ 'first': index == 0 }">
+			<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('components.repositoryListItem.private') : $t('components.repositoryListItem.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
+			<div class="details">
+				<div class="title">
+					<span class="owner">{{repo.owner.login}}</span>
+					<span class="slash">/</span>
+					<span class="name">{{repo.name}}</span>
+				</div>
+				<div class="subtitle" v-html="$t('components.repositoryListItem.lastUpdated', [`<span class='strong'>${updatedAt}</span>`])">
 				</div>
 			</div>
-			<div class="subtitle" v-else>
-				{{ $t("components.repositoryListItem.noContributors") }}
+			<div class="contributors hide-small">
+				<div class="contributors-row" v-if="repo.contributors.length > 0">
+					<div v-tooltip="{ theme: 'panorama', content: contributor.login }" v-for="(contributor, index) in repo.contributors" :key="contributor.id" class="contributor"  :style="{ 'z-index': 5 - index }">
+						<div class="image" :style="{'background-image': `url('${contributor.avatarUrl}')`}"></div>
+					</div>
+				</div>
+				<div class="subtitle" v-else>
+					{{ $t("components.repositoryListItem.noContributors") }}
+				</div>
 			</div>
-		</div>
-		<div class="actions">
-			<font-awesome-icon icon="chevron-right"/>
+			<div class="actions">
+				<font-awesome-icon icon="chevron-right"/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -70,30 +72,6 @@ export default Vue.extend({
 	box-sizing: border-box;
 	padding: 10px 0px;
 	height: 70px;
-
-	cursor: pointer;
-	border-top: 1px solid rgba(black, .1);
-	&.first {
-		border-top: none !important;
-	}
-	
-	transition: background-color 0.3s;
-
-	&:hover {
-		background-color: rgba($blue, .05);
-	}
-
-	> :first-child {
-		margin-left: 30px;
-	}
-
-	> :last-child {
-		margin-right: 30px;
-	}
-
-	> *:not(:last-child) {
-		margin-right: 30px;
-	}
 
 	.repo-icon {
 		font-size: 0.8em;

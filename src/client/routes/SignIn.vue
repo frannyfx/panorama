@@ -18,7 +18,7 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import CommitCanvas from "../components/CommitCanvas.vue";
 
 // API imports
-import { saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
+import { clearAuthenticationData, saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
@@ -81,7 +81,11 @@ export default Vue.extend({
 			if (!profileResult.status.ok) return createAlert("WARNING", this.$i18n.t("alerts.profileFetchFailed.title").toString(), this.$i18n.t("alerts.profileFetchFailed.description").toString());
 
 			// Navigate to dashboard.
-			this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } });
+			this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } }, undefined, () => {
+				clearAuthenticationData();
+				console.log("Navigation aborted because an error occurred fetching Dashboard data.");
+				Store.commit("setLoading", false);
+			});
 		}
 	},
 	async beforeRouteEnter (to, from, next) {

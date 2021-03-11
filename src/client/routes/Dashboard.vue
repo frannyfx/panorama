@@ -9,7 +9,14 @@
 			</div>
 			<h2>{{ $t("routes.dashboard.repositories") }}</h2>
 			<div class="repos">
-				<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.Repositories.list" :key="repo.id" :repo="repo" :index="index"/>
+				<transition-group name="list">
+					<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.Repositories.list" :key="repo.id" :repo="repo" :index="index"/>
+				</transition-group>
+				<transition name="list">
+					<div @click="() => loadMoreRepos()" v-show="$store.state.Repositories.canLoadMore">
+						<div class="repo-loader list-item">{{$i18n.t("routes.dashboard.viewMore")}}</div>
+					</div>
+				</transition>
 			</div>
 			<h2>{{ $t("routes.dashboard.test") }}</h2>
 			<a @click="testAlert">Test alert</a>
@@ -28,7 +35,7 @@ import Store from "../store";
 import Repositories from "../store/modules/Repositories";
 
 // Modules
-import { getProfile, getRepositories } from "../modules/GitHub";
+import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
 
 // Components
@@ -87,8 +94,8 @@ export default Vue.extend({
 			subscribeToJobProgress("frannyfx/panorama-test", ticketResponse.result!.jobId, ticketResponse.result!.ticket, this.$store.state.auth.accessToken);
 		},
 		getRepo(repo: Repository) {
-			console.log("Getting repo...", repo);
-			//this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
+			// Create a modal if the repository has not yet been analysed.
+			// ...
 			createCustomModal({
 				title: this.$i18n.t("modals.custom.repoNotAnalysed.title").toString(),
 				description: this.$i18n.t("modals.custom.repoNotAnalysed.description", [repo.fullName]).toString(),
@@ -112,6 +119,16 @@ export default Vue.extend({
 				// Otherwise, push the repo onto the router and analyse it.
 				this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
 			});
+		},
+		async loadMoreRepos() {
+			// Fetch more repos and handle error.
+			let repos : Repository[] | null = await getRepositories(this.$store.state.Repositories.page + 1);
+			if (!repos) {
+				createAlert("WARNING", this.$i18n.t("alerts.repoFetchFailed.title").toString(), this.$i18n.t("alerts.repoFetchFailed.description").toString());
+				return;
+			}
+
+			this.$store.commit("Repositories/add", { repositories: repos, page: this.$store.state.Repositories.page + 1 });
 		}
 	},
 	async beforeRouteEnter (to, from, next) {
@@ -131,10 +148,17 @@ export default Vue.extend({
 			Store.commit("setLoading", true);
 			repos = await getRepositories();
 		}
+
+		// Handle repo fetch error.
+		if (!repos) {
+			createAlert("WARNING", i18n.t("alerts.repoFetchFailed.title").toString(), i18n.t("alerts.repoFetchFailed.description").toString());
+			next(false);
+			return;
+		}
 		
 		// Navigate once the repositories have been added.
 		next(vm => {
-			if (repos) vm.$store.commit("Repositories/add", {
+			vm.$store.commit("Repositories/add", {
 				repositories: repos,
 				page: 1
 			});
@@ -197,5 +221,16 @@ h2 {
 	border-radius: 16px;
 	box-sizing: border-box;
 	overflow: hidden;
+
+	.repo-loader {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		font-size: 0.9em;
+		height: 50px;
+		color: $blue;
+		font-weight: 600;
+	}
 }
 </style>

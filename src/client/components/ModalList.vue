@@ -36,6 +36,7 @@ export default Vue.extend({
 	.modal-backdrop {
 		background-color: rgba($deep, 0.5);
 		backdrop-filter: blur(10px);
+		-webkit-backdrop-filter: blur(10px);
 		position: absolute;
 		top: 0; right: 0; left: 0; bottom: 0;
 		width: 100%;
