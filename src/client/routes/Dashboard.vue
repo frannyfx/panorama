@@ -25,6 +25,7 @@
 			<a @click="testMultipleModals">Test multiple modals</a>
 			<a @click="testProgress">Test progress notification</a>
 			<a @click="testAnalysis">Test analysis</a>
+			<content-footer/>
 		</div>
 	</div>
 </template>
@@ -37,10 +38,6 @@ import Repositories from "../store/modules/Repositories";
 // Modules
 import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
-
-// Components
-import RepositoryListItem from "../components/RepositoryListItem.vue";
-import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import { send, waitForAuth } from "../modules/API";
 import { addNotification, createAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
@@ -48,10 +45,16 @@ import { Method } from "../../shared/Method";
 import { subscribeToJobProgress } from "../modules/Queue";
 import { createCustomModal, createModal, Modal, OK, OK_CANCEL, OK_CANCEL_DESTRUCTIVE } from "../modules/Modal";
 
+// Components
+import RepositoryListItem from "../components/RepositoryListItem.vue";
+import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import ContentFooter from "../components/Footer.vue";
+
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
-		RepositoryListItem
+		RepositoryListItem,
+		ContentFooter
 	},
 	methods: {
 		testAlert() {

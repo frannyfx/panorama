@@ -1,0 +1,44 @@
+<template>
+	<div class="footer">
+		<div class="line"></div>
+		<font-awesome-icon icon="eye"/>
+		<div class="line"></div>
+	</div>
+</template>
+<script lang="ts">
+// Imports
+import Vue from "vue"
+
+// Components
+import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+export default Vue.extend({
+	components: {
+		FontAwesomeIcon
+	}
+})
+</script>
+<style lang="scss" scoped>
+@import "../stylesheets/globals.scss";
+.footer {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 40px 0px 10px 0px;
+
+	.line {
+		background-color: $white-blue;
+		height: 1px;
+		flex-grow: 1;
+	}
+	
+	svg {
+		color: $white-blue;
+		font-size: 2em;
+	}
+
+	> :not(:last-child) {
+		margin-right: 20px;
+	}
+}
+</style>
