@@ -15,6 +15,8 @@ import { Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
 import { User } from "./models/User";
 import { File, toFile } from "./models/File";
+import { send } from "./API";
+import { Method } from "../../shared/Method";
 
 // Variables
 var instance : Octokit | null = null;
@@ -80,13 +82,13 @@ export async function getRepositories(page: number = 1) : Promise<Repository[] |
 		});
 
 		let contributors : Data[] = contributorsResult.status == 200 ? contributorsResult.data : [];
-		return toRepository(repo, contributors);
+		
+		// Get analysis data.
+		let analysis = await send(Method.GET, `repo/${repo.full_name}/analysis`);
+		return toRepository(repo, contributors, analysis.status.ok ? analysis.result!.analysisId : -1);
 	}));
 
-	// TODO: Get latest analysis ID for each repository.
-	// ...
-
-	reposWithContributors.sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());
+	reposWithContributors.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
 	return reposWithContributors;
 }
 

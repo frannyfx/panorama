@@ -17,10 +17,10 @@ export interface Repository {
 	private: boolean,
 	description: string,
 	contributors: User[],
-	updated_at: Date,
-	lastAnalysis?: {
+	updatedAt: Date,
+	lastAnalysis: {
 		id: number,
-		analysis: Analysis
+		analysis?: Analysis
 	},
 	content: {
 		loaded: boolean,
@@ -38,7 +38,7 @@ export interface RepositoryObject {
  * @param contributors Set of loaded contributors to show.
  * @returns A Repository object representing the input data.
  */
-export function toRepository(input: Data, contributors: Data[]) : Repository {
+export function toRepository(input: Data, contributors: Data[], analysisId: number) : Repository {
 	return {
 		id: input.id!,
 		name: input.name!,
@@ -47,7 +47,10 @@ export function toRepository(input: Data, contributors: Data[]) : Repository {
 		private: input.private!,
 		description: input.description!,
 		contributors: contributors.map(c => toUser(c)),
-		updated_at: new Date(input.pushed_at!),
+		updatedAt: new Date(input.pushed_at!),
+		lastAnalysis: {
+			id: analysisId
+		},
 		content: {
 			loaded: false
 		}

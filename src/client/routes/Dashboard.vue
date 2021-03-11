@@ -95,30 +95,33 @@ export default Vue.extend({
 		},
 		getRepo(repo: Repository) {
 			// Create a modal if the repository has not yet been analysed.
-			// ...
-			createCustomModal({
-				title: this.$i18n.t("modals.custom.repoNotAnalysed.title").toString(),
-				description: this.$i18n.t("modals.custom.repoNotAnalysed.description", [repo.fullName]).toString(),
-				icon: ["fab", "github"],
-				theme: "NORMAL",
-				actions: [{
-					type: "NORMAL",
-					id: "CANCEL",
-					icon: ["fas", "chevron-left"],
-					content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.cancel").toString(),
-				}, {
-					type: "PRIMARY",
-					id: "OK",
-					icon: ["fas", "check"],
-					content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.analyseRepo").toString()
-				}]
-			}, (modal : Modal, actionId: string) => {
-				// If user does not want to analyse the repo, return.
-				if (actionId != "OK") return;
-				
-				// Otherwise, push the repo onto the router and analyse it.
+			if (repo.lastAnalysis.id == -1) {
+				createCustomModal({
+					title: this.$i18n.t("modals.custom.repoNotAnalysed.title").toString(),
+					description: this.$i18n.t("modals.custom.repoNotAnalysed.description", [repo.fullName]).toString(),
+					icon: ["fab", "github"],
+					theme: "NORMAL",
+					actions: [{
+						type: "NORMAL",
+						id: "CANCEL",
+						icon: ["fas", "chevron-left"],
+						content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.cancel").toString(),
+					}, {
+						type: "PRIMARY",
+						id: "OK",
+						icon: ["fas", "check"],
+						content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.analyseRepo").toString()
+					}]
+				}, (modal : Modal, actionId: string) => {
+					// If user does not want to analyse the repo, return.
+					if (actionId != "OK") return;
+					
+					// Otherwise, push the repo onto the router and analyse it.
+					this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
+				});
+			} else {
 				this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
-			});
+			}
 		},
 		async loadMoreRepos() {
 			// Fetch more repos and handle error.
@@ -147,23 +150,23 @@ export default Vue.extend({
 			// Set loading and load repos.
 			Store.commit("setLoading", true);
 			repos = await getRepositories();
-		}
 
-		// Handle repo fetch error.
-		if (!repos) {
-			createAlert("WARNING", i18n.t("alerts.repoFetchFailed.title").toString(), i18n.t("alerts.repoFetchFailed.description").toString());
-			next(false);
-			return;
+			// Handle repo fetch error.
+			if (!repos) {
+				createAlert("WARNING", i18n.t("alerts.repoFetchFailed.title").toString(), i18n.t("alerts.repoFetchFailed.description").toString());
+				next(false);
+				return;
+			}
+
+			// Add the loaded repositories.
+			Store.commit("Repositories/add", {
+				repositories: repos,
+				page: 1
+			});
 		}
 		
 		// Navigate once the repositories have been added.
 		next(vm => {
-			vm.$store.commit("Repositories/add", {
-				repositories: repos,
-				page: 1
-			});
-
-			// TODO: Show failure upon receiving null repositories.
 			vm.$store.commit("setLoading", false);
 		});
 	},

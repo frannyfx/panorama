@@ -7,6 +7,9 @@
 					<span class="owner">{{repo.owner.login}}</span>
 					<span class="slash">/</span>
 					<span class="name">{{repo.name}}</span>
+					<span class="analysed" v-show="repo.lastAnalysis.id != -1" v-tooltip="{ theme: 'panorama', content: $t('components.repositoryListItem.analysed') }">
+						<font-awesome-icon icon="check"/>
+					</span>
 				</div>
 				<div class="subtitle" v-html="$t('components.repositoryListItem.lastUpdated', [`<span class='strong'>${updatedAt}</span>`])">
 				</div>
@@ -58,7 +61,7 @@ export default Vue.extend({
 	},
 	mounted: async function () {
 		let m = await moment();
-		this.updatedAt = m.default(this.repo.updated_at).locale(this.$i18n.locale).fromNow();
+		this.updatedAt = m.default(this.repo.updatedAt).locale(this.$i18n.locale).fromNow();
 	}
 });
 </script>
@@ -106,6 +109,12 @@ export default Vue.extend({
 			.name {
 				font-weight: 700;
 			}
+
+			.analysed {
+				color: $blue;
+				font-size: 0.8em;
+				margin-left: 6px;
+			}
 		}
 	}
 
@@ -144,7 +153,6 @@ export default Vue.extend({
 		}
 	}
 	
-
 	.actions {
 		display: flex;
 		align-items: center;
