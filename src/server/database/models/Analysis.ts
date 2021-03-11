@@ -56,6 +56,32 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 	return true;
 }
 
+/**
+ * Get the ID of the latest analysis of a repository.
+ * @param owner The owner of the repository.
+ * @param repo The name of the repository.
+ * @returns The ID of the latest analysis of that repository or -1.
+ */
+async function getLatest(owner: string, repo: string) : Promise<number> {
+	// TODO: Use a join.
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return -1;
+
+	// Get owner ID.
+	let ownerRow = await connection("User").where({ login: owner }).select("userId").first();
+	if (!ownerRow) return -1;
+
+	// Get repository ID.
+	let repositoryRow = await connection("Repository").where({ ownerId: ownerRow.userId, name: repo }).select("repositoryId").first();
+	if (!repositoryRow) return -1;
+
+	// Get analysis with repo name and owner ID.
+	let analysisRow = await connection("Analysis").where({ repositoryId: repositoryRow.repositoryId }).select("analysisId").orderBy("completedAt", "desc").first();
+	if (!analysisRow) return -1;
+	return analysisRow.analysisId;
+}
+
 export default {
-	insert, update
+	insert, update, getLatest
 };

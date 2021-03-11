@@ -260,6 +260,12 @@ async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: Analy
 	return true;
 }
 
+/**
+ * Get the list of analysed items in a folder.
+ * @param analysisId The analysis to get the analysed files from.
+ * @param path The path to search for files.
+ * @returns The list of analysed child items and sub-directories of the path.
+ */
 async function getItemsInFolder(analysisId: number, path: string) : Promise<any[]> {
 	// Get connection.
 	let connection = await getConnection();
@@ -278,8 +284,7 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<any[
 	let results = await connection("AnalysedItem").where({analysisId}).andWhere("path", "like", `${path}%`).andWhereNot("path", "like", `${path}%/%`).select("path");
 
 	// TODO: Return results.
-	console.log(results);
-	return [];
+	return results.map(row => row.path).filter(path => path != "");
 }
 
 export default {

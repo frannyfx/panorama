@@ -39,8 +39,10 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		// TODO: ...
-		send(response, Codes.OK);
+		let analysisId = await DatabaseAnalysis.getLatest(request.params!.owner, request.params!.repo);
+		send(response, Codes.OK, {
+			analysisId
+		});
 	}
 }, {
 	method: Method.GET,
