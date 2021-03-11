@@ -7,16 +7,16 @@
 import { MutationTree } from "vuex";
 
 // Modules
-import { Notification, NotificationData, NotificationObject} from "../../modules/Notifications";
+import { Notification, NotificationData, NotificationsObject} from "../../modules/Notifications";
 
 export interface NotificationsState {
 	list: Notification[],
-	object: NotificationObject
+	object: NotificationsObject
 };
 
 const state : NotificationsState = {
 	list: [] as Notification[],
-	object: {} as NotificationObject
+	object: {} as NotificationsObject
 };
 
 const getters = { };
@@ -40,7 +40,7 @@ const mutations : MutationTree<NotificationsState> = {
 		// Remove the notification from the list and set the removed flag.
 		// (!) We don't actually delete the notification data here as it may still be visible in Vue.
 		// Deletion of the data is lazy and deferred until later.
-		state.list.splice(state.list.indexOf(notification), 1);
+		state.list.splice(notificationIndex, 1);
 		state.object[notification.id].removed = true;
 	},
 	updateNotificationProgress(state, data : any) {
@@ -64,6 +64,9 @@ const mutations : MutationTree<NotificationsState> = {
 	},
 	setDataExpiry(state, data) {
 		state.object[data.id].data.expiry = data.expiry;
+	},
+	clear(state : NotificationsState) {
+		
 	}
 };
 

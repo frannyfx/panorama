@@ -12,6 +12,7 @@ import { Repository } from "../modules/models/Repository";
 // Modules
 import Notifications from "./modules/Notifications";
 import Repositories from "./modules/Repositories";
+import Modals from "./modules/Modals";
 
 // Use plugin
 Vue.use(Vuex);
@@ -31,10 +32,6 @@ export interface RootState {
 		avatarUrl: string,
 		name: string,
 		email: string
-	},
-	repos: {
-		loaded: boolean,
-		list: Repository[]
 	}
 };
 
@@ -53,10 +50,6 @@ const state : RootState = {
 		avatarUrl: "",
 		name: "",
 		email: ""
-	},
-	repos: {
-		loaded: false,
-		list: []
 	}
 };
 
@@ -83,12 +76,6 @@ const mutations : MutationTree<RootState> = {
 		state.user.avatarUrl = user.avatar_url;
 		state.user.name = user.name;
 		state.user.email = user.email;
-	},
-	setRepositories(state, repos: Repository[]) {	// TODO: Move the repository data to the Repositories module.
-		// Remove all elements.
-		state.repos.loaded = true;
-		state.repos.list.splice(0, state.repos.list.length);
-		state.repos.list.push(...repos);
 	}
 };
 
@@ -101,7 +88,8 @@ export default new Vuex.Store<RootState>({
 	mutations,
 	modules: {
 		Notifications,
-		Repositories
+		Repositories,
+		Modals
 	},
 	strict: debug
 });

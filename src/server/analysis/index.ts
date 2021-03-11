@@ -124,7 +124,7 @@ async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
 			path: repositoryPath 
 		});
 	} catch (e) {
-		console.log(e);
+		logger.error(`Unable to clone repository ${job.data.repository.full_name}: ${e}`);
 		return buildResult(false, undefined, e);
 	}
 }

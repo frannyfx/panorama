@@ -12,21 +12,8 @@
 			<div class="icon">
 				<font-awesome-icon :icon="notification.data.icon"/>
 			</div>
-			<!--
 			<div class="content">
-				<div class="title">Analysing repo <span class="repo-name">frannyfx/ether...</span></div>
-				<div class="description">
-					<div class="progress-bar">
-						<div class="progress"></div>
-					</div>
-					<div class="progress-status">
-						<font-awesome-icon icon="check-circle"/>
-						Cloning repo...
-					</div>
-				</div>
-			</div>-->
-			<div class="content">
-				<div class="title">{{notification.data.title}}</div>
+				<div class="title" v-html="notification.data.title"></div>
 				<div class="description">
 					{{notification.data.description}}
 					<div v-if="notification.data.type == 'PROGRESS'" class="progress-container">

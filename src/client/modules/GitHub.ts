@@ -22,17 +22,17 @@ var instance : Octokit | null = null;
  * Get the current instance of Octokit.
  */
 function getOctokit() : Octokit {
-	// Return instance if it already exists.
-	if (instance) return instance;
+	// Create instance if it does not exist.
+	if (!instance) instance = new Octokit({ auth: Store.state.auth.accessToken });
 
-	// Otherwise, create instance.
-	instance = new Octokit({
-		auth: Store.state.auth.accessToken
-	});
+	// Return instance.
 	return instance;
 }
 
-
+/**
+ * Get the authenticated user's details.
+ * @returns The profile of the authenticated user.
+ */
 export async function getProfile() : Promise<Result> {
 	let result = await getOctokit().users.getAuthenticated();
 	
@@ -44,12 +44,21 @@ export async function getProfile() : Promise<Result> {
 	};
 }
 
+/**
+ * Get the OAUTH redirect URI depending on the current location.
+ * @returns The redirect URI to use for the OAUTH flow.
+ */
 export function getRedirectURI() : string {
 	return `${window.location.protocol}//${window.location.host}/api/github/callback`;
 }
 
-export async function getRepositories() : Promise<Repository[]> {
+/**
+ * Get the list of repositories.
+ * @returns The list of repositories the user has access to.
+ */
+export async function getRepositories(page: number = 1) : Promise<Repository[]> {
 	// Get repos.
+	// TODO: Implement paging.
 	let result = await getOctokit().repos.listForAuthenticatedUser({
 		per_page: 10,
 		affiliation: "owner,collaborator",
@@ -76,6 +85,12 @@ export async function getRepositories() : Promise<Repository[]> {
 	return reposWithContributors;
 }
 
+/**
+ * Get the contents of a directory.
+ * @param repository The repository to get the files from.
+ * @param path The path of the folder to get files from.
+ * @returns The files in the folder.
+ */
 export async function getFiles(repository: Repository, path: string) : Promise<File[]> {
 	// Get files.
 	let result = await getOctokit().repos.getContent({
@@ -87,7 +102,6 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
 	if (result.status != 200) return [];
 
 	// Convert to file interfaces.
-	//let files : File[] = [].concat(result.data!).map(file => toFile(file));
-	//return files;
-	return [];
+	let files : File[] = Array.isArray(result.data) ? [...result.data!].map(file => toFile(file)) : [];
+	return files;
 }

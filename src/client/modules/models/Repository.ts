@@ -10,7 +10,11 @@ export interface Repository {
 	private: boolean,
 	description: string,
 	contributors: User[],
-	updated_at: Date
+	updated_at: Date,
+	content: {
+		loaded: boolean,
+		root?: File
+	}
 };
 
 export interface RepositoryObject {
@@ -26,6 +30,9 @@ export function toRepository(input: Data, contributors: Data[]) : Repository {
 		private: input.private!,
 		description: input.description!,
 		contributors: contributors.map(c => toUser(c)),
-		updated_at: new Date(input.pushed_at!)
+		updated_at: new Date(input.pushed_at!),
+		content: {
+			loaded: false
+		}
 	};
 }

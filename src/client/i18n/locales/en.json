@@ -30,7 +30,7 @@
 			"description": "Something went wrong. Please try again later."
 		},
 		"analysis": {
-			"title": "Analysing {0}...",
+			"title": "Analysing <b>{0}</b>...",
 			"progress": {
 				"Starting": "Starting...",
 				"Cloning": "Cloning the repository...",
@@ -48,12 +48,44 @@
 			"description": "Failed to analyse {0}. Please try again later."
 		}
 	},
+	"modals": {
+		"templates": {
+			"OK": {
+				"actions": {
+					"ok": "Okay"
+				}
+			},
+			"OK_CANCEL": {
+				"actions": {
+					"ok": "Okay",
+					"cancel": "Cancel"
+				}
+			},
+			"OK_CANCEL_DESTRUCTIVE": {
+				"actions": {
+					"ok": "Okay",
+					"cancel": "Cancel"
+				}
+			}
+		},
+		"custom": {
+			"repoNotAnalysed": {
+				"title": "Not analysed",
+				"description": "The repository <b>{0}</b> has not yet been analysed. Would you like to analyse it?",
+				"actions": {
+					"analyseRepo": "Analyse repo",
+					"cancel": "Cancel"
+				}
+			}
+		}
+	},
 	"components": {
 		"navbar": {
 			"signOut": "Sign out"
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Last updated {0}.",
+			"lastAnalysed": "Last analysed {0}.",
 			"noContributors": "No contributors.",
 			"public": "Public",
 			"private": "Private"

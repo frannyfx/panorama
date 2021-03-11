@@ -260,6 +260,29 @@ async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: Analy
 	return true;
 }
 
+async function getItemsInFolder(analysisId: number, path: string) : Promise<any[]> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return [];
+
+	// Prevent an empty path.
+	if (path.length == 0) path = "/";
+
+	// Remove trailing slash at the beginning of the path.
+	if (path[0] == "/") path = path.substr(1);
+	
+	// Ensure trailing slash at the end of path as it prevents non-folders from being specified.
+	if (path.length >= 1 && path[path.length - 1] != "/") path += "/";
+
+	// Get one layer deep files and folders.
+	let results = await connection("AnalysedItem").where({analysisId}).andWhere("path", "like", `${path}%`).andWhereNot("path", "like", `${path}%/%`).select("path");
+
+	// TODO: Return results.
+	console.log(results);
+	return [];
+}
+
 export default {
-	convertAndInsert
+	convertAndInsert,
+	getItemsInFolder
 };

@@ -19,8 +19,10 @@ import { faInfoCircle } from "@fortawesome/free-solid-svg-icons/faInfoCircle";
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons/faExclamationCircle";
 import { faExclamationTriangle} from "@fortawesome/free-solid-svg-icons/faExclamationTriangle";
 import { faTimes } from "@fortawesome/free-solid-svg-icons/faTimes";
+import { faCheck } from "@fortawesome/free-solid-svg-icons/faCheck";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons/faCheckCircle";
 import { faUser } from "@fortawesome/free-solid-svg-icons/faUser";
+import { faChevronLeft } from "@fortawesome/free-solid-svg-icons/faChevronLeft";
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons/faChevronRight";
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons/faSignOutAlt";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
@@ -38,8 +40,10 @@ export default library.add(
 	faExclamationCircle,
 	faExclamationTriangle,
 	faTimes,
+	faCheck,
 	faCheckCircle, 
 	faUser, 
+	faChevronLeft,
 	faChevronRight,
 	faSignOutAlt, 
 	faGithub

@@ -54,10 +54,10 @@ const routes = [{
 	component: Test,
 	name: "test"
 }, {
-	path: "/:locale/repo/:owner/:repo",
+	path: "/:locale/repo/:owner/:repo/",
 	component: Repository,
 	name: "repo"
-}/*, {
+}, /*, {
 	path: "/:locale/repo/:owner/:repo/path/",
 	component: Repository,
 	name: "repo-path",

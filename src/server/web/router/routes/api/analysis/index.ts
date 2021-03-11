@@ -26,10 +26,41 @@ import ticket from "../../../../../crypto/ticket";
 import DatabaseAnalysis from "../../../../../database/models/Analysis";
 import DatabaseRepository from "../../../../../database/models/Repository";
 import DatabaseUser from "../../../../../database/models/User";
+import DatabaseAnalysedItem from "../../../../../database/models/AnalysedItem";
 
 let route : Array<Route> = [{
+	method: Method.GET,
+	url: "/api/repo/:owner/:repo/analysis",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			owner: Joi.string(),
+			repo: Joi.string()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		// TODO: ...
+		send(response, Codes.OK);
+	}
+}, {
+	method: Method.GET,
+	url: "/api/analysis/:id/files",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			id: Joi.number().required()
+		}),
+		query: Joi.object({
+			path: Joi.string().required()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		let result = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
+		send(response, Codes.OK, result);
+	}
+}, {
 	method: Method.PUT,
-	url: "/api/queue/repo",
+	url: "/api/repo/queue",
 	auth: true,
 	schemas: {
 		body: Joi.object({
@@ -37,6 +68,7 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
+		// TODO: Check if the repo is already enqueued.
 		// Get repository information.
 		let repositoryResult = await getRepository(request.body!.name, request.auth!.token!);
 		if (!repositoryResult.status.ok) return send(response, Codes.BadRequest);
@@ -46,6 +78,7 @@ let route : Array<Route> = [{
 			// Insert data into the database and return a server error if any of those inserts fail.
 			// TODO: MySQL transaction.
 			// TODO: Just use throw for the errors since we're in a try/catch block.
+			// TODO: Look into MySQL TCP connection timeout (might just be due to connection from localhost to fran.codes)
 			// - Requesting user.
 			if (!(await DatabaseUser.insertOrUpdate({
 				userId: request.auth!.payload!.id,
@@ -96,8 +129,9 @@ let route : Array<Route> = [{
 				jobId: job.id,
 				ticket: jobTicket
 			});
-		} catch {
+		} catch (e) {
 			// If anything goes wrong in the process, return internal server error.
+			console.log(e);
 			return send(response, Codes.ServerError);
 		}
 	}

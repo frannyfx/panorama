@@ -23,6 +23,8 @@ export default Vue.extend({
 </script>
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
+
+/* Variables */
 $notifications-margin: 20px;
 
 .notifications {

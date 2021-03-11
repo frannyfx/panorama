@@ -38,6 +38,45 @@
 				"Finalising": "Casi terminado...",
 				"Done": "Terminado."
 			}
+		},
+		"jobProgressSubscriptionFailed": {
+			"title": "Failed to subscribe to repo updates.",
+			"description": "Could not connect to the server. Please try again later."
+		},
+		"analysisFailed": {
+			"title": "Repository analysis failed.",
+			"description": "Failed to analyse {0}. Please try again later."
+		}
+	},
+	"modals": {
+		"templates": {
+			"OK": {
+				"actions": {
+					"ok": "Okay"
+				}
+			},
+			"OK_CANCEL": {
+				"actions": {
+					"ok": "Okay",
+					"cancel": "Cancel"
+				}
+			},
+			"OK_CANCEL_DESTRUCTIVE": {
+				"actions": {
+					"ok": "Okay",
+					"cancel": "Cancel"
+				}
+			}
+		},
+		"custom": {
+			"repoNotAnalysed": {
+				"title": "Not analysed",
+				"description": "The repository <b>{0}</b> has not yet been analysed. Would you like to analyse it?",
+				"actions": {
+					"analyseRepo": "Analyse repo",
+					"cancel": "Cancel"
+				}
+			}
 		}
 	},
 	"components": {
@@ -46,6 +85,7 @@
 		},
 		"repositoryListItem": {
 			"lastUpdated": "Actualizado {0}.",
+			"lastAnalysed": "Analisado {0}.",
 			"noContributors": "Sin collaboradores.",
 			"public": "Público",
 			"private": "Privado"

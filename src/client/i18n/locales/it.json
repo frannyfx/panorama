@@ -48,6 +48,37 @@
 			"description": "Errore durante l'analisi di {0}. Provare più tardi."
 		}
 	},
+	"modals": {
+		"templates": {
+			"OK": {
+				"actions": {
+					"ok": "OK"
+				}
+			},
+			"OK_CANCEL": {
+				"actions": {
+					"ok": "OK",
+					"cancel": "Annulla"
+				}
+			},
+			"OK_CANCEL_DESTRUCTIVE": {
+				"actions": {
+					"ok": "OK",
+					"cancel": "Annulla"
+				}
+			}
+		},
+		"custom": {
+			"repoNotAnalysed": {
+				"title": "Archivio non analizzato",
+				"description": "L'archivio <b>{0}</b> non è ancora stato analizzato. Vuoi analizzarlo?",
+				"actions": {
+					"analyseRepo": "Analizza archivio",
+					"cancel": "Annulla"
+				}
+			}
+		}
+	},
 	"components": {
 		"navbar": {
 			"signOut": "Esci"

@@ -20,17 +20,25 @@ import { i18n } from "../i18n";
 
 // Components
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
+import { getFiles } from "../modules/GitHub";
 
 export default Vue.extend({
 	components: {
 		RepositoryFileListItem
 	},
+	watch: {
+		$route(to, from) {
+			console.log("Route changed!");
+		}
+	},
 	methods: {
 		async loadFiles(path : string) {
 			console.log(`Loading files for repository ${this.$route.params.owner}/${this.$route.params.repo} in path '${path}'...`);
+			//getFiles()
 		}
 	},
 	async beforeRouteEnter(to, from, next) {
+		console.log(to, from);
 		// Set loading.
 		Store.commit("setLoading", true);
 		
@@ -45,8 +53,8 @@ export default Vue.extend({
 
 		// Load repo...
 		await sleep(1000);
-		next(vm => {
-			//vm.loadFiles("/");
+		next((vm: any) => {
+			vm.loadFiles("/");
 			vm.$store.commit("setLoading", false);
 		});
 	}

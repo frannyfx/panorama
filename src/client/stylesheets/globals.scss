@@ -4,6 +4,9 @@
 /* Colour scheme */
 $deep: #192B5D;
 $blue: #3960A1;
+$grey-blue: #758296;
+$red: #a1394c;
+$grey-red: #96757e;
 
 /* Global styles */
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
@@ -188,10 +191,14 @@ button {
 	border: none;
 	padding: 12px 30px;
 	color: white;
-	background-color: $blue;
+	background-color: $grey-blue;
 	border-radius: 30px;
 	font-size: 0.8em;
 	outline: none;
+
+	&.primary {
+		background-color: $blue;
+	}
 	
 	&:not(:disabled) {
 		cursor: pointer;

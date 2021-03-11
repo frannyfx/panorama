@@ -7,6 +7,9 @@
 import Store from "../store";
 
 // Interfaces
+/**
+ * Notification interfaces.
+ */
 export interface NotificationData {
 	type: "NORMAL" | "PROGRESS",
 	icon: string[],
@@ -30,10 +33,16 @@ export interface Notification {
 	data: NotificationData
 };
 
-export interface NotificationObject {
+/**
+ * Vuex interfaces.
+ */
+export interface NotificationsObject {
 	[key: string]: Notification
 };
 
+/**
+ * Internal timeouts interfaces.
+ */
 export interface NotificationTimeouts {
 	fade?: NodeJS.Timeout,
 	expiry?: NodeJS.Timeout
@@ -122,6 +131,12 @@ export function createAlert(type: "INFO" | "WARNING", title: string, description
 	});
 }
 
+/**
+ * 
+ * @param notification 
+ * @param enabled 
+ * @returns 
+ */
 export function toggleNotificationExpiry(notification: Notification, enabled: boolean) {
 	// Prevent accidental re-enabling of the notification by checking the removed flag.
 	// This would be triggered by the mouse leaving the notification component in Vue after deletion.

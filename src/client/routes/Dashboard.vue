@@ -9,10 +9,13 @@
 			</div>
 			<h2>{{ $t("routes.dashboard.repositories") }}</h2>
 			<div class="repos">
-				<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.repos.list" :key="repo.id" :repo="repo" :index="index"/>
+				<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.Repositories.list" :key="repo.id" :repo="repo" :index="index"/>
 			</div>
 			<h2>{{ $t("routes.dashboard.test") }}</h2>
 			<a @click="testAlert">Test alert</a>
+			<a @click="testModal">Test normal modal</a>
+			<a @click="testDestructiveModal">Test destructive modal</a>
+			<a @click="testMultipleModals">Test multiple modals</a>
 			<a @click="testProgress">Test progress notification</a>
 			<a @click="testAnalysis">Test analysis</a>
 		</div>
@@ -22,6 +25,7 @@
 // Imports
 import Vue from "vue";
 import Store from "../store";
+import Repositories from "../store/modules/Repositories";
 
 // Modules
 import { getProfile, getRepositories } from "../modules/GitHub";
@@ -35,6 +39,7 @@ import { addNotification, createAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
 import { subscribeToJobProgress } from "../modules/Queue";
+import { createCustomModal, createModal, Modal, OK, OK_CANCEL, OK_CANCEL_DESTRUCTIVE } from "../modules/Modal";
 
 export default Vue.extend({
 	components: {
@@ -44,6 +49,16 @@ export default Vue.extend({
 	methods: {
 		testAlert() {
 			createAlert("INFO", "Test notification.", "This is the notification's content.");
+		},
+		testModal() {
+			createModal(OK_CANCEL, "Not analysed", "The repository frannyfx/panorama-test has not yet been analysed. Would you like to analyse it?");
+		},
+		testDestructiveModal() {
+			createModal(OK_CANCEL_DESTRUCTIVE, "Are you sure?", "If you quit now, all your unsaved changes will be lost!");
+		},
+		testMultipleModals() {
+			createModal(OK, "Welcome to Panorama", "Thank you for being a user. Your support is highly appreciated.");
+			setTimeout(() => createModal(OK_CANCEL, "Not analysed", "The repository frannyfx/panorama-test has not yet been analysed. Would you like to analyse it?"), 1000);
 		},
 		testProgress() {
 			addNotification({
@@ -61,7 +76,7 @@ export default Vue.extend({
 		},
 		async testAnalysis() {
 			// Ask for a ticket to subscribe to this repository's analysis.
-			let ticketResponse = await send(Method.PUT, "queue/repo", {
+			let ticketResponse = await send(Method.PUT, "repo/queue", {
 				name: "frannyfx/panorama-test"
 			});
 
@@ -73,7 +88,30 @@ export default Vue.extend({
 		},
 		getRepo(repo: Repository) {
 			console.log("Getting repo...", repo);
-			this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name}});
+			//this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
+			createCustomModal({
+				title: this.$i18n.t("modals.custom.repoNotAnalysed.title").toString(),
+				description: this.$i18n.t("modals.custom.repoNotAnalysed.description", [repo.fullName]).toString(),
+				icon: ["fab", "github"],
+				theme: "NORMAL",
+				actions: [{
+					type: "NORMAL",
+					id: "CANCEL",
+					icon: ["fas", "chevron-left"],
+					content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.cancel").toString(),
+				}, {
+					type: "PRIMARY",
+					id: "OK",
+					icon: ["fas", "check"],
+					content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.analyseRepo").toString()
+				}]
+			}, (modal : Modal, actionId: string) => {
+				// If user does not want to analyse the repo, return.
+				if (actionId != "OK") return;
+				
+				// Otherwise, push the repo onto the router and analyse it.
+				this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
+			});
 		}
 	},
 	async beforeRouteEnter (to, from, next) {
@@ -88,15 +126,20 @@ export default Vue.extend({
 
 		// Load repos if they have not yet been loaded.
 		var repos : Repository[] | null = null;
-		if (!Store.state.repos.loaded) {
+		if (Repositories.state.page == -1) {
 			// Set loading and load repos.
-			Store.commit("setLoading", true);	
+			Store.commit("setLoading", true);
 			repos = await getRepositories();
 		}
 		
-		// Navigate.
+		// Navigate once the repositories have been added.
 		next(vm => {
-			if (repos) vm.$store.commit("setRepositories", repos);
+			if (repos) vm.$store.commit("Repositories/add", {
+				repositories: repos,
+				page: 1
+			});
+
+			// TODO: Show failure upon receiving null repositories.
 			vm.$store.commit("setLoading", false);
 		});
 	},

@@ -31,6 +31,7 @@
 			</div>
 		</transition>
 		<notification-list/>
+		<modal-list/>
 	</div>
 </template>
 <script lang="ts">
@@ -43,6 +44,7 @@ import CommitCanvas from "../components/CommitCanvas.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Navbar from "../components/Navbar.vue";
 import NotificationList from "../components/NotificationList.vue";
+import ModalList from "../components/ModalList.vue";
 
 // Modules
 import { loadLanguageAsync } from "../i18n";
@@ -54,7 +56,8 @@ export default Vue.extend({
 		CommitCanvas,
 		FontAwesomeIcon,
 		Navbar,
-		NotificationList
+		NotificationList,
+		ModalList
 	},
 	computed: {
 		navbarVisible() : boolean {
