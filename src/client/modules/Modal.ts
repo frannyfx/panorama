@@ -7,6 +7,9 @@
 import Store from "../store";
 import { i18n } from "../i18n";
 
+// Modules
+import config from "../config";
+
 // Interfaces
 /**
  * Modal interfaces.
@@ -183,7 +186,7 @@ export function dismissModal(modal: Modal) {
 	Store.commit("Modals/remove", modal);
 	
 	// Lazy delete the modal data.
-	setTimeout(() => Store.commit("Modals/deleteData", modal), 5000);
+	setTimeout(() => Store.commit("Modals/deleteData", modal), config.store.lazyDataPurgeDelay);
 }
 
 /**

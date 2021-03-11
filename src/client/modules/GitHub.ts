@@ -10,7 +10,7 @@ import { AuthInterface } from "@octokit/types";
 
 // Modules
 import Store from "../store";
-import Config from "../config";
+import config from "../config";
 import { Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
 import { User } from "./models/User";
@@ -61,7 +61,7 @@ export async function getRepositories(page: number = 1) : Promise<Repository[] |
 	// Get repos.
 	let result = await getOctokit().repos.listForAuthenticatedUser({
 		page,
-		per_page: Config.repositories.pageSize,
+		per_page: config.repositories.pageSize,
 		affiliation: "owner,collaborator",
 		sort: "updated",
 		direction: "desc"

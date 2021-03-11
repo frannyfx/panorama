@@ -8,7 +8,7 @@ import { MutationTree } from "vuex";
 
 // Modules
 import { Repository, RepositoryObject } from "../../modules/models/Repository";
-import Config from "../../config";
+import config from "../../config";
 
 export interface RepositoryState {
 	page: number,
@@ -40,7 +40,7 @@ const mutations : MutationTree<RepositoryState> = {
 		state.page = data.page;
 
 		// We can't load more if we returned less than the configured page size or if an empty data set was returned.
-		state.canLoadMore = data.repositories.length == Config.repositories.pageSize;
+		state.canLoadMore = data.repositories.length == config.repositories.pageSize;
 	},
 	clear(state : RepositoryState) {
 		// Dynamically delete keys (Vue components will react accordingly).

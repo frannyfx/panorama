@@ -6,6 +6,9 @@
 // Imports
 import Store from "../store";
 
+// Modules
+import config from "../config";
+
 // Interfaces
 /**
  * Notification interfaces.
@@ -110,7 +113,7 @@ export function removeNotification(notification: Notification) {
 	Store.commit("Notifications/remove", notification);
 
 	// Lazy delete the notification data.
-	setTimeout(() => Store.commit("Notifications/deleteData", notification), 5000);
+	setTimeout(() => Store.commit("Notifications/deleteData", notification), config.store.lazyDataPurgeDelay);
 }
 
 /**
@@ -132,10 +135,9 @@ export function createAlert(type: "INFO" | "WARNING", title: string, description
 }
 
 /**
- * 
- * @param notification 
- * @param enabled 
- * @returns 
+ * Toggle the expiry of a notification, useful for disabling expiry during mouseover events.
+ * @param notification The notification to toggle the expiry for.
+ * @param enabled Whether expiry will become enabled or disabled.
  */
 export function toggleNotificationExpiry(notification: Notification, enabled: boolean) {
 	// Prevent accidental re-enabling of the notification by checking the removed flag.
