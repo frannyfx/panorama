@@ -95,6 +95,10 @@
 			"noContributors": "Sin collaboradores.",
 			"public": "Público",
 			"private": "Privado"
+		},
+		"repositoryFileListItem": {
+			"file": "Archivo",
+			"directory": "Carpeta"
 		}
 	}
 }

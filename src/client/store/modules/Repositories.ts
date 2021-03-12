@@ -56,9 +56,17 @@ const mutations : MutationTree<RepositoryState> = {
 		state.object[repository.fullName] = repository;
 	},
 	addFileChildren(state: RepositoryState, data: { repository: Repository, path: string, files: File[] }) {
+		// Sort children.
+		let sortedFiles = data.files.sort((a: File, b: File) => {
+			if (a.type == "dir" && b.type != "dir") return -1;
+			if (a.type != "dir" && b.type == "dir") return 1;
+			if (a.type == b.type) return a.name < b.name ? -1 : 1;
+			return 0;
+		});
+
 		// Get file paths and add them to the file's children.
 		data.repository.content.files[data.path].children.loaded = true;
-		data.repository.content.files[data.path].children.list.push(...data.files.map(file => file.path));
+		data.repository.content.files[data.path].children.list.push(...sortedFiles.map(file => file.path));
 
 		// Add the files to the repository.
 		data.files.map(file => data.repository.content.files[file.path] = file);

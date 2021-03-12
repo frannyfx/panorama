@@ -1,40 +1,63 @@
 <template>
-	<div class="file" :class="{ 'first': index == 0 }">
-		<span>File</span>
+	<div class="file-wrapper">
+		<div class="list-item file" :class="{ 'first': index == 0 }">
+			<div class="file-icon" v-tooltip="{ theme: 'panorama', content: $t(`components.repositoryFileListItem.${file.type == 'dir' ? 'directory' : 'file'}`)}">
+				<img :src="iconPath">
+			</div>
+			<span>{{ overrideName ? overrideName : file.name }}</span>
+		</div>
 	</div>
 </template>
 <script lang="ts">
 // Imports
 import Vue, { PropType } from "vue";
-const moment = () => import("moment");
+
+// Modules
+import config from "../config";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import { Repository } from "../modules/models/Repository";
+import { File } from "../modules/models/File";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon
 	},
-	data() {
-		return {
-			updatedAt: ""
-		};
+	computed: {
+		iconPath() : string {
+			if (this.file.type == "dir") return `${config.repositories.extensions.icons.path}/folder.${config.repositories.extensions.icons.extension}`;
+			return "/icons/material/file.svg";
+		},
+		file() : File {
+			return this.repo.content.files[this.path];
+		}
 	},
 	props: {
+		repo: {
+			type: Object as PropType<Repository>,
+			required: true
+		},
+		path: {
+			type: String,
+			required: true 
+		},
 		index: {
 			type: Number,
 			required: true,
 			default: -1
+		},
+		overrideName: {
+			type: String,
+			required: false
 		}
-	},
-	mounted: async function () {
-
 	}
+	
 });
 </script>
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
-.repo {
+.file {
 	display: flex;
 	align-items: center;
 	justify-content: flex-start;
@@ -43,29 +66,19 @@ export default Vue.extend({
 	padding: 10px 0px;
 	height: 50px;
 
-	cursor: pointer;
-	border-top: 1px solid rgba(black, .1);
-	
-	&.first {
-		border-top: none !important;
-	}
-	
-	transition: background-color 0.3s;
+	font-size: 0.85em;
 
-	&:hover {
-		background-color: rgba($blue, .05);
-	}
+	.file-icon {
+		display: flex;
+		align-items: center;
 
-	> :first-child {
-		margin-left: 30px;
-	}
-
-	> :last-child {
-		margin-right: 30px;
+		> img {
+			width: 20px;
+		}
 	}
 
 	> *:not(:last-child) {
-		margin-right: 30px;
+		margin-right: 20px;
 	}
 }
 </style>

@@ -95,6 +95,10 @@
 			"noContributors": "Nessun collaboratore.",
 			"public": "Pubblico",
 			"private": "Privato"
+		},
+		"repositoryFileListItem": {
+			"file": "File",
+			"directory": "Cartella"
 		}
 	}
 }

@@ -14,7 +14,12 @@
 				</transition-group>
 				<transition name="list">
 					<div @click="() => loadMoreRepos()" v-show="$store.state.Repositories.canLoadMore">
-						<div class="repo-loader list-item">{{$i18n.t("routes.dashboard.viewMore")}}</div>
+						<div class="repo-loader list-item">
+							<font-awesome-icon :icon="repos.fetching ? ['fas', 'sync'] : ['fas', 'chevron-right']" :spin="repos.fetching"/>
+							<span class="view-more">
+								{{ $t("routes.dashboard.viewMore") }}
+							</span>
+						</div>
 					</div>
 				</transition>
 			</div>
@@ -55,6 +60,13 @@ export default Vue.extend({
 		FontAwesomeIcon,
 		RepositoryListItem,
 		ContentFooter
+	},
+	data() {
+		return {
+			repos: {
+				fetching: false
+			}
+		};
 	},
 	methods: {
 		testAlert() {
@@ -128,6 +140,10 @@ export default Vue.extend({
 			}
 		},
 		async loadMoreRepos() {
+			// Check and set flag.
+			if (this.repos.fetching) return;
+			this.repos.fetching = true;
+
 			// Fetch more repos and handle error.
 			let repos : Repository[] | null = await getRepositories(this.$store.state.Repositories.page + 1);
 			if (!repos) {
@@ -137,6 +153,9 @@ export default Vue.extend({
 
 			// Add the loaded repositories to the store.
 			this.$store.commit("Repositories/add", { repositories: repos, page: this.$store.state.Repositories.page + 1 });
+
+			// Set flag.
+			this.repos.fetching = false;
 		}
 	},
 	async beforeRouteEnter (to, from, next) {
@@ -233,6 +252,11 @@ h2 {
 		height: 50px;
 		color: $blue;
 		font-weight: 600;
+
+		> svg {
+			margin: 0px;
+			margin-right: 10px;
+		}
 	}
 }
 </style>

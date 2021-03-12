@@ -3,9 +3,26 @@
 		<div class="content container">
 			<h2>{{$route.params.owner}}/{{$route.params.repo}}</h2>
 			<div class="files">
-				<div v-for="path in $store.state.Repositories.object[`${$route.params.owner}/${$route.params.repo}`].content.files[$route.query.path || ''].children.list" :key="path" @click="() => setPath(path)">
-					{{path}}
-				</div>
+				<transition name="list">
+					<repository-file-list-item
+						v-show="($route.query.path || '') != ''"
+						:repo="$store.state.Repositories.object[repoFullName]"
+						:path="parentPath"
+						@click.native="() => setPath(parentPath)"
+						:overrideName="'..'"
+						:index="0"
+					/>
+				</transition>
+				<transition-group name="list">
+					<repository-file-list-item
+						v-for="(path, index) in currentFiles"
+						:key="path"
+						@click.native="() => setPath(path)"
+						:repo="$store.state.Repositories.object[repoFullName]" :path="path"
+						:index="currentPath == '' ? index : index + 1"
+					/>
+				</transition-group>
+				
 			</div>
 		</div>
 	</div>
@@ -18,12 +35,13 @@ import Store from "../store";
 // Modules
 import { waitForAuth } from "../modules/API";
 import { i18n } from "../i18n";
-
-// Components
-import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import { getFiles, getRepository } from "../modules/GitHub";
 import Repositories from "../store/modules/Repositories";
 import { Repository } from "../modules/models/Repository";
+
+// Components
+import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
+import { File } from "../modules/models/File";
 
 /**
  * Load children for a path.
@@ -62,15 +80,27 @@ export default Vue.extend({
 	components: {
 		RepositoryFileListItem
 	},
-	watch: {
-		$route(to : any, from: any) {
-
+	computed: {
+		currentPath() : string {
+			return <string>this.$route.query.path || "";
+		},
+		repoFullName() : string {
+			return `${this.$route.params.owner}/${this.$route.params.repo}`;
+		},
+		parentPath() : string {
+			let pathSplit = this.currentPath.split("/");
+			let parentPath = pathSplit.slice(0, pathSplit.length - 1).join("/");
+			return parentPath;
+		},
+		currentFiles() : string[] {
+			let files : string[] = this.$store.state.Repositories.object[this.repoFullName].content.files[this.currentPath].children.list;
+			return files;
 		}
 	},
 	methods: {
 		async setPath(path: string) {
 			// Get current repository.
-			let repository : Repository = this.$store.state.Repositories.object[`${this.$router.currentRoute.params.owner}/${this.$router.currentRoute.params.repo}`];
+			let repository : Repository = this.$store.state.Repositories.object[this.repoFullName];
 
 			// Get file for selected path and prevent navigation if it is not a directory.
 			let file = repository.content.files[path];
@@ -89,7 +119,7 @@ export default Vue.extend({
 			});
 		}
 	},
-	async beforeRouteEnter(to : any, from: any, next: Function) {
+	async beforeRouteEnter(to: any, from: any, next: Function) {
 		// Set loading.
 		Store.commit("setLoading", true);
 		
@@ -120,7 +150,7 @@ export default Vue.extend({
 		let addFileChildrenResult = await addFileChildren(to.params.owner, to.params.repo, to.query.path ? to.query.path : "");
 		if (!addFileChildrenResult) return next(false);
 
-		// Load repo...
+		// Set loading to false.
 		next((vm: any) => {
 			vm.$store.commit("setLoading", false);
 		});
@@ -128,6 +158,7 @@ export default Vue.extend({
 });
 </script>
 <style lang="scss" scoped>
+@import "../stylesheets/globals.scss";
 .page {
 	background-color: white;
 	color: black;
