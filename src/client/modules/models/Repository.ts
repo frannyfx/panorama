@@ -7,6 +7,7 @@
 import { Data } from "../../../shared/Result";
 import { Analysis } from "./Analysis";
 import { toUser, User } from "./User";
+import { File } from "./File";
 
 // Interfaces
 export interface Repository {
@@ -24,6 +25,9 @@ export interface Repository {
 	},
 	content: {
 		loaded: boolean,
+		files: {
+			[key: string]: File
+		},
 		root?: File
 	}
 };
@@ -39,6 +43,18 @@ export interface RepositoryObject {
  * @returns A Repository object representing the input data.
  */
 export function toRepository(input: Data, contributors: Data[], analysisId: number) : Repository {
+	// Generate root directory file.
+	let root : File = {
+		type: "dir",
+		name: "root",
+		path: "",
+		children: {
+			loaded: false,
+			list: []
+		}
+	};
+
+	// Return the converted repository.
 	return {
 		id: input.id!,
 		name: input.name!,
@@ -52,7 +68,9 @@ export function toRepository(input: Data, contributors: Data[], analysisId: numb
 			id: analysisId
 		},
 		content: {
-			loaded: false
+			loaded: false,
+			files: { "": root },
+			root
 		}
 	};
 }

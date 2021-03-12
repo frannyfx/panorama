@@ -39,9 +39,24 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		let analysisId = await DatabaseAnalysis.getLatest(request.params!.owner, request.params!.repo);
+		let analysisId = await DatabaseAnalysis.getLatestId(request.params!.owner, request.params!.repo);
 		send(response, Codes.OK, {
 			analysisId
+		});
+	}
+}, {
+	method: Method.GET,
+	url: "/api/analysis/:id",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			id: Joi.number()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		//let analysis = await DatabaseAnalysis.get(request.params!.id);
+		send(response, Codes.OK, {
+		//	analysis
 		});
 	}
 }, {

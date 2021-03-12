@@ -34,7 +34,7 @@ export default Vue.extend({
 	
 	svg {
 		color: $white-blue;
-		font-size: 2em;
+		font-size: 1.4em;
 	}
 
 	> :not(:last-child) {

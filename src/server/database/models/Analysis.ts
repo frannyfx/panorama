@@ -62,7 +62,7 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
  * @param repo The name of the repository.
  * @returns The ID of the latest analysis of that repository or -1.
  */
-async function getLatest(owner: string, repo: string) : Promise<number> {
+async function getLatestId(owner: string, repo: string) : Promise<number> {
 	// TODO: Use a join.
 	// Get connection.
 	let connection = await getConnection();
@@ -82,6 +82,18 @@ async function getLatest(owner: string, repo: string) : Promise<number> {
 	return analysisRow.analysisId;
 }
 
+/**
+ * Returns base analysis data.
+ * @param id The ID of the analysis to retrieve.
+ */
+async function get(id: number) : Promise<void> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return;
+
+	
+}
+
 export default {
-	insert, update, getLatest
+	insert, update, getLatestId
 };

@@ -165,7 +165,6 @@ function createActionHandlers(actions: ModalAction[]) {
 export function createCustomModal(data: ModalData, onAction: ModalActionCallback | undefined = undefined) {
 	// Add handlers to the given actions.
 	createActionHandlers(data.actions);
-	console.log(data.actions);
 
 	// Generate a modal based on the given data.
 	let modal : Modal = {

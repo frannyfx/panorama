@@ -6,7 +6,7 @@
 // Imports
 import { Octokit } from "@octokit/rest";
 import { createTokenAuth }from "@octokit/auth-token";
-import { AuthInterface } from "@octokit/types";
+import { AuthInterface, GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
 
 // Modules
 import Store from "../store";
@@ -20,6 +20,10 @@ import { Method } from "../../shared/Method";
 
 // Variables
 var instance : Octokit | null = null;
+
+// Types
+//let octokitForTypes = new Octokit();
+//export type GithubRepository = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.get>;
 
 /**
  * Get the current instance of Octokit.
@@ -72,24 +76,51 @@ export async function getRepositories(page: number = 1) : Promise<Repository[] |
 	// Return null if we failed to fetch the repositories.
 	if (result.status != 200) return null;
 
-	// Get contributors.
-	let reposWithContributors : Repository[] = await Promise.all(result.data.map(async repo => {
-		// Get contributors and convert them to User instances.
-		let contributorsResult = await getOctokit().repos.listContributors({
-			owner: repo.owner!.login,
-			repo: repo.name,
-			per_page: 5
-		});
+	// Enrich repositories.
+	let enrichedRepositories : Repository[] = await Promise.all(result.data.map(repo => enrichRepository(repo)));
 
-		let contributors : Data[] = contributorsResult.status == 200 ? contributorsResult.data : [];
-		
-		// Get analysis data.
-		let analysis = await send(Method.GET, `repo/${repo.full_name}/analysis`);
-		return toRepository(repo, contributors, analysis.status.ok ? analysis.result!.analysisId : -1);
-	}));
+	// Sort by time updated.
+	enrichedRepositories.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+	return enrichedRepositories;
+}
 
-	reposWithContributors.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-	return reposWithContributors;
+/**
+ * Get a single repository from GitHub.
+ * @param owner The owner of the repository.
+ * @param repo The name of the repository.
+ * @returns The requested repository.
+ */
+export async function getRepository(owner: string, repo: string) : Promise<Repository | null> {
+	// Get repo.
+	let result = await getOctokit().repos.get({
+		owner, repo
+	});
+
+	// Return null if fetching the repository failed.
+	if (result.status != 200) return null;
+
+	// Enrich repository and return result.
+	return await enrichRepository(result.data);
+}
+
+/**
+ * Fetch additional data for a repository.
+ * @param repository The repository data returned by GitHub.
+ * @returns A Panorama Repository model of the data.
+ */
+export async function enrichRepository(repository: any) : Promise<Repository> {
+	// Get contributors and convert them to User instances.
+	let contributorsResult = await getOctokit().repos.listContributors({
+		owner: repository.owner!.login,
+		repo: repository.name,
+		per_page: 5
+	});
+
+	let contributors : Data[] = contributorsResult.status == 200 ? contributorsResult.data : [];
+	
+	// Get analysis data.
+	let analysis = await send(Method.GET, `repo/${repository.full_name}/analysis`);
+	return toRepository(repository, contributors, analysis.status.ok ? analysis.result!.analysisId : -1);
 }
 
 /**
@@ -108,7 +139,10 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
 
 	if (result.status != 200) return [];
 
+	// Get parent file directory.
+	let parent = repository.content.files[path];
+
 	// Convert to file interfaces.
-	let files : File[] = Array.isArray(result.data) ? [...result.data!].map(file => toFile(file)) : [];
+	let files : File[] = Array.isArray(result.data) ? [...result.data!].map(file => toFile(file, parent)) : [];
 	return files;
 }

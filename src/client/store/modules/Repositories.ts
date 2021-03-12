@@ -9,6 +9,7 @@ import { MutationTree } from "vuex";
 // Modules
 import { Repository, RepositoryObject } from "../../modules/models/Repository";
 import config from "../../config";
+import { File } from "../../modules/models/File";
 
 export interface RepositoryState {
 	page: number,
@@ -29,11 +30,20 @@ const getters = { };
 const actions = { };
 
 const mutations : MutationTree<RepositoryState> = {
-	add(state : RepositoryState, data: { repositories: Repository[], page: number }) {
+	add(state: RepositoryState, data: { repositories: Repository[], page: number }) {
+		// Get IDs of repositories already in the list (need to ensure the list and the object contain the same objects).
+		let repoIds = state.list.map(repo => repo.id);
+
 		// Add repositories to the list and the object.
 		data.repositories.map(repository => {
-			state.list.push(repository);
-			state.object[repository.id] = repository;
+			// Remove the old version of the repository if a new one is contained in the list to be added.
+			let repoIndex = repoIds.indexOf(repository.id);
+			if (repoIndex != -1) {
+				state.list.splice(repoIndex, 1, repository);
+			} else state.list.push(repository);
+
+			// Add to the object.
+			state.object[repository.fullName] = repository;
 		});
 
 		// Set the page accordingly.
@@ -42,7 +52,18 @@ const mutations : MutationTree<RepositoryState> = {
 		// We can't load more if we returned less than the configured page size or if an empty data set was returned.
 		state.canLoadMore = data.repositories.length == config.repositories.pageSize;
 	},
-	clear(state : RepositoryState) {
+	addSingle(state: RepositoryState, repository: Repository) {
+		state.object[repository.fullName] = repository;
+	},
+	addFileChildren(state: RepositoryState, data: { repository: Repository, path: string, files: File[] }) {
+		// Get file paths and add them to the file's children.
+		data.repository.content.files[data.path].children.loaded = true;
+		data.repository.content.files[data.path].children.list.push(...data.files.map(file => file.path));
+
+		// Add the files to the repository.
+		data.files.map(file => data.repository.content.files[file.path] = file);
+	},
+	clear(state: RepositoryState) {
 		// Dynamically delete keys (Vue components will react accordingly).
 		Object.keys(state.object).map(key => {
 			delete state.object[key];
