@@ -9,11 +9,13 @@ import { MutationTree } from "vuex";
 // Modules
 import { Notification, NotificationData, NotificationsObject} from "../../modules/Notifications";
 
+// State interface.
 export interface NotificationsState {
 	list: Notification[],
 	object: NotificationsObject
 };
 
+// Default state.
 const state : NotificationsState = {
 	list: [] as Notification[],
 	object: {} as NotificationsObject

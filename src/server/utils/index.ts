@@ -1,7 +1,18 @@
+/**
+ * @file Server-side utility functions.
+ * @author Francesco Compagnoni
+ */
+
 // Imports
 import { promises as fs } from "fs";
 import path from "path";
 
+/**
+ * Get all of a folder's children.
+ * @param directory The directory to find children from.
+ * @param fileRegex The regex the file name has to match in order to be counted.
+ * @returns A list of all the children's paths.
+ */
 export async function walkDir(directory: string, fileRegex: RegExp) : Promise<Array<string>> {
 	// Read the directory.
 	var entities;

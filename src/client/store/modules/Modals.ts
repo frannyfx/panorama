@@ -10,11 +10,13 @@ import { Modal, ModalsObject } from "../../modules/Modal";
 // Modules
 // ...
 
+// State interface.
 export interface ModalsState {
 	list: Modal[],
 	object: ModalsObject
 };
 
+// Default state.
 const state : ModalsState = {
 	list: [] as Modal[],
 	object: {} as ModalsObject

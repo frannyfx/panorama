@@ -1,7 +1,10 @@
 <template>
 	<div class="file-wrapper">
 		<div class="list-item file" :class="{ 'first': index == 0 }">
-			<div class="file-icon" v-tooltip="{ theme: 'panorama', content: $t(`components.repositoryFileListItem.${file.type == 'dir' ? 'directory' : 'file'}`)}">
+			<div class="file-icon" v-tooltip="{ 
+				theme: 'panorama', 
+				content: file.type == 'dir' ? $t('components.repositoryFileListItem.directory') : fileType ? $t('components.repositoryFileListItem.fileOfType', [fileType.name]) : $t('components.repositoryFileListItem.file')
+			}">
 				<img :src="iconPath">
 			</div>
 			<span>{{ overrideName ? overrideName : file.name }}</span>
@@ -14,20 +17,34 @@ import Vue, { PropType } from "vue";
 
 // Modules
 import config from "../config";
+import Extensions from "../store/modules/Extensions";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import { Repository } from "../modules/models/Repository";
 import { File } from "../modules/models/File";
+import { FileType } from "../../shared/models/FileType";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon
 	},
 	computed: {
+		extension() : string {
+			return this.file.name.split(".").pop()!;
+		},
+		fileType() : FileType {
+			return Extensions.state.map[this.file.name.split(".").pop()!];
+		},
 		iconPath() : string {
+			// Return folder icon.
 			if (this.file.type == "dir") return `${config.repositories.extensions.icons.path}/folder.${config.repositories.extensions.icons.extension}`;
-			return "/icons/material/file.svg";
+
+			// Get extension information
+			if (this.fileType) return `${config.repositories.extensions.icons.path}/${this.fileType.icon}.${config.repositories.extensions.icons.extension}`;
+
+			// No extension information, return default file icon.
+			return `${config.repositories.extensions.icons.path}/file.${config.repositories.extensions.icons.extension}`;
 		},
 		file() : File {
 			return this.repo.content.files[this.path];

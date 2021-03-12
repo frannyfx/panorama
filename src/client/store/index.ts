@@ -13,6 +13,7 @@ import { Repository } from "../modules/models/Repository";
 import Notifications from "./modules/Notifications";
 import Repositories from "./modules/Repositories";
 import Modals from "./modules/Modals";
+import Extensions from "./modules/Extensions";
 
 // Use plugin
 Vue.use(Vuex);
@@ -92,7 +93,8 @@ export default new Vuex.Store<RootState>({
 	modules: {
 		Notifications,
 		Repositories,
-		Modals
+		Modals,
+		Extensions
 	},
 	strict: debug
 });

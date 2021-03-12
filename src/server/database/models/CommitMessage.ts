@@ -10,7 +10,7 @@ import { getConnection } from "../";
 /**
  * The interface matching the CommitMessage table in the database.
  */
-export interface CommitMessage {
+export interface DatabaseCommitMessage {
 	commitId: string,
 	message: string
 };
@@ -19,7 +19,7 @@ export interface CommitMessage {
  * Insert many commit messages into the database.
  * @param messages The messages to insert.
  */
-export async function insert(messages: CommitMessage[]) : Promise<boolean> {
+export async function insert(messages: DatabaseCommitMessage[]) : Promise<boolean> {
 	// Get connection.
 	let connection = await getConnection();
 	if (!connection) return false;

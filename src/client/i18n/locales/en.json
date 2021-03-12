@@ -97,6 +97,7 @@
 			"private": "Private"
 		},
 		"repositoryFileListItem": {
+			"fileOfType": "{0} file",
 			"file": "File",
 			"directory": "Directory"
 		}

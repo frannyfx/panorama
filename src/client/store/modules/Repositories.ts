@@ -11,14 +11,16 @@ import { Repository, RepositoryObject } from "../../modules/models/Repository";
 import config from "../../config";
 import { File } from "../../modules/models/File";
 
-export interface RepositoryState {
+// State interface.
+export interface RepositoriesState {
 	page: number,
 	canLoadMore: boolean,
 	list: Repository[],
 	object: RepositoryObject
 };
 
-const state : RepositoryState = {
+// Default state.
+const state : RepositoriesState = {
 	page: -1,
 	canLoadMore: true as boolean,
 	list: [] as Repository[],
@@ -29,8 +31,8 @@ const getters = { };
 
 const actions = { };
 
-const mutations : MutationTree<RepositoryState> = {
-	add(state: RepositoryState, data: { repositories: Repository[], page: number }) {
+const mutations : MutationTree<RepositoriesState> = {
+	add(state: RepositoriesState, data: { repositories: Repository[], page: number }) {
 		// Get IDs of repositories already in the list (need to ensure the list and the object contain the same objects).
 		let repoIds = state.list.map(repo => repo.id);
 
@@ -52,10 +54,10 @@ const mutations : MutationTree<RepositoryState> = {
 		// We can't load more if we returned less than the configured page size or if an empty data set was returned.
 		state.canLoadMore = data.repositories.length == config.repositories.pageSize;
 	},
-	addSingle(state: RepositoryState, repository: Repository) {
+	addSingle(state: RepositoriesState, repository: Repository) {
 		state.object[repository.fullName] = repository;
 	},
-	addFileChildren(state: RepositoryState, data: { repository: Repository, path: string, files: File[] }) {
+	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[] }) {
 		// Sort children.
 		let sortedFiles = data.files.sort((a: File, b: File) => {
 			if (a.type == "dir" && b.type != "dir") return -1;
@@ -71,7 +73,7 @@ const mutations : MutationTree<RepositoryState> = {
 		// Add the files to the repository.
 		data.files.map(file => data.repository.content.files[file.path] = file);
 	},
-	clear(state: RepositoryState) {
+	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).
 		Object.keys(state.object).map(key => {
 			delete state.object[key];

@@ -33,15 +33,18 @@ import Vue from "vue";
 import Store from "../store";
 
 // Modules
-import { waitForAuth } from "../modules/API";
+import { send, waitForAuth } from "../modules/API";
 import { i18n } from "../i18n";
 import { getFiles, getRepository } from "../modules/GitHub";
 import Repositories from "../store/modules/Repositories";
 import { Repository } from "../modules/models/Repository";
+import { Method } from "../../shared/Method";
+import Extensions from "../store/modules/Extensions";
 
 // Components
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import { File } from "../modules/models/File";
+import { dedupe } from "../../shared/utils";
 
 /**
  * Load children for a path.
@@ -66,6 +69,20 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 
 	// Get the files.
 	let files = await getFiles(repository, path);
+
+	// Extract the extensions that we don't yet have in the map.
+	let validExtensions : string[] = files.filter(file => file.type == "file").map(file => file.name.split(".").pop()!).filter(extension => extension && !Extensions.state.map[extension]);
+	if (validExtensions.length != 0) {
+		// Remove duplicates.
+		let extensionSet = dedupe(validExtensions, (a: string, b: string) => a == b);
+
+		// Get the extension data.
+		let extensionData = await send(Method.GET, `extensions?list=${extensionSet.join(",")}`);
+
+		// Add the new extensions to the map.
+		if (extensionData.status.ok) Store.commit("Extensions/add", extensionData.result!);
+	}
+	
 
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", {

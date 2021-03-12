@@ -29,6 +29,9 @@ export async function getConnection() : Promise<knex | null> {
 		databaseConnection = knex({
 			client: "mysql",
 			connection: config.database,
+			pool: {
+				min: 1
+			},
 			useNullAsDefault: true
 		});
 
