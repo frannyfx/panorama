@@ -243,6 +243,7 @@ export default Vue.extend({
 	}
 
 	.minor, .major {
+		font-size: 0.9em;
 		color: $blue;
 	}
 
@@ -252,7 +253,6 @@ export default Vue.extend({
 
 	.separator {
 		color: $grey-blue;
-		font-size: 1.1em;
 		margin: 0px 5px;
 		font-weight: 400;
 	}
@@ -272,7 +272,7 @@ export default Vue.extend({
 	.major, .minor {
 		color: $blue;
 		text-decoration: underline solid transparent;
-		transition: text-decoration-color .3s;
+		transition: color .3s, text-decoration-color .3s;
 	}
 
 	.separator {
