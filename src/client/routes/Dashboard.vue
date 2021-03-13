@@ -14,7 +14,7 @@
 				</transition-group>
 				<transition name="list">
 					<div @click="() => loadMoreRepos()" v-show="$store.state.Repositories.canLoadMore">
-						<div class="repo-loader list-item">
+						<div class="repo-loader list-item clickable">
 							<font-awesome-icon :icon="repos.fetching ? ['fas', 'sync'] : ['fas', 'chevron-right']" :spin="repos.fetching"/>
 							<span class="view-more">
 								{{ $t("routes.dashboard.viewMore") }}
@@ -227,7 +227,7 @@ h2 {
 		width: 300px;
 		height: 180px;
 		border-radius: 16px;
-		background-color: rgba(black, .1);
+		background-color: rgba($deep, .1);
 
 		&:not(:last-child) {
 			margin-right: 20px;
@@ -238,7 +238,7 @@ h2 {
 .repos {
 	width: 100%;
 	margin: 20px 0px;
-	border: 1px solid rgba(black, .1);
+	border: 1px solid rgba($deep, .1);
 	border-radius: 16px;
 	box-sizing: border-box;
 	overflow: hidden;

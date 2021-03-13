@@ -1,6 +1,6 @@
 <template>
 	<div class="file-wrapper">
-		<div class="list-item file" :class="{ 'first': index == 0 }">
+		<div class="list-item clickable file" :class="{ 'first': index == 0 }">
 			<div class="file-icon" v-tooltip="{ 
 				theme: 'panorama', 
 				content: file.type == 'dir' ? $t('components.repositoryFileListItem.directory') : fileType ? $t('components.repositoryFileListItem.fileOfType', [fileType.name]) : $t('components.repositoryFileListItem.file')

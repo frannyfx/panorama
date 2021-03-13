@@ -1,6 +1,6 @@
 <template>
 	<div class="repo-wrapper">
-		<div class="repo list-item" :class="{ 'first': index == 0 }">
+		<div class="repo list-item clickable" :class="{ 'first': index == 0 }">
 			<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('components.repositoryListItem.private') : $t('components.repositoryListItem.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
 			<div class="details">
 				<div class="title">

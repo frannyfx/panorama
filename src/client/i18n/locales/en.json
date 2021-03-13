@@ -19,6 +19,9 @@
 		"signIn": {
 			"title": "Sign in",
 			"signInWithGitHub": "Sign in with GitHub"
+		},
+		"repo": {
+			"noDescription": "No description."
 		}
 	},
 	"alerts": {

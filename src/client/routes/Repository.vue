@@ -1,16 +1,35 @@
 <template>
 	<div class="page nav no-select">
 		<div class="content container">
-			<h2>{{$route.params.owner}}/{{$route.params.repo}}</h2>
+			<h2 class="title">
+				<font-awesome-icon class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
+				<span class="minor">{{$route.params.owner}}</span>
+				<span class="separator">/</span>
+				<span class="major">{{$route.params.repo}}</span>
+			</h2>
+			<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
 			<div class="files">
+				<div class="list-item first header">
+					<div class="breadcrumbs">
+						<transition-group name="breadcrumb">
+							<span v-for="(component, index) in breadcrumbs" :key="index + component">
+								<span
+									:class="{ minor: index != 0, major: index == 0, current: index == breadcrumbs.length - 1, clickable: index != breadcrumbs.length - 1 }"
+									@click="() => index != breadcrumbs.length - 1 ? setPath(breadcrumbs.slice(1, index + 1).join('/')) : ''"
+								>{{component}}</span>	
+								<span class="separator" :class="{ visible : index != breadcrumbs.length - 1 }"><font-awesome-icon icon="chevron-right"/></span>
+							</span>
+						</transition-group>
+					</div>
+				</div>
 				<transition name="list">
 					<repository-file-list-item
 						v-show="($route.query.path || '') != ''"
-						:repo="$store.state.Repositories.object[repoFullName]"
+						:repo="repo"
 						:path="parentPath"
 						@click.native="() => setPath(parentPath)"
 						:overrideName="'..'"
-						:index="0"
+						:index="1"
 					/>
 				</transition>
 				<transition-group name="list">
@@ -18,8 +37,8 @@
 						v-for="(path, index) in currentFiles"
 						:key="path"
 						@click.native="() => setPath(path)"
-						:repo="$store.state.Repositories.object[repoFullName]" :path="path"
-						:index="currentPath == '' ? index : index + 1"
+						:repo="repo" :path="path"
+						:index="currentPath == '' ? index + 1 : index + 2"
 					/>
 				</transition-group>
 				
@@ -40,11 +59,13 @@ import Repositories from "../store/modules/Repositories";
 import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
 import Extensions from "../store/modules/Extensions";
-
-// Components
-import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import { File } from "../modules/models/File";
 import { dedupe } from "../../shared/utils";
+
+// Components
+import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
+
 
 /**
  * Load children for a path.
@@ -115,14 +136,23 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 
 export default Vue.extend({
 	components: {
+		FontAwesomeIcon,
 		RepositoryFileListItem
 	},
 	computed: {
 		currentPath() : string {
 			return <string>this.$route.query.path || "";
 		},
+		breadcrumbs() : string[] {
+			let breadcrumbs = [this.$route.params.repo];
+			breadcrumbs.push(...this.currentPath.split("/").filter(component => component.length != 0));
+			return breadcrumbs;
+		},
 		repoFullName() : string {
 			return `${this.$route.params.owner}/${this.$route.params.repo}`;
+		},
+		repo() : Repository {
+			return this.$store.state.Repositories.object[this.repoFullName];
 		},
 		parentPath() : string {
 			let pathSplit = this.currentPath.split("/");
@@ -141,7 +171,7 @@ export default Vue.extend({
 
 			// Get file for selected path and prevent navigation if it is not a directory.
 			let file = repository.content.files[path];
-			if (file.type != "dir") return;
+			if (file && file.type != "dir") return;
 
 			// Fetch the children first, before navigating. This allows the UI to update.
 			await addFileChildren(this.$router.currentRoute.params.owner, this.$router.currentRoute.params.repo, path || "");
@@ -201,12 +231,107 @@ export default Vue.extend({
 	color: black;
 }
 
+.title {
+	display: flex;
+	align-items: center;
+	font-weight: 600;
+
+	.repo-icon {
+		color: $grey-blue;
+		font-size: 0.7em;
+		margin-right: 15px;
+	}
+
+	.minor, .major {
+		color: $blue;
+	}
+
+	.minor {
+		font-weight: 300;
+	}
+
+	.separator {
+		color: $grey-blue;
+		font-size: 1.1em;
+		margin: 0px 5px;
+		font-weight: 400;
+	}
+}
+
+.description {
+	font-size: 0.85em;
+	color: $grey-blue;
+	margin-top: 0px;
+}
+
+.breadcrumbs {
+	display: flex;
+	align-items: center;
+	font-weight: 600;
+
+	.major, .minor {
+		color: $blue;
+		text-decoration: underline solid transparent;
+		transition: text-decoration-color .3s;
+	}
+
+	.separator {
+		margin: 0px 15px;
+		font-weight: 400;
+		font-size: 0.8em;
+		color: $grey-blue;
+		opacity: 0;
+		transition: opacity 0.3s;
+
+		&.visible {
+			opacity: 1;
+		}
+	}
+
+	.minor {
+		font-weight: 300;
+	}
+
+	.clickable {
+		cursor: pointer;
+		
+		&:hover {
+			text-decoration-color: $blue;
+		}
+	}
+
+	:not(.separator):not(.clickable) {
+		color: $grey-blue;
+	}
+}
+
+.breadcrumb-enter-active, .breadcrumb-leave-active {
+	transition: opacity .3s, transform .3s;
+	display: inline-block;
+}
+
+.breadcrumb-enter, .breadcrumb-leave-to {
+	transform: translateY(-10px);
+	opacity: 0;
+}
+
+.breadcrumb-enter-to, .breadcrumb-leave {
+	opacity: 1;
+}
+
 .files {
 	width: 100%;
 	margin: 20px 0px;
-	border: 1px solid rgba(black, .1);
+	border: 1px solid rgba($deep, .1);
 	border-radius: 16px;
 	box-sizing: border-box;
 	overflow: hidden;
+
+	.list-item.header {
+		display: flex;
+		align-items: center;
+		height: 50px;
+		border: none;
+	}
 }
 </style>
