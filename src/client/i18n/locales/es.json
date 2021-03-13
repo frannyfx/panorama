@@ -97,6 +97,7 @@
 			"private": "Privado"
 		},
 		"repositoryFileListItem": {
+			"fileOfType": "Archivo {0}",
 			"file": "Archivo",
 			"directory": "Carpeta"
 		}

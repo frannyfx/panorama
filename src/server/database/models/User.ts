@@ -13,7 +13,8 @@ import { getConnection } from "../";
 export interface DatabaseUser {
 	userId: number,
 	login: string,
-	lastAccess?: Date
+	lastAccess?: Date,
+	colour?: string
 };
 
 /**
@@ -33,7 +34,8 @@ export async function insertOrUpdate(user: DatabaseUser) : Promise<boolean> {
 		// Update the existing user.
 		await connection("User").where({ userId: user.userId }).update({
 			login: user.login,
-			lastAccess: user.lastAccess ? user.lastAccess : undefined
+			lastAccess: user.lastAccess ? user.lastAccess : undefined,
+			colour: user.colour
 		});
 	}
 

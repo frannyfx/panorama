@@ -180,8 +180,8 @@ export default Vue.extend({
 
 				.progress-bar {
 					width: 100%;
-					height: 5px;
-					border-radius: 5px;
+					height: 6px;
+					border-radius: 6px;
 					background-color: rgba($deep, .2);
 					overflow: hidden;
 
@@ -189,7 +189,7 @@ export default Vue.extend({
 						width: 75%;
 						transition: width 1s;
 						height: 100%;
-						border-radius: 5px;
+						border-radius: 6px;
 						background-color: $blue;
 					}
 				}

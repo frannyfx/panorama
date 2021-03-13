@@ -71,7 +71,12 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 	let files = await getFiles(repository, path);
 
 	// Extract the extensions that we don't yet have in the map.
-	let validExtensions : string[] = files.filter(file => file.type == "file").map(file => file.name.split(".").pop()!).filter(extension => extension && !Extensions.state.map[extension]);
+	let validExtensions : string[] = files
+		.filter(file => file.type == "file")
+		.map(file => file.name.split(".").pop()!)
+		.filter(extension => extension && !Extensions.state.map[extension] && Extensions.state.unknown.indexOf(extension) == -1);
+
+	// If there are extensions to request, process them and request them.
 	if (validExtensions.length != 0) {
 		// Remove duplicates.
 		let extensionSet = dedupe(validExtensions, (a: string, b: string) => a == b);
@@ -79,8 +84,23 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 		// Get the extension data.
 		let extensionData = await send(Method.GET, `extensions?list=${extensionSet.join(",")}`);
 
-		// Add the new extensions to the map.
-		if (extensionData.status.ok) Store.commit("Extensions/add", extensionData.result!);
+		// If the extension data was returned successfully, add them.
+		if (extensionData.status.ok) {
+			// Subtract returned extensions from the requested ones to get the unknown extensions.
+			let unknownExtensions : string[] = [];
+			let returnedExtensions : string[] = Object.keys(extensionData.result!);
+
+			// Add each extension to the list of unknown extension if it was not returned.
+			extensionSet.map(requestedExtension => {
+				if (returnedExtensions.indexOf(requestedExtension) == -1) unknownExtensions.push(requestedExtension);
+			});
+			
+			// Add the new extensions to the map.
+			Store.commit("Extensions/add", {
+				map: extensionData.result!,
+				unknown: unknownExtensions	
+			});
+		}
 	}
 	
 

@@ -7,7 +7,12 @@
 			}">
 				<img :src="iconPath">
 			</div>
-			<span>{{ overrideName ? overrideName : file.name }}</span>
+			<div class="details">
+				<span>{{ overrideName ? overrideName : file.name }}</span>
+			</div>
+			<div class="statistics">
+				<file-percentage/>
+			</div>
 		</div>
 	</div>
 </template>
@@ -18,16 +23,18 @@ import Vue, { PropType } from "vue";
 // Modules
 import config from "../config";
 import Extensions from "../store/modules/Extensions";
-
-// Components
-import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import { Repository } from "../modules/models/Repository";
 import { File } from "../modules/models/File";
 import { FileType } from "../../shared/models/FileType";
 
+// Components
+import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import FilePercentage from "./FilePercentage.vue";
+
 export default Vue.extend({
 	components: {
-		FontAwesomeIcon
+		FontAwesomeIcon,
+		FilePercentage
 	},
 	computed: {
 		extension() : string {
@@ -92,6 +99,12 @@ export default Vue.extend({
 		> img {
 			width: 20px;
 		}
+	}
+
+	.details {
+		flex-grow: 1;
+
+		
 	}
 
 	> *:not(:last-child) {

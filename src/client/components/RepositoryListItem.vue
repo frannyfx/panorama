@@ -16,7 +16,7 @@
 			</div>
 			<div class="contributors hide-small">
 				<div class="contributors-row" v-if="repo.contributors.length > 0">
-					<div v-tooltip="{ theme: 'panorama', content: contributor.login }" v-for="(contributor, index) in repo.contributors" :key="contributor.id" class="contributor"  :style="{ 'z-index': 5 - index }">
+					<div v-tooltip="{ theme: 'panorama', content: contributor.login }" v-for="(contributor, index) in repo.contributors" :key="contributor.id" class="contributor" :style="{ 'z-index': 5 - index }">
 						<div class="image" :style="{'background-image': `url('${contributor.avatarUrl}')`}"></div>
 					</div>
 				</div>

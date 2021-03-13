@@ -4,7 +4,6 @@
  */
 
 // Imports
-import axios, { AxiosBasicCredentials } from "axios";
 import { Octokit } from "@octokit/rest";
 import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
 import { GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
@@ -14,7 +13,6 @@ import loadConfig, { Config } from "../Config";
 const config : Config = loadConfig();
 
 // Modules
-import { Method } from "../../shared/Method";
 import { Result, buildResult, Data } from "../../shared/Result";
 
 // Types
@@ -22,8 +20,6 @@ let octokitForTypes = new Octokit();
 export type Repository = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.get>;
 export type User = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.users.getAuthenticated>;
 export type Contributors = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.listContributors>;
-
-
 
 // Constants
 const octokitAuth = createOAuthAppAuth({

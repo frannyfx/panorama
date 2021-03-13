@@ -97,6 +97,7 @@
 			"private": "Privato"
 		},
 		"repositoryFileListItem": {
+			"fileOfType": "File {0}",
 			"file": "File",
 			"directory": "Cartella"
 		}

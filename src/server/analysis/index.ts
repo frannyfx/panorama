@@ -31,6 +31,7 @@ import DatabaseAnalysedItem from "../database/models/AnalysedItem";
 import { getRepositoryContributors } from "../github";
 import { insertOrUpdate } from "../database/models/AnalysisContributor";
 import { dedupe } from "../../shared/utils";
+import { extractVibrant } from "./colours";
 /**
  * Start the analysis system.
  */
@@ -288,12 +289,19 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let contributors = dedupe(Object.keys(contributorMap).map(email => contributorMap[email]).filter(contributor => contributor && contributor.id), (a, b) => a.id === b.id);
 	try {
 		// - Insert contributors. (TODO: Do this as a bulk MySQL query).
-		contributors.map(contributor => {
-			insertOrUpdate(analysis.analysisId!, {
+		await Promise.all(contributors.map(async contributor => {
+			// Get vibrant colour from avatar.
+			let vibrant = await extractVibrant(contributor.avatar_url);
+
+			// Insert/update user.
+			await insertOrUpdate(analysis.analysisId!, {
 				userId: contributor.id,
-				login: contributor.login
+				login: contributor.login,
+				colour: vibrant || undefined
 			});
-		});
+		}));
+
+		console.log("inserted");
 
 		// - Insert analysis data.
 		DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults, contributorMap);

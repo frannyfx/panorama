@@ -12,7 +12,12 @@ export interface User {
 	login: string,
 	avatarUrl: string,
 	name: string,
-	email: string
+	email: string,
+	color?: string
+};
+
+export interface UserObject {
+	[key: string]: User
 };
 
 /**
