@@ -383,7 +383,7 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 	let pathsInFolder : string[] = itemsInFolder.map(row => row.path);
 
 	// Get AnalysedItemContributors for the files in the folder.
-	let contributors : DatabaseAnalysedItemContributor[] = await connection("AnalysedItemContributor").where({analysisId}).whereIn("path", pathsInFolder);
+	let contributors : any[] = await connection("AnalysedItemContributor").where({analysisId}).whereIn("path", pathsInFolder).join("User", { "AnalysedItemContributor.contributorId": "User.userId"});
 
 	// Get ContributorAggregateStats for the files in the folder.
 	let contributorAggregateStats : DatabaseAnalysedItemContributorAggregateStats[] = await connection("AnalysedItemContributorAggregateStats").where({analysisId}).whereIn("path", pathsInFolder);
@@ -416,8 +416,8 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 			});
 
 			// Get existing contributor stats or create new.
-			itemContributorStats[contributor.contributorId] = {
-				contributorId: contributor.contributorId.toString(),
+			itemContributorStats[contributor.login] = {
+				contributorId: contributor.login,
 				numLines: contributor.numLines,
 				percentage: contributor.percentage,
 				aggregateLineStats: aggregateStats
