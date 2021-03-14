@@ -5,6 +5,7 @@
 
 // Imports
 import { Data } from "../../../shared/Result";
+import { Analysis, toAnalysis } from "./Analysis";
 
 // Interfaces
 export interface File {
@@ -15,7 +16,8 @@ export interface File {
 	children: {
 		loaded: boolean,
 		list: string[]
-	}
+	},
+	analysis?: Analysis
 };
 
 /**
@@ -23,7 +25,7 @@ export interface File {
  * @param input The input data to convert to a File.
  * @returns A File object representing the input data.
  */
-export function toFile(input: Data, parent: File | undefined = undefined) : File {
+export function toFile(input: Data, analysis: Data | undefined = undefined, parent: File | undefined = undefined) : File {
 	return {
 		type: input.type,
 		name: input.name,
@@ -32,6 +34,7 @@ export function toFile(input: Data, parent: File | undefined = undefined) : File
 		children: {
 			loaded: false,
 			list: []
-		}
+		},
+		analysis: analysis ? toAnalysis(analysis) : undefined
 	};
 }

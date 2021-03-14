@@ -8,8 +8,33 @@ import { Data } from "../../../shared/Result";
 
 // Interfaces
 export interface Analysis {
-	analysisId: number
+	contributorList: string[],
+	contributorObject: ContributorMap,
+	aggregateLineStats: AggregateLineStats,
+	numLines: number
 };
+
+export interface AnalysisMap {
+	[key: string]: Analysis
+};
+
+export interface ContributorMap {
+	[key: string]: AnalysisContributor
+}
+
+export interface AnalysisContributor {
+	contributorId: string,
+	numLines: number,
+	percentage: number,
+	aggregateLineStats: AggregateLineStats
+}
+
+export interface AggregateLineStats {
+	[key: string]: {
+		numLines: number,
+		percentage: number
+	}
+}
 
 /**
  * Convert raw data to the Analysis data model.
@@ -17,7 +42,13 @@ export interface Analysis {
  * @returns An Analysis object representing the input data.
  */
 export function toAnalysis(input: Data) : Analysis {
+	// Process contributors.
+	let contributorList = Object.keys(input.contributors);
+
 	return {
-		analysisId: input.analysisId
+		contributorList,
+		contributorObject: input.contributors,
+		aggregateLineStats: input.aggregateLineStats,
+		numLines: input.numLines
 	};
 }

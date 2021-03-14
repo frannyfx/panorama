@@ -10,6 +10,7 @@ import { MutationTree } from "vuex";
 import { Repository, RepositoryObject } from "../../modules/models/Repository";
 import config from "../../config";
 import { File } from "../../modules/models/File";
+import { AnalysisMap } from "../../modules/models/Analysis";
 
 // State interface.
 export interface RepositoriesState {
@@ -57,7 +58,7 @@ const mutations : MutationTree<RepositoriesState> = {
 	addSingle(state: RepositoriesState, repository: Repository) {
 		state.object[repository.fullName] = repository;
 	},
-	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[] }) {
+	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
 		// Sort children.
 		let sortedFiles = data.files.sort((a: File, b: File) => {
 			if (a.type == "dir" && b.type != "dir") return -1;
@@ -70,8 +71,14 @@ const mutations : MutationTree<RepositoriesState> = {
 		data.repository.content.files[data.path].children.loaded = true;
 		data.repository.content.files[data.path].children.list.push(...sortedFiles.map(file => file.path));
 
-		// Add the files to the repository.
-		data.files.map(file => data.repository.content.files[file.path] = file);
+		// Add the files to the repository and set the analysis data.
+		data.files.map(file => {
+			file.analysis = data.analysis[file.path];
+			data.repository.content.files[file.path] = file;
+		});
+
+		// Set analysis for the directory whose children we added.
+		if (data.analysis[data.path]) data.repository.content.files[data.path].analysis = data.analysis[data.path];
 	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).

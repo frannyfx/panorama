@@ -269,7 +269,6 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 			// Integrate the two analysis results together
 			let analysis = processFileAnalysis(file, tokenGroups, blameGroups);
 			analysisResults.push(analysis);
-			//console.log(util.inspect(analysis, false, null, true));
 		} else logger.warn(`Lexing '${file}' from '${job.data.repository.full_name}' failed.`);
 	}
 

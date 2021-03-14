@@ -20,8 +20,7 @@ export interface Repository {
 	contributors: User[],
 	updatedAt: Date,
 	lastAnalysis: {
-		id: number,
-		analysis?: Analysis
+		id: number
 	},
 	content: {
 		loaded: boolean,

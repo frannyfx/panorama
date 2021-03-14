@@ -143,6 +143,6 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
 	let parent = repository.content.files[path];
 
 	// Convert to file interfaces.
-	let files : File[] = Array.isArray(result.data) ? [...result.data!].map(file => toFile(file, parent)) : [];
+	let files : File[] = Array.isArray(result.data) ? [...result.data!].map(file => toFile(file, undefined, parent)) : [];
 	return files;
 }

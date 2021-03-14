@@ -432,6 +432,7 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 			};
 		});
 
+		// Return complete AnalysedItem.
 		return {
 			path: item.path,
 			contributors: itemContributorStats,

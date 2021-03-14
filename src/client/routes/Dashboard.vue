@@ -146,10 +146,7 @@ export default Vue.extend({
 
 			// Fetch more repos and handle error.
 			let repos : Repository[] | null = await getRepositories(this.$store.state.Repositories.page + 1);
-			if (!repos) {
-				createAlert("WARNING", this.$i18n.t("alerts.repoFetchFailed.title").toString(), this.$i18n.t("alerts.repoFetchFailed.description").toString());
-				return;
-			}
+			if (!repos) return createAlert("WARNING", this.$i18n.t("alerts.repoFetchFailed.title").toString(), this.$i18n.t("alerts.repoFetchFailed.description").toString());
 
 			// Add the loaded repositories to the store.
 			this.$store.commit("Repositories/add", { repositories: repos, page: this.$store.state.Repositories.page + 1 });

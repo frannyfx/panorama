@@ -27,6 +27,7 @@ import DatabaseAnalysis from "../../../../../database/models/Analysis";
 import DatabaseRepository from "../../../../../database/models/Repository";
 import DatabaseUser from "../../../../../database/models/User";
 import DatabaseAnalysedItem from "../../../../../database/models/AnalysedItem";
+import { AnalysedItem } from "../../../../../analysis/Item";
 
 let route : Array<Route> = [{
 	method: Method.GET,
@@ -58,7 +59,9 @@ let route : Array<Route> = [{
 	},
 	handler: async (request: Request, response: any) => {
 		let analysis = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
-		send(response, Codes.OK, analysis);
+		let analysisObject : {[key: string]: AnalysedItem} = {};
+		analysis.map(item => analysisObject[item.path] = item);
+		send(response, Codes.OK, analysisObject);
 	}
 }, {
 	method: Method.GET,

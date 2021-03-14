@@ -65,6 +65,7 @@ import { dedupe } from "../../shared/utils";
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
+import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
 
 
 /**
@@ -92,10 +93,7 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 	let files = await getFiles(repository, path);
 
 	// Extract the extensions that we don't yet have in the map.
-	let validExtensions : string[] = files
-		.filter(file => file.type == "file")
-		.map(file => file.name.split(".").pop()!)
-		.filter(extension => extension && !Extensions.state.map[extension] && Extensions.state.unknown.indexOf(extension) == -1);
+	let validExtensions : string[] = files.filter(file => file.type == "file").map(file => file.name.split(".").pop()!).filter(extension => extension && !Extensions.state.map[extension] && Extensions.state.unknown.indexOf(extension) == -1);
 
 	// If there are extensions to request, process them and request them.
 	if (validExtensions.length != 0) {
@@ -124,12 +122,20 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 		}
 	}
 	
+	// Get analysis data for the current folder.
+	let analysis : AnalysisMap = {};
+	if (repository.lastAnalysis.id != -1) {
+		// Send request
+		let analysisResult = await send(Method.GET, `analysis/${repository.lastAnalysis.id}?path=${path == '' ? '/' : path}`);
+
+		// If the request was successful, add converted analysis data to the object.
+		if (analysisResult.status.ok) Object.keys(analysisResult.result!).map(path => analysis[path] = toAnalysis(analysisResult.result![path]));
+	}
+
+	console.log(analysis);
 
 	// Add to store.
-	Store.commit("Repositories/addFileChildren", {
-		repository,
-		path, files
-	});
+	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });
 
 	return true;
 }
