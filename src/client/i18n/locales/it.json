@@ -19,6 +19,11 @@
 		"signIn": {
 			"title": "Accesso",
 			"signInWithGitHub": "Accedi con GitHub"
+		},
+		"repo": {
+			"noDescription": "Senza descrizione.",
+			"public": "Pubblico",
+			"private": "Privato"
 		}
 	},
 	"alerts": {

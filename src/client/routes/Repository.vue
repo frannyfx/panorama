@@ -2,7 +2,7 @@
 	<div class="page nav no-select">
 		<div class="content container">
 			<h2 class="title">
-				<font-awesome-icon class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
+				<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('routes.repo.private') : $t('routes.repo.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
 				<span class="minor">{{$route.params.owner}}</span>
 				<span class="separator">/</span>
 				<span class="major">{{$route.params.repo}}</span>
@@ -268,6 +268,12 @@ export default Vue.extend({
 	display: flex;
 	align-items: center;
 	font-weight: 600;
+
+	> *, & {
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		overflow: hidden;
+	}
 
 	.major, .minor {
 		color: $blue;

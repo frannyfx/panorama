@@ -14,7 +14,7 @@
 				</transition-group>
 				<transition name="list">
 					<div @click="() => loadMoreRepos()" v-show="$store.state.Repositories.canLoadMore">
-						<div class="repo-loader list-item clickable">
+						<div class="repo-loader list-item" :class="{ clickable : !repos.fetching }">
 							<font-awesome-icon :icon="repos.fetching ? ['fas', 'sync'] : ['fas', 'chevron-right']" :spin="repos.fetching"/>
 							<span class="view-more">
 								{{ $t("routes.dashboard.viewMore") }}

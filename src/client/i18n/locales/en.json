@@ -21,7 +21,9 @@
 			"signInWithGitHub": "Sign in with GitHub"
 		},
 		"repo": {
-			"noDescription": "No description."
+			"noDescription": "No description.",
+			"public": "Public",
+			"private": "Private"
 		}
 	},
 	"alerts": {
