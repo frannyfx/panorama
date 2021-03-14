@@ -65,8 +65,11 @@ export function getRedirectURI() : string {
  * @returns The user's information.
  */
 export async function getUser(username: string) : Promise<User | null> {
+	// Fetch the user information.
 	let result = await getOctokit().users.getByUsername({ username });
 	if (result.status != 200) return null;
+
+	// Convert result to User interface.
 	let user = toUser(result.data);
 
 	// Enrich user.
@@ -75,6 +78,7 @@ export async function getUser(username: string) : Promise<User | null> {
 		user.colour = userData.result!.colour;
 	}
 
+	// Return the user.
 	return user;
 }
 
