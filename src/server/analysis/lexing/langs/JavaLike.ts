@@ -10,7 +10,7 @@
  */
 
 // Modules
-import { Lexer, TokenType, TokenDefinition } from "../Lexer";
+import { Lexer, TokenType } from "../Lexer";
 
 const lexer : Lexer = {
 	extensions: [

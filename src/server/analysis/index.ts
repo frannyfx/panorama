@@ -301,8 +301,6 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 			});
 		}));
 
-		console.log("inserted");
-
 		// - Insert analysis data.
 		DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults, contributorMap);
 

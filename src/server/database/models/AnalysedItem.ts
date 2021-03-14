@@ -8,6 +8,9 @@ import { ContributorMap } from "../../analysis/blame";
 import { AnalysedItem } from "../../analysis/Item";
 import { DatabaseAnalysis } from "./Analysis";
 
+// Models
+import FileType from "./FileType";
+
 // Interfaces
 /**
  * The interface matching the AnalysedItem table in the database.
@@ -66,6 +69,17 @@ export interface DatabaseAnalysedItemContributorAggregateStats {
 };
 
 /**
+ * The interface matching the ANalysedItemAggregateFileType table in the database.
+ */
+export interface DatabaseAnalysedItemAggregateFileType {
+	analysisId: number,
+	path: string,
+	fileType: number,
+	numLines: number,
+	percentage: number
+};
+
+/**
  * Convert a list of AnalysedItems to their database representation.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
@@ -79,12 +93,8 @@ async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analyse
 	// Get all the extensions of all the files.
 	let fileExtensions = new Set(analysedItems.filter(item => item.isFile).map(item => item.path.split(".").pop() || "").filter(extension => extension != ""));
 
-	// Lookup all these file extensions and add them to a (Extension -> TypeId) map.
-	let types : {[key: string]: number} = {};
-	(await connection("FileTypeExtension").whereIn("extension", [...fileExtensions])).map(row => {
-		let extension = <string>row.extension;
-		types[extension] = row.typeId;
-	});
+	// Lookup all file extensions.
+	let types = await FileType.lookupExtensions([...fileExtensions]);
 
 	// Convert base structure to DatabaseAnalysedItem.
 	let convertedAnalysedItems : DatabaseAnalysedItem[] = analysedItems.map(item => {
@@ -97,7 +107,7 @@ async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analyse
 			path: item.path,
 			isFile: item.isFile,
 			numLines: item.numLines,
-			type: item.isFile && itemExtension && types[itemExtension] ? types[itemExtension] : undefined 
+			type: item.isFile && itemExtension && types[itemExtension] ? types[itemExtension].typeId : undefined 
 		};
 	});
 
@@ -239,6 +249,50 @@ async function convertAndInsertAnalysedItemContributorAggregateStats(analysis: D
 }
 
 /**
+ * 
+ * @param analysis 
+ * @param analysedItems 
+ */
+async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[]) : Promise<boolean> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return false;
+
+	// Filter out items that are not directories.
+	let folders = analysedItems.filter(item => !item.isFile && item.extensions);
+
+	// Add all extensions to a set.
+	let extensions = new Set<string>();
+	folders.map(folder => {
+		let folderExtensions = Object.keys(folder.extensions!);
+		folderExtensions.map(extension => extensions.add(extension));
+	});
+
+	// Look-up all extensions to get the relevant file types.
+	let types = await FileType.lookupExtensions([...extensions]);
+	
+	// Create a list to hold aggregate file types.
+	let aggregateFileTypes : DatabaseAnalysedItemAggregateFileType[] = [];
+
+	// Loop through the folders and create the file type rows.
+	folders.map(folder => {
+		for (let extension of Object.keys(folder.extensions!)) {
+			aggregateFileTypes.push({
+				analysisId: analysis.analysisId!,
+				path: folder.path,
+				fileType: types[extension].typeId,
+				numLines: folder.extensions![extension].numLines,
+				percentage: folder.extensions![extension].percentage
+			});
+		}
+	});
+
+	// Insert the aggregate file types.
+	await connection("AnalysedItemAggregateFileType").insert(aggregateFileTypes);
+	return true;
+}
+
+/**
  * Convert a list of AnalysedItems to a broken down relational representation.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
@@ -246,6 +300,7 @@ async function convertAndInsertAnalysedItemContributorAggregateStats(analysis: D
  * @returns Whether the query was successful.
  */
 async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap) : Promise<boolean> {
+	// TODO: Check result of each / use transaction.
 	// Convert base AnalysedItem data.
 	await convertAndInsertAnalysedItems(analysis, analysedItems);
 	
@@ -257,6 +312,10 @@ async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: Analy
 
 	// Convert contributors stats data.
 	await convertAndInsertAnalysedItemContributorAggregateStats(analysis, analysedItems, contributorMap);
+
+	// Convert extension data.
+	await convertAndInsertAnalysedItemAggregateFileType(analysis, analysedItems);
+	
 	return true;
 }
 

@@ -18,6 +18,7 @@ export interface AnalysedItem {
 	aggregateLineStats: AdvancedLineStats,
 	numLines: number,
 	analysis?: AnalysisGroup[],
+	extensions?: ExtensionMap,
 	isFile: boolean
 };
 
@@ -29,13 +30,18 @@ interface LineStats {
 };
 
 /**
+ * Counts lines for a specific item.
+ */
+ interface AdvancedLineCount {
+	numLines: number,
+	percentage: number
+}
+
+/**
  * Maps a token type to the number of lines and percentage corresponding to it.
  */
 interface AdvancedLineStats {
-	[key: number]: {
-		numLines: number,
-		percentage: number
-	}
+	[key: number]: AdvancedLineCount
 }
 
 /**
@@ -63,6 +69,13 @@ export interface ContributorStats {
  */
 export interface ContributorStatsMap {
 	[key: string]: ContributorStats
+};
+
+/**
+ * Maps file extensions to aggregate line stats.
+ */
+export interface ExtensionMap {
+	[key: string]: AdvancedLineCount
 };
 
 /**
@@ -157,11 +170,12 @@ function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[])
 
 /**
  * Update data structures once all lines have been tallied to reflect the correct percentages.
+ * @param numLines The total number of lines of code in the file/folder.
  * @param aggregateLineStats The advanced line stats whose percentages need to be updated.
  * @param contributorStatsMap The contributor stats map whose percentages need to be updated.
- * @param numLines The total number of lines of code in the file/folder.
+ * @param extensionMap The extension map whose percentages need to be updated.
  */
-function computeItemPercentages(aggregateLineStats: AdvancedLineStats, contributorStatsMap : ContributorStatsMap, numLines: number) {
+function computeItemPercentages(numLines: number, aggregateLineStats: AdvancedLineStats, contributorStatsMap : ContributorStatsMap, extensionMap : ExtensionMap | undefined = undefined) {
 	// Generate sums of aggregate line stats (they may not be the same as numLines since a line can be counted twice).
 	let aggregateLineStatsTypes = Object.keys(aggregateLineStats).map(type => parseInt(type));
 	let aggregatesSum = 0;
@@ -186,9 +200,12 @@ function computeItemPercentages(aggregateLineStats: AdvancedLineStats, contribut
 		});
 	}
 
-	return {
-		aggregateLineStats, contributorStatsMap
-	};
+	// Compute extension map percentages.
+	if (extensionMap) {
+		for (let extension of Object.keys(extensionMap)) {
+			extensionMap[extension].percentage = extensionMap[extension].numLines / numLines;
+		}
+	}
 }
 
 /**
@@ -243,7 +260,8 @@ export function processFileAnalysis(path: string, tokenGroups: TokenGroup[], bla
 		contributorStatsMap[group.contributorId] = contributorStats;
 	}
 
-	computeItemPercentages(aggregateLineStats, contributorStatsMap, numLines);
+	// Compute the percentages for the file.
+	computeItemPercentages(numLines, aggregateLineStats, contributorStatsMap);
 
 	return {
 		path: `${path}`,
@@ -291,10 +309,12 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 		// Aggregate counters.
 		let aggregateLineStats : AdvancedLineStats = {};
 		let contributorStatsMap : ContributorStatsMap = {};
+		let extensionMap : ExtensionMap = {};
 		let numLines = 0;
 
 		// Loop through the children of the current folder.
 		for (let file of files) {
+			// Add lines.
 			numLines += file.numLines;
 			
 			// Loop through file contributors.
@@ -340,10 +360,26 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 					percentage: 0
 				};
 			});
+
+			// Get file extension and aggregate it.
+			let fileExtension = file.path.split(".").pop() || "";
+			if (fileExtension != "") {
+				// Get existing object or create new line stats for the extension.
+				let extensionLineCount : AdvancedLineCount = extensionMap[fileExtension] || {
+					numLines: 0,
+					percentage: 0
+				};
+
+				// Add lines for this file extension.
+				extensionLineCount.numLines += file.numLines;
+
+				// Set the line count to the new line count.
+				extensionMap[fileExtension] = extensionLineCount;
+			}
 		}
 
 		// Compute the percentages for the current folder.
-		computeItemPercentages(aggregateLineStats, contributorStatsMap, numLines);
+		computeItemPercentages(numLines, aggregateLineStats, contributorStatsMap, extensionMap);
 
 		// Return item.
 		return {
@@ -351,6 +387,7 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 			contributors: contributorStatsMap,
 			numLines,
 			aggregateLineStats,
+			extensions: extensionMap,
 			isFile: false
 		};
 	});
