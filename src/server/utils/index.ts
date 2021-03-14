@@ -32,3 +32,25 @@ export async function walkDir(directory: string, fileRegex: RegExp) : Promise<Ar
 	let files = entities.filter(entity => entity.isFile() && entity.name.match(fileRegex)).map(dir => path.join(directory, dir.name));
 	return files.concat(recursive);
 }
+
+/**
+ * Process a path so it can match in the database.
+ * @param path The input path.
+ * @returns The processed path.
+ */
+export function processFilePath(path: string) : string {
+	// Create new path.
+	let processedPath = path;
+
+	// Prevent an empty path.
+	if (path.length == 0) processedPath = "/";
+
+	// Remove trailing slash at the beginning of the path.
+	if (processedPath[0] == "/") processedPath = processedPath.substr(1);
+	
+	// Ensure trailing slash at the end of path as it prevents non-folders from being specified.
+	if (processedPath.length >= 1 && processedPath[processedPath.length - 1] != "/") processedPath += "/";
+
+	// Return the final processed path.
+	return processedPath;
+}

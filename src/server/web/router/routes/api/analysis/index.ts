@@ -51,13 +51,14 @@ let route : Array<Route> = [{
 	schemas: {
 		params: Joi.object({
 			id: Joi.number()
+		}),
+		query: Joi.object({
+			path: Joi.string().required()
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		//let analysis = await DatabaseAnalysis.get(request.params!.id);
-		send(response, Codes.OK, {
-		//	analysis
-		});
+		let analysis = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
+		send(response, Codes.OK, analysis);
 	}
 }, {
 	method: Method.GET,
@@ -72,7 +73,7 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		let result = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
+		let result = await DatabaseAnalysedItem.getPathsInFolder(request.params!.id, request.query!.path);
 		send(response, Codes.OK, result);
 	}
 }, {

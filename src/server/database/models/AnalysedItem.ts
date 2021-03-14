@@ -5,7 +5,8 @@
 // Imports
 import { getConnection } from "../";
 import { ContributorMap } from "../../analysis/blame";
-import { AnalysedItem } from "../../analysis/Item";
+import { AdvancedLineStats, AnalysedItem, ContributorStats, ContributorStatsMap } from "../../analysis/Item";
+import { processFilePath } from "../../utils";
 import { DatabaseAnalysis } from "./Analysis";
 
 // Models
@@ -57,6 +58,17 @@ export interface DatabaseAnalysedItemChunkToken {
 };
 
 /**
+ * The interface matching the AnalysedItemContributor table in the database.
+ */
+export interface DatabaseAnalysedItemContributor {
+	analysisId: number,
+	path: string,
+	contributorId: number,
+	numLines: number,
+	percentage: number
+};
+
+/**
  * The interface matching the AnalysedItemContributorAggregateStats table in the database.
  */
 export interface DatabaseAnalysedItemContributorAggregateStats {
@@ -80,7 +92,7 @@ export interface DatabaseAnalysedItemAggregateFileType {
 };
 
 /**
- * Convert a list of AnalysedItems to their database representation.
+ * Convert a list of AnalysedItems to their database representation and insert them.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @returns Whether the query was successful.
@@ -117,7 +129,7 @@ async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analyse
 }
 
 /**
- * Convert a list of AggregateStats to their database representation.
+ * Convert a list of AggregateStats to their database representation and insert them.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @returns Whether the query was successful.
@@ -151,7 +163,7 @@ async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analys
 }
 
 /**
- * Convert the chunks from a list of AnalysedItems into their database representation.
+ * Convert the chunks from a list of AnalysedItems into their database representation and insert them.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @param contributorMap Maps commit emails to contributors.
@@ -205,18 +217,19 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
 }
 
 /**
- * 
+ * Convert the contributor map in the analysed items to its database representation and insert the results.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @param contributorMap Maps commit emails to contributors.
  * @returns Whether the query was successful.
  */
-async function convertAndInsertAnalysedItemContributorAggregateStats(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap) : Promise<boolean> {
+async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap) : Promise<boolean> {
 	// Get connection.
 	let connection = await getConnection();
 	if (!connection) return false;
 
-	// Create a list to hold the aggregate stats.
+	// Create lists to hold the contributors and the aggregate stats.
+	let contributors : DatabaseAnalysedItemContributor[] = [];
 	let contributorAggregateStats : DatabaseAnalysedItemContributorAggregateStats[] = [];
 
 	// Loop through the items.
@@ -224,6 +237,15 @@ async function convertAndInsertAnalysedItemContributorAggregateStats(analysis: D
 		Object.keys(item.contributors).map(contributorId => {
 			// TODO: Handle anonymous contributors.
 			if (!contributorMap[contributorId].id) return;
+
+			// Add the contributor for the item.
+			contributors.push({
+				analysisId: analysis.analysisId!,
+				path: item.path,
+				contributorId: contributorMap[contributorId].id,
+				numLines: item.contributors[contributorId].numLines,
+				percentage: item.contributors[contributorId].percentage
+			});
 
 			// Get the aggregate stats for the contributor.
 			Object.keys(item.contributors[contributorId].aggregateLineStats).map(tokenType => {
@@ -243,15 +265,17 @@ async function convertAndInsertAnalysedItemContributorAggregateStats(analysis: D
 		});
 	});
 
-	// Insert the aggregate stats.
+	// Insert the contributors and the aggregate stats.
+	await connection("AnalysedItemContributor").insert(contributors);
 	await connection("AnalysedItemContributorAggregateStats").insert(contributorAggregateStats);
 	return true;
 }
 
 /**
- * 
- * @param analysis 
- * @param analysedItems 
+ * Convert the extension map in the analysed items to its database representation and insert the results.
+ * @param analysis Parent analysis data.
+ * @param analysedItems The analysed items from the repository to convert.
+ * @returns Whether the query was successful.
  */
 async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[]) : Promise<boolean> {
 	// Get connection.
@@ -310,8 +334,8 @@ async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: Analy
 	// Convert AnalysedItemChunk and AnalysedItemChunkToken data.
 	await convertAndInsertAnalysedItemChunks(analysis, analysedItems, contributorMap);
 
-	// Convert contributors stats data.
-	await convertAndInsertAnalysedItemContributorAggregateStats(analysis, analysedItems, contributorMap);
+	// Convert contributors data.
+	await convertAndInsertAnalysedItemContributors(analysis, analysedItems, contributorMap);
 
 	// Convert extension data.
 	await convertAndInsertAnalysedItemAggregateFileType(analysis, analysedItems);
@@ -320,24 +344,18 @@ async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: Analy
 }
 
 /**
- * Get the list of analysed items in a folder.
+ * Get the list of analysed path names in a folder.
  * @param analysisId The analysis to get the analysed files from.
  * @param path The path to search for files.
  * @returns The list of analysed child items and sub-directories of the path.
  */
-async function getItemsInFolder(analysisId: number, path: string) : Promise<any[]> {
+async function getPathsInFolder(analysisId: number, path: string) : Promise<string[]> {
 	// Get connection.
 	let connection = await getConnection();
 	if (!connection) return [];
 
-	// Prevent an empty path.
-	if (path.length == 0) path = "/";
-
-	// Remove trailing slash at the beginning of the path.
-	if (path[0] == "/") path = path.substr(1);
-	
-	// Ensure trailing slash at the end of path as it prevents non-folders from being specified.
-	if (path.length >= 1 && path[path.length - 1] != "/") path += "/";
+	// Process path.
+	path = processFilePath(path);
 
 	// Get one layer deep files and folders.
 	let results = await connection("AnalysedItem").where({analysisId}).andWhere("path", "like", `${path}%`).andWhereNot("path", "like", `${path}%/%`).select("path");
@@ -346,7 +364,88 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<any[
 	return results.map(row => row.path).filter(path => path != "");
 }
 
+/**
+ * Get the list of analysed items in a folder.
+ * @param analysisId The analysis to get the analysed files from.
+ * @param path The path to search for files.
+ * @returns The list of analysed child items and sub-directories of the path.
+ */
+async function getItemsInFolder(analysisId: number, path: string) : Promise<AnalysedItem[]> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return [];
+
+	// Process path.
+	path = processFilePath(path);
+
+	// Get items in the folder.
+	let itemsInFolder : DatabaseAnalysedItem[] = await connection("AnalysedItem").where({analysisId}).andWhere("path", "like", `${path}%`).andWhereNot("path", "like", `${path}%/%`);
+	let pathsInFolder : string[] = itemsInFolder.map(row => row.path);
+
+	// Get AnalysedItemContributors for the files in the folder.
+	let contributors : DatabaseAnalysedItemContributor[] = await connection("AnalysedItemContributor").where({analysisId}).whereIn("path", pathsInFolder);
+
+	// Get ContributorAggregateStats for the files in the folder.
+	let contributorAggregateStats : DatabaseAnalysedItemContributorAggregateStats[] = await connection("AnalysedItemContributorAggregateStats").where({analysisId}).whereIn("path", pathsInFolder);
+	
+	// Get AggregateStats for the files in the folder.
+	let aggregateStats : DatabaseAnalysedItemAggregateStats[] = await connection("AnalysedItemAggregateStats").where({analysisId}).whereIn("path", pathsInFolder);
+
+	// Loop through the items in the folder and aggregate each with the relevant data.
+	let results : AnalysedItem[] = itemsInFolder.map(item => {
+		// Create all the sub-items for the current item.
+		let itemContributorStats : ContributorStatsMap = {};
+		let itemAggregateStats : AdvancedLineStats = {};
+		
+		// Get contributor data for the current item.
+		let itemContributorData = contributors.filter(contributor => contributor.path == item.path);
+		let itemAggregateStatsData = aggregateStats.filter(aggregate => aggregate.path == item.path);
+
+		// Loop through the contributors for this item.
+		itemContributorData.map(contributor => {
+			// Get aggregate stats for current path and current contributor.
+			let itemContributorAggregateStatsData = contributorAggregateStats.filter(aggregateStats => aggregateStats.path == item.path && aggregateStats.contributorId == contributor.contributorId);
+			
+			// Create advanced line stats for the current path and current contributor.
+			let aggregateStats : AdvancedLineStats = {};
+			itemContributorAggregateStatsData.map(aggregate => {
+				aggregateStats[aggregate.tokenType] = {
+					numLines: aggregate.numLines,
+					percentage: aggregate.percentage
+				};
+			});
+
+			// Get existing contributor stats or create new.
+			itemContributorStats[contributor.contributorId] = {
+				contributorId: contributor.contributorId.toString(),
+				numLines: contributor.numLines,
+				percentage: contributor.percentage,
+				aggregateLineStats: aggregateStats
+			};
+		});
+
+		// Loop through the aggregate stats for this item.
+		itemAggregateStatsData.map(aggregate => {
+			itemAggregateStats[aggregate.token] = {
+				numLines: aggregate.numLines,
+				percentage: aggregate.percentage
+			};
+		});
+
+		return {
+			path: item.path,
+			contributors: itemContributorStats,
+			aggregateLineStats: itemAggregateStats,
+			numLines: item.numLines,
+			isFile: item.isFile == true
+		};
+	});
+
+	return results;
+}
+
 export default {
 	convertAndInsert,
+	getPathsInFolder,
 	getItemsInFolder
 };

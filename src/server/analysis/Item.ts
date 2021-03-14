@@ -40,7 +40,7 @@ interface LineStats {
 /**
  * Maps a token type to the number of lines and percentage corresponding to it.
  */
-interface AdvancedLineStats {
+export interface AdvancedLineStats {
 	[key: number]: AdvancedLineCount
 }
 

@@ -1,12 +1,12 @@
 <template>
 	<div class="page nav no-select">
 		<div class="content container">
-			<h2 class="title">
+			<h3 class="title">
 				<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('routes.repo.private') : $t('routes.repo.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
 				<span class="minor">{{$route.params.owner}}</span>
 				<span class="separator">/</span>
 				<span class="major">{{$route.params.repo}}</span>
-			</h2>
+			</h3>
 			<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
 			<div class="files">
 				<div class="list-item first header">
@@ -259,7 +259,7 @@ export default Vue.extend({
 }
 
 .description {
-	font-size: 0.85em;
+	font-size: 0.8em;
 	color: $grey-blue;
 	margin-top: 0px;
 }

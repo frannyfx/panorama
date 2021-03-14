@@ -113,14 +113,21 @@ $screen-lg-min: 992px;
 }
 
 /* Text styles */
+h1, h2, h3 {
+	margin: 0; padding: 0;
+}
+
 h1 {
 	font-weight: 400;
-	margin: 0; padding: 0;
 }
 
 h2 {
 	font-weight: 600;
-	margin: 0; padding: 0;
+}
+
+h3 {
+	font-size: 1.3em;
+	font-weight: 500;
 }
 
 a {
