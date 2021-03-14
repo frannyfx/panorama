@@ -13,7 +13,7 @@ export interface User {
 	avatarUrl: string,
 	name: string,
 	email: string,
-	color?: string
+	colour?: string
 };
 
 export interface UserObject {
@@ -26,6 +26,7 @@ export interface UserObject {
  * @returns A User object representing the input data.
  */
 export function toUser(input: Data) : User {
+	// Create user.
 	return {
 		id: input.id!,
 		login: input.login!,

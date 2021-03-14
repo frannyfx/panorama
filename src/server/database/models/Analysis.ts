@@ -5,6 +5,7 @@
 
 // Imports
 import { getConnection } from "../";
+import { Data } from "../../../shared/Result";
 
 // Interfaces
 /**
@@ -83,17 +84,23 @@ async function getLatestId(owner: string, repo: string) : Promise<number> {
 }
 
 /**
- * Returns base analysis data.
- * @param id The ID of the analysis to retrieve.
+ * Returns base analysis data with joined owner and repository information.
+ * @param analysisId The ID of the analysis to retrieve.
  */
-async function get(id: number) : Promise<void> {
+async function get(analysisId: number) : Promise<Data | null> {
 	// Get connection.
 	let connection = await getConnection();
-	if (!connection) return;
+	if (!connection) return null;
 
-	
+	// Get the row.
+	let analysisRow = await connection("Analysis")
+		.where({ analysisId })
+		.join("Repository", { "Analysis.repositoryId": "Repository.repositoryId"})
+		.join("User", { "Repository.ownerId": "User.userId"})
+		.select("Analysis.*", "Repository.name as repositoryName", "User.login as owner").first();
+	return analysisRow;
 }
 
 export default {
-	insert, update, getLatestId
+	insert, update, getLatestId, get
 };

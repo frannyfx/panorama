@@ -87,12 +87,16 @@ export async function getRepository(name: string, accessToken: string) : Promise
 	if (split.length != 2) return buildResult(false);
 
 	// Get repository.
-	let result = await octokit.repos.get({
-		owner: split[0],
-		repo: split[1]
-	});
-	
-	return buildResult(result.status == 200, result.data);
+	try {
+		let result = await octokit.repos.get({
+			owner: split[0],
+			repo: split[1]
+		});
+		
+		return buildResult(result.status == 200, result.data);
+	} catch (e) {
+		return buildResult(false);
+	}
 }
 
 export async function getRepositoryContributors(name: string, accessToken: string) : Promise<Result<Contributors>> {

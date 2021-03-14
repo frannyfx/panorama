@@ -40,10 +40,38 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
+		// Check the user can access the repo.
+		let repository = await getRepository(`${request.params!.owner}/${request.params!.repo}`, request.auth!.token!);
+		if (!repository.status.ok) return send(response, Codes.Forbidden);
+
+		// Get the latest ID for the repository.
 		let analysisId = await DatabaseAnalysis.getLatestId(request.params!.owner, request.params!.repo);
 		send(response, Codes.OK, {
 			analysisId
 		});
+	}
+}, {
+	method: Method.GET,
+	url: "/api/analysis/:id/contributors",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			id: Joi.number()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		// Get the requested analysis.
+		let analysis = await DatabaseAnalysis.get(request.params!.id);
+
+		// If the analysis does not exist, return 404. 
+		if (!analysis) return send(response, Codes.NotFound);
+
+		// Check if the user can access the analysis.
+		let repository = await getRepository(`${analysis.owner}/${analysis.repositoryName}`, request.auth!.token!);
+		if (!repository.status.ok) return send(response, Codes.Forbidden);
+
+		// TODO: ...
+		return send(response, Codes.OK);
 	}
 }, {
 	method: Method.GET,
@@ -58,26 +86,25 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		let analysis = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
+		// Get the requested analysis.
+		let analysis = await DatabaseAnalysis.get(request.params!.id);
+
+		// If the analysis does not exist, return 404. 
+		if (!analysis) return send(response, Codes.NotFound);
+
+		// Check if the user can access the analysis.
+		let repository = await getRepository(`${analysis.owner}/${analysis.repositoryName}`, request.auth!.token!);
+		if (!repository.status.ok) return send(response, Codes.Forbidden);
+
+		// Get the files in the current folder.
+		let analysisItems = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
+
+		// Create an object that maps paths to the analysed item.
 		let analysisObject : {[key: string]: AnalysedItem} = {};
-		analysis.map(item => analysisObject[item.path] = item);
+		analysisItems.map(item => analysisObject[item.path] = item);
+
+		// Return the object.
 		send(response, Codes.OK, analysisObject);
-	}
-}, {
-	method: Method.GET,
-	url: "/api/analysis/:id/files",
-	auth: true,
-	schemas: {
-		params: Joi.object({
-			id: Joi.number().required()
-		}),
-		query: Joi.object({
-			path: Joi.string().required()
-		})
-	},
-	handler: async (request: Request, response: any) => {
-		let result = await DatabaseAnalysedItem.getPathsInFolder(request.params!.id, request.query!.path);
-		send(response, Codes.OK, result);
 	}
 }, {
 	method: Method.PUT,

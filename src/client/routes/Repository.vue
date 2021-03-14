@@ -132,8 +132,6 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 		if (analysisResult.status.ok) Object.keys(analysisResult.result!).map(path => analysis[path] = toAnalysis(analysisResult.result![path]));
 	}
 
-	console.log(analysis);
-
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });
 

@@ -13,7 +13,7 @@ import Store from "../store";
 import config from "../config";
 import { Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
-import { User } from "./models/User";
+import { toUser, User } from "./models/User";
 import { File, toFile } from "./models/File";
 import { send } from "./API";
 import { Method } from "../../shared/Method";
@@ -57,6 +57,25 @@ export async function getProfile() : Promise<Result> {
  */
 export function getRedirectURI() : string {
 	return `${window.location.protocol}//${window.location.host}/api/github/callback`;
+}
+
+/**
+ * Retrieve a user's data.
+ * @param username The username of the user to retrieve.
+ * @returns The user's information.
+ */
+export async function getUser(username: string) : Promise<User | null> {
+	let result = await getOctokit().users.getByUsername({ username });
+	if (result.status != 200) return null;
+	let user = toUser(result.data);
+
+	// Enrich user.
+	let userData = await send(Method.GET, `user/${username}`);
+	if (userData.status.ok) {
+		user.colour = userData.result!.colour;
+	}
+
+	return user;
 }
 
 /**
