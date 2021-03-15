@@ -5,7 +5,6 @@
 
 // Imports
 import { Data } from "../../../shared/Result";
-import { Analysis } from "./Analysis";
 import { toUser, User } from "./User";
 import { File } from "./File";
 
@@ -17,7 +16,10 @@ export interface Repository {
 	owner: User,
 	private: boolean,
 	description: string,
-	contributors: User[],
+	contributors: {
+		enriched: boolean,
+		list: User[]	
+	},
 	updatedAt: Date,
 	lastAnalysis: {
 		id: number
@@ -61,7 +63,10 @@ export function toRepository(input: Data, contributors: Data[], analysisId: numb
 		owner: toUser(input.owner!),
 		private: input.private!,
 		description: input.description!,
-		contributors: contributors.map(c => toUser(c)),
+		contributors: {
+			enriched: false,
+			list: contributors.map(c => toUser(c))
+		},
 		updatedAt: new Date(input.pushed_at!),
 		lastAnalysis: {
 			id: analysisId

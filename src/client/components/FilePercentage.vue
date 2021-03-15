@@ -1,26 +1,43 @@
 <template>
 	<div class="file-percentage">
-		<div class="progress-bar">
-			<div class="progress"></div>
-			<div class="progress"></div>
-			<div class="progress"></div>
-		</div>
-		<div class="contributors">
-			<div class="contributor">
-				<div class="contributor-image">
-					<div class="image"></div>
+		<transition-group name="progress" tag="div" class="progress-bar">
+			<div class="progress"
+				v-tooltip="{ theme: 'panorama', content: login }"
+				v-for="login in analysis.contributorList"
+				:key="login"
+				:style="{ 
+					'background-color': `#${$store.state.Users.object[login].enrichedData.colour}`, 
+					'width': `${Math.round(analysis.contributorObject[login].percentage * 100)}%`
+				}"
+			></div>
+		</transition-group>
+		<!--<div class="contributors">
+			<div class="contributor" v-for="login in analysis.contributorList" :key="login">
+				<div class="contributor-image"
+					:style="{
+						'background-color': `#${$store.state.Users.object[login].enrichedData.colour}`
+					}"
+				>
 				</div>
-				<div class="details">
-
-				</div>
+				<span class="username" :style="{ 'color': `#${$store.state.Users.object[login].enrichedData.colour}`}">{{ login }}</span>
+				<span class="percentage">{{`${Math.round(analysis.contributorObject[login].percentage * 100)}%`}}</span>
 			</div>
-		</div>
+		</div>-->
 	</div>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+// Imports
+import Vue, { PropType } from "vue";
+import { Analysis } from "../modules/models/Analysis";
+import { File } from "../modules/models/File"
+
 export default Vue.extend({
-	
+	props: {
+		analysis: {
+			type: Object as PropType<Analysis>,
+			required: true
+		},
+	}
 })
 </script>
 <style lang="scss" scoped>
@@ -48,26 +65,73 @@ export default Vue.extend({
 		.progress {
 			height: 100%;
 			box-sizing: border-box;
+			transition: width .5s, margin-right .2s;
 
 			&:not(:last-child) {
-				border-right: 2px white solid;
+				margin-right: 2px;
+			}
+		}
+	}
+
+	.contributors {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: center;
+		flex-wrap: wrap;
+
+		.contributor {
+			display: flex;
+			align-items: center;
+
+			&:not(:last-child) {
+				margin-right: 10px;
 			}
 
-			&:nth-child(1) {
-				width: 60%;
-				background-color: $blue;
+			.contributor-image {
+				width: 10px;
+				height: 10px;
+				border-radius: 10px;
+				margin-right: 5px;
+
+				/*
+				overflow: hidden;
+				border: 2px solid transparent;
+
+				.image {
+					background-size: cover;
+					background-position: center;
+					width: 100%;
+					height: 100%;
+				}*/
 			}
 
-			&:nth-child(2) {
-				width: 30%;
-				background-color: $red;
+			.username {
+				font-weight: 700;
+				font-size: 0.8em;	
+				margin-right: 5px;
 			}
 
-			&:nth-child(3) {
-				width: 10%;
-				background-color: $deep;
+			.percentage {
+				font-weight: 400;
+				font-size: 0.8em;
+				color: $grey-blue;
 			}
 		}
 	}
 }
+
+.progress-enter-active, .progress-leave-active {
+	transition: all .5s;
+}
+
+.progress-enter, .progress-leave-to {
+	width: 0px !important;
+	flex-grow: 0 !important;
+}
+
+.progress-move {
+	position: absolute;
+}
+
 </style>

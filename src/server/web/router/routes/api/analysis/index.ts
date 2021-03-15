@@ -25,8 +25,9 @@ import ticket from "../../../../../crypto/ticket";
 // Models
 import DatabaseAnalysis from "../../../../../database/models/Analysis";
 import DatabaseRepository from "../../../../../database/models/Repository";
-import DatabaseUser from "../../../../../database/models/User";
+import DatabaseUser, { DatabaseUser as User } from "../../../../../database/models/User";
 import DatabaseAnalysedItem from "../../../../../database/models/AnalysedItem";
+import DatabaseAnalysisContributor from "../../../../../database/models/AnalysisContributor";
 import { AnalysedItem } from "../../../../../analysis/Item";
 
 let route : Array<Route> = [{
@@ -70,8 +71,14 @@ let route : Array<Route> = [{
 		let repository = await getRepository(`${analysis.owner}/${analysis.repositoryName}`, request.auth!.token!);
 		if (!repository.status.ok) return send(response, Codes.Forbidden);
 
-		// TODO: ...
-		return send(response, Codes.OK);
+		// Get contributors.
+		let contributors = await DatabaseAnalysisContributor.getFromAnalysis(request.params!.id);
+		if (!contributors) return send(response, Codes.ServerError);
+
+		// Create an object that maps logins to each user.
+		let contributorObject : {[key: string]: User} = {};
+		contributors.map(contributor => contributorObject[contributor.login] = contributor);
+		return send(response, Codes.OK, contributorObject);
 	}
 }, {
 	method: Method.GET,

@@ -11,7 +11,7 @@
 				<span>{{ overrideName ? overrideName : file.name }}</span>
 			</div>
 			<div class="statistics">
-				<file-percentage/>
+				<file-percentage v-if="file.analysis" :analysis="file.analysis"/>
 			</div>
 		</div>
 	</div>

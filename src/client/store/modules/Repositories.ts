@@ -11,6 +11,7 @@ import { Repository, RepositoryObject } from "../../modules/models/Repository";
 import config from "../../config";
 import { File } from "../../modules/models/File";
 import { AnalysisMap } from "../../modules/models/Analysis";
+import { User } from "../../modules/models/User";
 
 // State interface.
 export interface RepositoriesState {
@@ -79,6 +80,14 @@ const mutations : MutationTree<RepositoriesState> = {
 
 		// Set analysis for the directory whose children we added.
 		if (data.analysis[data.path]) data.repository.content.files[data.path].analysis = data.analysis[data.path];
+	},
+	updateContributors(state: RepositoriesState, data: { repository: Repository, contributors: User[] }) {
+		// Dedupe contributors.
+		let logins = data.repository.contributors.list.map(user => user.login);
+		data.contributors.map(contributor => {
+			// Add contributor.
+			if (logins.indexOf(contributor.login) == -1) data.repository.contributors.list.push(contributor);
+		});
 	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).

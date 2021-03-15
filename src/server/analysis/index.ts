@@ -255,6 +255,8 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Create cache which maps contributor emails to their profiles.
 	let contributorMap : ContributorMap = {};
+	let unknownExtensions : Set<string> = new Set();
+	let failedFiles = 0;
 
 	// Lex and process blame on files, combining the analysis.
 	for (let file of files) {
@@ -267,13 +269,17 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 			let blameGroups = await generateBlameGroups(job.data.repository.owner!.login, job.data.repository.name, job.data.access_token, repository, file, contributorMap);
 
 			// Integrate the two analysis results together
-			let analysis = processFileAnalysis(file, tokenGroups, blameGroups);
+			let analysis = processFileAnalysis(file, tokenGroups, blameGroups, contributorMap);
 			analysisResults.push(analysis);
-		} else logger.warn(`Lexing '${file}' from '${job.data.repository.full_name}' failed.`);
+		} else {
+			if (result.extension) unknownExtensions.add(result.extension);
+			failedFiles++;
+		}
 	}
 
 	// Log a successful analysis.
 	logger.success(`Analysed ${analysisResults.length} files from repository '${job.data.repository.full_name}'.`);
+	if (failedFiles > 0) logger.warn(`${failedFiles} files with the following extensions failed lexing: ${[...unknownExtensions].join(", ")}.`);
 
 	// Aggregate analysis data into subfolders.
 	let folderEntries : AnalysedItem[] = generateFolderEntries(analysisResults);
@@ -282,6 +288,10 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Finish up...
 	reportJobProgress(job, AnalysisStage.Finalising);
+
+	// Create ID map from contributor map (ID -> Contributor from Email -> Contributor).
+	let idMap : ContributorMap = {};
+	Object.keys(contributorMap).map(email => idMap[contributorMap[email].id] = contributorMap[email]);
 
 	// Commit analysis to database.
 	// - Remove duplicates from contributors.
@@ -301,7 +311,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		}));
 
 		// - Insert analysis data.
-		DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults, contributorMap);
+		DatabaseAnalysedItem.convertAndInsert(analysis, analysisResults, idMap);
 
 		// Set the job completion date.
 		analysis.completedAt = new Date();

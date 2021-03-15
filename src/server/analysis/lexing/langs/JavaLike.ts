@@ -7,6 +7,7 @@
  * - C
  * - C++
  * - C#
+ * - Dart
  */
 
 // Modules
@@ -35,7 +36,10 @@ const lexer : Lexer = {
 		"cc",
 
 		// C#
-		"cs"
+		"cs",
+
+		// Dart
+		"dart"
 	],
 	definitions: [{
 		type: TokenType.Documentation,

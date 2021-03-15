@@ -5,6 +5,7 @@
 
 // Imports
 import { getConnection } from "../";
+import Analysis from "./Analysis";
 
 // Models
 import { DatabaseUser, insertOrUpdate as insertOrUpdateUser } from "./User";
@@ -37,6 +38,21 @@ export async function insertOrUpdate(analysisId: number, user: DatabaseUser) : P
 	return true;
 }
 
+/**
+ * Get contributor information from an analysis.
+ * @param analysisId The analysis ID of the contributors.
+ * @returns A list of contributors.
+ */
+export async function getFromAnalysis(analysisId: number) : Promise<DatabaseUser[] | null> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return null;
+
+	// Get contributors.
+	let users : DatabaseUser[] = await connection("AnalysisContributor").where({ analysisId }).join("User", { "AnalysisContributor.userId": "User.userId" }).select("User.userId", "User.login", "User.colour");
+	return users;
+}
+
 export default {
-	insertOrUpdate
+	insertOrUpdate, getFromAnalysis
 };

@@ -21,7 +21,7 @@ export async function extractVibrant(imageUrl: string) : Promise<string | null> 
 
 		// Get palette.
 		let palette = await Vibrant.from(imageBuffer.data).getPalette();
-		return palette.LightVibrant?.hex.slice(1) || null;
+		return palette.Vibrant?.hex.slice(1) || null;
 	} catch (e) {
 		return null;
 	}

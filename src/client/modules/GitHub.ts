@@ -10,8 +10,9 @@ import { AuthInterface, GetResponseDataTypeFromEndpointMethod } from "@octokit/t
 
 // Modules
 import Store from "../store";
+import Users from "../store/modules/Users";
 import config from "../config";
-import { Data, Result } from "../../shared/Result";
+import { buildResult, Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
 import { toUser, User } from "./models/User";
 import { File, toFile } from "./models/File";
@@ -64,22 +65,13 @@ export function getRedirectURI() : string {
  * @param username The username of the user to retrieve.
  * @returns The user's information.
  */
-export async function getUser(username: string) : Promise<User | null> {
+export async function getUser(username: string) : Promise<Data | null> {
 	// Fetch the user information.
 	let result = await getOctokit().users.getByUsername({ username });
 	if (result.status != 200) return null;
 
-	// Convert result to User interface.
-	let user = toUser(result.data);
-
-	// Enrich user.
-	let userData = await send(Method.GET, `user/${username}`);
-	if (userData.status.ok) {
-		user.colour = userData.result!.colour;
-	}
-
 	// Return the user.
-	return user;
+	return result.data;
 }
 
 /**
@@ -168,4 +160,52 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
 	// Convert to file interfaces.
 	let files : File[] = Array.isArray(result.data) ? [...result.data!].map(file => toFile(file, undefined, parent)) : [];
 	return files;
+}
+
+/**
+ * 
+ * @param repository 
+ * @returns 
+ */
+export async function getEnrichedRepositoryContributors(repository: Repository) : Promise<boolean> {
+	// Check the repository has a valid analysis available.
+	if (repository.lastAnalysis.id == -1) return false;
+
+	// Get all analysed contributors from repository.
+	let contributorData = await send(Method.GET, `analysis/${repository.lastAnalysis.id}/contributors`);
+	if (!contributorData.status.ok) return false;
+
+	// Check which contributors have not had their GitHub data fetched.
+	let unknownUserLogins = Object.keys(contributorData.result!).filter(login => Users.state.list.indexOf(login) == -1);
+
+	// Get contributors that need to be updated with enriched data.
+	let unenrichedUserLogins = Users.state.list.filter(login => !Users.state.object[login].enrichedData && contributorData.result![login]);
+
+	// If there are unknown contributors, fetch them.
+	let contributors : User[] = [];
+	if (unknownUserLogins.length != 0) {
+		// Add new users to the array.
+		let fetchedUsers : (User | null)[] = await Promise.all(unknownUserLogins.map(async login => {
+			// Request base user data from GitHub.
+			let userData = await getUser(login);
+			if (!userData) return null;
+
+			// Combine with Panorama data and return as a User model.
+			return toUser(userData, contributorData.result![login]);
+		}));
+
+		// Filter out failed entities and add them to contributors.
+		contributors.push(...<User[]>fetchedUsers.filter(user => user != null));
+	}
+
+	// Update unenriched users.
+	unenrichedUserLogins.map(login => {
+		Store.commit("Users/update", { login, enrichedData: contributorData.result![login]});
+		contributors.push(Users.state.object[login]);
+	});
+
+	// Now add all contributors (the store will take care of deduping).
+	Store.commit("Repositories/updateContributors", { repository, contributors });
+	return true;
+
 }

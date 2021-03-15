@@ -54,7 +54,7 @@ import Store from "../store";
 // Modules
 import { send, waitForAuth } from "../modules/API";
 import { i18n } from "../i18n";
-import { getFiles, getRepository } from "../modules/GitHub";
+import { getEnrichedRepositoryContributors, getFiles, getRepository } from "../modules/GitHub";
 import Repositories from "../store/modules/Repositories";
 import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
@@ -204,17 +204,23 @@ export default Vue.extend({
 		});
 
 		// Check if repository already exists in the Repositories state object.
-		let existingRepository = Repositories.state.object[`${to.params.owner}/${to.params.repo}`];
-		if (!existingRepository) {
-			// Fetch the requested repository.
-			let repository = await getRepository(to.params.owner, to.params.repo);
-			if (!repository) {
-				// TODO: Handle failure.
-				return next(false);
-			}
+		var repository = Repositories.state.object[`${to.params.owner}/${to.params.repo}`];
+		if (!repository) {
+			// Fetch the requested repository. (TODO: Handle failure).
+			let fetchedRepository = await getRepository(to.params.owner, to.params.repo);
+			if (!fetchedRepository) return next(false);
+			repository = fetchedRepository;
 
 			// Add the repository to the store.
 			Store.commit("Repositories/addSingle", repository);
+		}
+
+		// Check if enriched contributors have been fetched for the repository.
+		if (!repository.contributors.enriched && repository.lastAnalysis.id != -1) {
+			if (!await getEnrichedRepositoryContributors(repository)) {
+				// TODO: Handle failure.
+				return next(false);
+			}
 		}
 
 		// Load files from the root directory if necessary.

@@ -43,7 +43,7 @@ export interface AggregateLineStats {
  */
 export function toAnalysis(input: Data) : Analysis {
 	// Process contributors.
-	let contributorList = Object.keys(input.contributors);
+	let contributorList = Object.keys(input.contributors).sort((a: string, b: string) => input.contributors[b].percentage - input.contributors[a].percentage);
 
 	return {
 		contributorList,

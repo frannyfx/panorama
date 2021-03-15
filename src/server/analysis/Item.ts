@@ -5,7 +5,7 @@
  */
 
 // Modules
-import { BlameGroup } from "./blame";
+import { BlameGroup, ContributorMap } from "./blame";
 import { TokenGroup } from "./lexing/Lexer";
 
 // Interfaces
@@ -115,8 +115,9 @@ export function countLines(start: number, end: number, tokenGroups: TokenGroup[]
  * Combine two sets of groups into a single cohesive analysis group list.
  * @param tokenGroups The groups of tokens.
  * @param blameGroups The groups of lines of code grouped by contributor ID.
+ * @param contributorMap The map which allows the function to use contributor IDs instead of emails.
  */
-function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[]) : AnalysisGroup[] {
+function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[], contributorMap: ContributorMap) : AnalysisGroup[] {
 	// Create an array to hold the data.
 	let analysisGroups : AnalysisGroup[] = [];
 
@@ -150,8 +151,8 @@ function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[])
 			lastTokenIndex++;
 		}
 
-		// No tokens, we have to break.
-		if (childTokenGroups.length == 0) break;
+		// No tokens, we have to continue to the next blame group (whitespace).
+		if (childTokenGroups.length == 0) continue;
 
 		// Make sure tokens are full used up.
 		if (childTokenGroups[childTokenGroups.length - 1].end >= blameGroup.end) lastTokenIndex--;
@@ -160,7 +161,7 @@ function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[])
 		analysisGroups.push({
 			start: blameGroup.start,
 			end: blameGroup.end,
-			contributorId: blameGroup.contributorId,
+			contributorId: contributorMap[blameGroup.contributorId].id,
 			lineStats: countLines(blameGroup.start, blameGroup.end, tokenGroups)
 		});
 	}
@@ -186,17 +187,20 @@ function computeItemPercentages(numLines: number, aggregateLineStats: AdvancedLi
 	// Compute percentages for the aggregate line stats.
 	for (var tokenType of aggregateLineStatsTypes) {
 		aggregateLineStats[tokenType].percentage = aggregateLineStats[tokenType].numLines / aggregatesSum;
+		if (isNaN(aggregateLineStats[tokenType].percentage)) aggregateLineStats[tokenType].percentage = 0;
 	}
 
 	// Loop through contributors to compute percentages.
 	for (let contributorId of Object.keys(contributorStatsMap)) {
 		// File percentages.
 		contributorStatsMap[contributorId].percentage = contributorStatsMap[contributorId].numLines / numLines;
+		if (isNaN(contributorStatsMap[contributorId].percentage)) contributorStatsMap[contributorId].percentage = 0;
 
 		// Advanced stats map percentages.
 		let tokenTypes = Object.keys(contributorStatsMap[contributorId].aggregateLineStats).map(type => parseInt(type));
 		tokenTypes.map(type => {
 			contributorStatsMap[contributorId].aggregateLineStats[type].percentage = contributorStatsMap[contributorId].aggregateLineStats[type].numLines / aggregateLineStats[type].numLines;
+			if (isNaN(contributorStatsMap[contributorId].aggregateLineStats[type].percentage)) contributorStatsMap[contributorId].aggregateLineStats[type].percentage = 0;
 		});
 	}
 
@@ -204,6 +208,7 @@ function computeItemPercentages(numLines: number, aggregateLineStats: AdvancedLi
 	if (extensionMap) {
 		for (let extension of Object.keys(extensionMap)) {
 			extensionMap[extension].percentage = extensionMap[extension].numLines / numLines;
+			if (isNaN(extensionMap[extension].percentage)) extensionMap[extension].percentage = 0;
 		}
 	}
 }
@@ -213,10 +218,11 @@ function computeItemPercentages(numLines: number, aggregateLineStats: AdvancedLi
  * @param path The path of the file.
  * @param tokenGroups The groups of tokens.
  * @param blameGroups The groups of lines of code grouped by contributor ID.
+ * @param contributorMap The map which allows the function to use contributor IDs instead of emails.
  */
-export function processFileAnalysis(path: string, tokenGroups: TokenGroup[], blameGroups: BlameGroup[]) : AnalysedItem {
+export function processFileAnalysis(path: string, tokenGroups: TokenGroup[], blameGroups: BlameGroup[], contributorMap: ContributorMap) : AnalysedItem {
 	// Combine the two group sets into a single list of analysis groups.
-	let analysisGroups = getAnalysisGroups(tokenGroups, blameGroups);
+	let analysisGroups = getAnalysisGroups(tokenGroups, blameGroups, contributorMap);
 
 	// Run statistics on the groups by grouping the analysis group together by contributor ID.
 	let aggregateLineStats : AdvancedLineStats = {};
