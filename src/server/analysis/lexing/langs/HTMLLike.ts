@@ -25,7 +25,7 @@ const lexer : Lexer = {
 		expression: /^<!--.+-->/
 	}, {
 		type: TokenType.Whitespace,
-		expression: /^\n\s*/
+		expression: /^(\r|\n)\s*/
 	}, {
 		type: TokenType.Code,
 		expression: /^.+?(?=(<!--)|\n|$)/

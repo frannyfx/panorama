@@ -94,7 +94,7 @@ export async function lexFile(repoPath: string, filePath: string) : Promise<Lexi
 			numLines: result.length > 0 ? result[result.length - 1].position!.end : 0
 		};
 	} catch (e) {
-		logger.error(`Unable to lex file '${path}': ${e}`);
+		logger.error(`Unable to lex file "${filePath}". ${e}`);
 		return { ok: false, path: filePath, extension };
 	}
 }

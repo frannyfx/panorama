@@ -301,6 +301,10 @@ async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseA
 	// Loop through the folders and create the file type rows.
 	folders.map(folder => {
 		for (let extension of Object.keys(folder.extensions!)) {
+			// If the extension was not found, do not add it.
+			if (!types[extension]) continue;
+
+			// Otherwise, add the item.
 			aggregateFileTypes.push({
 				analysisId: analysis.analysisId!,
 				path: folder.path,

@@ -9,7 +9,7 @@ const lexer : Lexer = {
 	extensions: ["json"],
 	definitions: [{
 		type: TokenType.Whitespace,
-		expression: /^\n\s*/
+		expression: /^(\r|\n)\s*/
 	}, {
 		type: TokenType.Code,
 		expression: /^.+?(?=\n|$)/

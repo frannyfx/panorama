@@ -13,7 +13,8 @@ const logger = require("../../utils/logger")("lexer");
 export enum TokenType {
 	Documentation,
 	Code,
-	Whitespace
+	Whitespace,
+	String
 };
 
 // Interfaces
@@ -101,7 +102,7 @@ export function lex(lexer: Lexer, input: string) : Token[] {
 		
 		// Check if any matches were successful.
 		let successfulResults = results.filter(result => result.match != null && result.match[0].length != 0);
-		if (successfulResults.length == 0) throw new Error(`Unexpected symbol ${input[i]} at index ${i}.`);
+		if (successfulResults.length == 0) throw new Error(`Unexpected symbol '${input[i]}' on line ${lineNumber}, file index ${i}.`);
 		
 		// Sort successful matches by longest, following the maximal munch principle.
 		let bestMatch = successfulResults.sort((a : MatchResult, b: MatchResult) => b.match![0].length - a.match![0].length)[0];
