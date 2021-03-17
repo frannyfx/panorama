@@ -217,6 +217,10 @@ export default Vue.extend({
 
 			// Show selected file if it's not a directory.
 			if (file && file.type != "dir") {
+				// Avoid redundant navigation.
+				if (path == this.selectedFile) return;
+
+				// Otherwise, push the route.
 				this.$router.push({
 					name: "repo",
 					params: this.$route.params,

@@ -89,8 +89,6 @@ export default Vue.extend({
 				if (!content) console.log(`File ${this.file.path} from ${this.repo.fullName} failed to load.`);
 				this.$store.commit("Repositories/setFileContent", { file: this.file, content });
 			}
-
-			console.log(this.file);
 		}
 	},
 	props: {
@@ -206,7 +204,7 @@ export default Vue.extend({
 				font-weight: 600;
 				min-width: 30px;
 				background-color: $white-blue;
-				color: $grey-blue;
+				color: white;
 				padding: 4px 8px;
 			}
 

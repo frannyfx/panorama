@@ -68,7 +68,6 @@ export default Vue.extend({
 
 			// Delay stopping drawing so the canvas is hidden.
 			this.visibilitySwitchTimeout = setTimeout(() => {
-				console.log(`Commit canvas is ${newValue ? '' : 'not '}visible.`);
 				this.shouldDraw = newValue;
 				if (this.shouldDraw) {
 					this.lastTs = undefined;
