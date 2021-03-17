@@ -179,9 +179,8 @@ export default Vue.extend({
 	width: 100%;
 
 	.line-table {	
-		border-collapse: separate;
+		border-collapse: collapse;
 		table-layout: fixed;
-
 		
 		tr {
 			&:first-child > .line-number {
@@ -204,9 +203,11 @@ export default Vue.extend({
 				font-weight: 600;
 				min-width: 30px;
 				background-color: white;
-				border-right: 1px solid rgba($deep, .1);
 				color: $grey-blue;
 				padding: 4px 8px;
+
+				/* Use box-shadow for border since border gets cut off when sticky */
+				box-shadow: inset -1px 0px 0 rgba($deep, .1);
 			}
 
 			.code {
