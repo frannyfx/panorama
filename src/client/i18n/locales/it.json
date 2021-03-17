@@ -105,6 +105,9 @@
 			"fileOfType": "File {0}",
 			"file": "File",
 			"directory": "Cartella"
+		},
+		"fileViewer": {
+			"viewSource": "Mostra sorgente"
 		}
 	}
 }

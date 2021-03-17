@@ -271,7 +271,7 @@ button {
 
 /* Lists */
 .list-item {
-	border-top: 1px solid rgba(black, .1);
+	border-top: 1px solid rgba($deep, .1);
 	transition: background-color 0.3s;
 
 	&.first {
@@ -283,15 +283,17 @@ button {
 		background-color: rgba($blue, .05);
 	}
 
-	> :first-child {
-		margin-left: 30px;
-	}
-
-	> :last-child {
-		margin-right: 30px;
-	}
-
-	> *:not(:last-child) {
-		margin-right: 30px;
+	&.margins {
+		> :first-child {
+			margin-left: 30px;
+		}
+	
+		> :last-child {
+			margin-right: 30px;
+		}
+	
+		> *:not(:last-child) {
+			margin-right: 30px;
+		}
 	}
 }

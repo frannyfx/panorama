@@ -17,6 +17,10 @@ export interface File {
 		loaded: boolean,
 		list: string[]
 	},
+	content: {
+		loaded: boolean,
+		data: string
+	},
 	analysis?: Analysis
 };
 
@@ -34,6 +38,10 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 		children: {
 			loaded: false,
 			list: []
+		},
+		content: {
+			loaded: false,
+			data: ""
 		},
 		analysis: analysis ? toAnalysis(analysis) : undefined
 	};

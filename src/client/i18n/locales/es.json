@@ -105,6 +105,9 @@
 			"fileOfType": "Archivo {0}",
 			"file": "Archivo",
 			"directory": "Carpeta"
+		},
+		"fileViewer": {
+			"viewSource": "View source"
 		}
 	}
 }

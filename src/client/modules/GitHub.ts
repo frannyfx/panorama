@@ -7,6 +7,7 @@
 import { Octokit } from "@octokit/rest";
 import { createTokenAuth }from "@octokit/auth-token";
 import { AuthInterface, GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
+import { paths, components } from "@octokit/openapi-types";
 
 // Modules
 import Store from "../store";
@@ -18,6 +19,9 @@ import { toUser, User } from "./models/User";
 import { File, toFile } from "./models/File";
 import { send } from "./API";
 import { Method } from "../../shared/Method";
+
+// Types
+type ContentFile = components["schemas"]["content-file"];
 
 // Variables
 var instance : Octokit | null = null;
@@ -208,5 +212,34 @@ export async function getEnrichedRepositoryContributors(repository: Repository) 
 	// Now add all contributors (the store will take care of deduping).
 	Store.commit("Repositories/updateContributors", { repository, contributors });
 	return true;
+}
 
+/**
+ * 
+ * @param repository 
+ * @param file 
+ * @returns 
+ */
+export async function getFileContent(repository: Repository, file: File) : Promise<string | null> {
+	// Prevent retrieving content if it's not a file.
+	if (file.type != "file") return null;
+
+	// Get file content.
+	let content = await getOctokit().repos.getContent({
+		owner: repository.owner.login,
+		repo: repository.name,
+		path: file.path,
+		ref: repository.analysis.commitId ? repository.analysis.commitId : undefined
+	});
+
+	// If fetching failed, return null, otherwise return the file's contents encoded in base64.
+	if (content.status != 200 || Array.isArray(content.data)) return null;
+	
+	try {
+		// Try to decode text file, but this might fail as it could be a blob.
+		return decodeURIComponent(escape(atob((content.data as ContentFile).content)));	
+	} catch (e) {
+		return null;
+	}
+	
 }

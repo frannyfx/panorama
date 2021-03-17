@@ -16,6 +16,7 @@ export interface Repository {
 	owner: User,
 	private: boolean,
 	description: string,
+	defaultBranch: string,
 	contributors: {
 		enriched: boolean,
 		list: User[]	
@@ -54,6 +55,10 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 		children: {
 			loaded: false,
 			list: []
+		},
+		content: {
+			loaded: false,
+			data: ""
 		}
 	};
 
@@ -65,6 +70,7 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 		owner: toUser(input.owner!),
 		private: input.private!,
 		description: input.description!,
+		defaultBranch: input.default_branch!,
 		contributors: {
 			enriched: false,
 			list: contributors.map(c => toUser(c))

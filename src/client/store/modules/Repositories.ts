@@ -12,6 +12,7 @@ import config from "../../config";
 import { File } from "../../modules/models/File";
 import { AnalysisMap } from "../../modules/models/Analysis";
 import { User } from "../../modules/models/User";
+import Vue from "vue";
 
 // State interface.
 export interface RepositoriesState {
@@ -47,7 +48,7 @@ const mutations : MutationTree<RepositoriesState> = {
 			} else state.list.push(repository);
 
 			// Add to the object.
-			state.object[repository.fullName] = repository;
+			Vue.set(state.object, repository.fullName, repository);
 		});
 
 		// Set the page accordingly.
@@ -57,7 +58,7 @@ const mutations : MutationTree<RepositoriesState> = {
 		state.canLoadMore = data.repositories.length == config.repositories.pageSize;
 	},
 	addSingle(state: RepositoriesState, repository: Repository) {
-		state.object[repository.fullName] = repository;
+		Vue.set(state.object, repository.fullName, repository);
 	},
 	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
 		// Sort children.
@@ -74,8 +75,8 @@ const mutations : MutationTree<RepositoriesState> = {
 
 		// Add the files to the repository and set the analysis data.
 		data.files.map(file => {
-			file.analysis = data.analysis[file.path];
-			data.repository.content.files[file.path] = file;
+			Vue.set(file, "analysis", data.analysis[file.path]);
+			Vue.set(data.repository.content.files, file.path, file);
 		});
 
 		// Set analysis for the directory whose children we added.
@@ -92,6 +93,11 @@ const mutations : MutationTree<RepositoriesState> = {
 	setTicket(state: RepositoriesState, data: { repository: Repository, ticket: string }) {
 		// Set analysis data retrieval ticket for repository.
 		data.repository.analysis.ticket = data.ticket;
+	},
+	setFileContent(state: RepositoriesState, data: { file: File, content: string }) {
+		// Set the file's content.
+		data.file.content.loaded = true;
+		data.file.content.data = data.content;
 	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).

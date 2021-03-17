@@ -9,7 +9,7 @@
 			</h3>
 			<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
 			<div class="files">
-				<div class="list-item first header file-header">
+				<div class="list-item first header margins file-header">
 					<div class="breadcrumbs">
 						<transition-group name="breadcrumb">
 							<span v-for="(component, index) in breadcrumbs" :key="index + component">
@@ -49,8 +49,8 @@
 						:index="currentPath == '' ? index + 1 : index + 2"
 					/>
 				</transition-group>
-				
 			</div>
+			<file-viewer :repo="repo" v-if="selectedFile != ''" :path="selectedFile"/>
 		</div>
 	</div>
 </template>
@@ -70,11 +70,12 @@ import { Method } from "../../shared/Method";
 import Extensions from "../store/modules/Extensions";
 import { File } from "../modules/models/File";
 import { dedupe } from "../../shared/utils";
+import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
-import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
+import FileViewer from "../components/FileViewer.vue";
 
 
 /**
@@ -164,7 +165,8 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
-		RepositoryFileListItem
+		RepositoryFileListItem,
+		FileViewer
 	},
 	computed: {
 		currentPath() : string {
@@ -192,13 +194,39 @@ export default Vue.extend({
 		},
 		config() {
 			return config;
+		},
+		selectedFile() : string {
+			// Get the current selected file.
+			let currentFile = <string>this.$route.query.file || "";
+
+			// If a file is set, return it.
+			if (currentFile != "") return currentFile;
+
+			// If there isn't a specific file selected, see if the current folder contains a README.md.
+			let readmePath = `${this.currentPath}${this.currentPath == '' ? '' : '/'}README.md`;
+			if (currentFile == "" && this.repo.content.files[readmePath]) return readmePath;
+
+			// Otherwise, return an empty string.
+			return "";
 		}
 	},
 	methods: {
 		async setPath(path: string) {
 			// Get file for selected path and prevent navigation if it is not a directory.
 			let file = this.repo.content.files[path];
-			if (file && file.type != "dir") return;
+
+			// Show selected file if it's not a directory.
+			if (file && file.type != "dir") {
+				this.$router.push({
+					name: "repo",
+					params: this.$route.params,
+					query: {
+						path: this.$route.query.path || "",
+						file: file.path
+					}
+				});
+				return;
+			}
 
 			// Fetch the children first, before navigating. This allows the UI to update.
 			await addFileChildren(this.$router.currentRoute.params.owner, this.$router.currentRoute.params.repo, path || "");

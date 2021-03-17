@@ -105,6 +105,9 @@
 			"fileOfType": "{0} file",
 			"file": "File",
 			"directory": "Directory"
+		},
+		"fileViewer": {
+			"viewSource": "View source"
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <template>
 	<div class="file-wrapper">
-		<div class="list-item clickable file" :class="{ 'first': index == 0 }">
+		<div class="list-item clickable margins file" :class="{ 'first': index == 0 }">
 			<div class="file-icon" v-tooltip="{ 
 				theme: 'panorama', 
 				content: file.type == 'dir' ? $t('components.repositoryFileListItem.directory') : fileType ? $t('components.repositoryFileListItem.fileOfType', [fileType.name]) : $t('components.repositoryFileListItem.file')
@@ -103,8 +103,7 @@ export default Vue.extend({
 
 	.details {
 		flex-grow: 1;
-
-		
+		color: $grey-blue;
 	}
 
 	> *:not(:last-child) {
