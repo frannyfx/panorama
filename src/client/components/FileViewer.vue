@@ -251,7 +251,7 @@ export default Vue.extend({
 }
 
 .markdown-renderer {
-	padding: 40px;
+	padding: 30px 40px 40px 40px;
 }
 
 .image-viewer, .icon-preview {
