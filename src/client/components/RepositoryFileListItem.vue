@@ -1,5 +1,5 @@
 <template>
-	<div class="file-wrapper">
+	<div class="file-wrapper" :class="{ 'loading': file.children.loading }">
 		<div class="list-item clickable margins file" :class="{ 'first': index == 0 }">
 			<div class="file-icon" v-tooltip="{ 
 				theme: 'panorama', 
@@ -108,6 +108,27 @@ export default Vue.extend({
 
 	> *:not(:last-child) {
 		margin-right: 20px;
+	}
+}
+
+/* Loading animation */
+@keyframes shimmer {
+	0% {
+		background-position: -750px 0;
+	}
+
+	100% {
+		background-position: 750px 0;
+	}
+}
+
+.file-wrapper {
+	&.loading {
+		background: white;
+		background: linear-gradient(to right, rgba($very-white-blue, 0) 25%, $very-white-blue 50%, rgba($very-white-blue, 0) 75%);
+		background-size: 1000px 100px;
+		background-repeat: no-repeat;
+		animation: shimmer 1.1s infinite;
 	}
 }
 </style>

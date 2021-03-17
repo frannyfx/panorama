@@ -78,7 +78,7 @@ export default Vue.extend({
 
 	.repo-icon {
 		font-size: 0.8em;
-		color: #aaa;
+		color: $light-grey-blue;
 	}
 
 	.details {
@@ -124,7 +124,7 @@ export default Vue.extend({
 
 	.subtitle {
 		font-size: 0.7em;
-		color: #aaa;
+		color: $light-grey-blue;
 		overflow: hidden;
 		white-space: nowrap;
 		text-overflow: ellipsis;
@@ -164,7 +164,7 @@ export default Vue.extend({
 		flex-grow: 0;
 		flex-shrink: 0;
 
-		color: #aaa;
+		color: $light-grey-blue;
 		font-size: 0.9em;
 	}
 }

@@ -51,6 +51,7 @@
 				</transition-group>
 			</div>
 			<file-viewer :repo="repo" v-if="selectedFile != ''" :path="selectedFile"/>
+			<content-footer/>
 		</div>
 	</div>
 </template>
@@ -69,14 +70,14 @@ import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
 import Extensions from "../store/modules/Extensions";
 import { File } from "../modules/models/File";
-import { dedupe } from "../../shared/utils";
+import { dedupe, sleep } from "../../shared/utils";
 import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
-
+import ContentFooter from "../components/Footer.vue";
 
 /**
  * Load children for a path.
@@ -166,7 +167,8 @@ export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
 		RepositoryFileListItem,
-		FileViewer
+		FileViewer,
+		ContentFooter
 	},
 	computed: {
 		currentPath() : string {
@@ -232,8 +234,14 @@ export default Vue.extend({
 				return;
 			}
 
-			// Fetch the children first, before navigating. This allows the UI to update.
+			// Set the folder's children loading state to true, which will play an animation.
+			this.$store.commit("Repositories/setFileChildrenLoading", { file, loading: true });
+
+			// Fetch the children folder's children.
 			await addFileChildren(this.$router.currentRoute.params.owner, this.$router.currentRoute.params.repo, path || "");
+
+			// Loading done, end the animation.
+			this.$store.commit("Repositories/setFileChildrenLoading", { file, loading: false });
 
 			// Push update.
 			this.$router.push({

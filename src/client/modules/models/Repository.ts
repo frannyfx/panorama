@@ -54,6 +54,7 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 		path: "",
 		children: {
 			loaded: false,
+			loading: false,
 			list: []
 		},
 		content: {

@@ -15,6 +15,7 @@ export interface File {
 	parent?: File,
 	children: {
 		loaded: boolean,
+		loading: boolean,
 		list: string[]
 	},
 	content: {
@@ -37,6 +38,7 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 		parent,
 		children: {
 			loaded: false,
+			loading: false,
 			list: []
 		},
 		content: {

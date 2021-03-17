@@ -23,8 +23,8 @@ export default Vue.extend({
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 100%;
-	padding: 40px 0px 10px 0px;
+	padding: 20px 20px;
+	box-sizing: border-box;
 
 	.line {
 		background-color: $white-blue;
@@ -33,7 +33,7 @@ export default Vue.extend({
 	}
 	
 	svg {
-		color: $white-blue;
+		color: $light-grey-blue;
 		font-size: 1.4em;
 	}
 

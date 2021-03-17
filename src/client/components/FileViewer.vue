@@ -179,7 +179,7 @@ export default Vue.extend({
 	width: 100%;
 
 	.line-table {	
-		border-collapse: collapse;
+		border-collapse: separate;
 		table-layout: fixed;
 
 		
@@ -203,8 +203,9 @@ export default Vue.extend({
 				font-size: 0.8em;
 				font-weight: 600;
 				min-width: 30px;
-				background-color: $white-blue;
-				color: white;
+				background-color: white;
+				border-right: 1px solid rgba($deep, .1);
+				color: $grey-blue;
 				padding: 4px 8px;
 			}
 

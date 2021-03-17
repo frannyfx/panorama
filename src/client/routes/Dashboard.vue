@@ -23,13 +23,6 @@
 					</div>
 				</transition>
 			</div>
-			<h2>{{ $t("routes.dashboard.test") }}</h2>
-			<a @click="testAlert">Test alert</a>
-			<a @click="testModal">Test normal modal</a>
-			<a @click="testDestructiveModal">Test destructive modal</a>
-			<a @click="testMultipleModals">Test multiple modals</a>
-			<a @click="testProgress">Test progress notification</a>
-			<a @click="testAnalysis">Test analysis</a>
 			<content-footer/>
 		</div>
 	</div>
@@ -69,45 +62,6 @@ export default Vue.extend({
 		};
 	},
 	methods: {
-		testAlert() {
-			createAlert("INFO", "Test notification.", "This is the notification's content.");
-		},
-		testModal() {
-			createModal(OK_CANCEL, "Not analysed", "The repository frannyfx/panorama-test has not yet been analysed. Would you like to analyse it?");
-		},
-		testDestructiveModal() {
-			createModal(OK_CANCEL_DESTRUCTIVE, "Are you sure?", "If you quit now, all your unsaved changes will be lost!");
-		},
-		testMultipleModals() {
-			createModal(OK, "Welcome to Panorama", "Thank you for being a user. Your support is highly appreciated.");
-			setTimeout(() => createModal(OK_CANCEL, "Not analysed", "The repository frannyfx/panorama-test has not yet been analysed. Would you like to analyse it?"), 1000);
-		},
-		testProgress() {
-			addNotification({
-				type: "PROGRESS",
-				icon: ["fab", "github"],
-				title: "Analysing repo frannyfx/ether...",
-				description: "",
-				dismissable: false,
-				expiry: false,
-				progress: {
-					value: 0.3,
-					status: "Cloning repo..."
-				}
-			});
-		},
-		async testAnalysis() {
-			// Ask for a ticket to subscribe to this repository's analysis.
-			let ticketResponse = await send(Method.PUT, "repo/queue", {
-				name: "frannyfx/panorama-test"
-			});
-
-			// If the request failed, show an error.
-			if (!ticketResponse.status.ok || !ticketResponse.result?.ticket) return createAlert("WARNING", "Failed", "Yada yada");
-			
-			// Use the ticket to subscribe to the events.
-			subscribeToJobProgress("frannyfx/panorama-test", ticketResponse.result!.jobId, ticketResponse.result!.ticket, this.$store.state.auth.accessToken);
-		},
 		getRepo(repo: Repository) {
 			// Create a modal if the repository has not yet been analysed.
 			if (repo.analysis.id == -1) {

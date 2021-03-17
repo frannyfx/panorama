@@ -60,6 +60,9 @@ const mutations : MutationTree<RepositoriesState> = {
 	addSingle(state: RepositoriesState, repository: Repository) {
 		Vue.set(state.object, repository.fullName, repository);
 	},
+	setFileChildrenLoading(state: RepositoriesState, data: { file: File, loading: boolean }) {
+		data.file.children.loading = data.loading;
+	},
 	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
 		// Sort children.
 		let sortedFiles = data.files.sort((a: File, b: File) => {
