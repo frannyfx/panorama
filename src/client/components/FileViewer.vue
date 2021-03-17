@@ -17,15 +17,22 @@
 		<div class="file-viewer list-item">
 			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown'" :source="file.content.data" :relativeLinkRoot="rawLink"/>
 			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
-				<img :src="`${rawLink}/${file.path}`">
+				<a :href="fileLink" target="_blank"><img :src="`${rawLink}/${file.path}`"></a>
+				<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
+				<a :href="fileLink" target="_blank" class="subtitle">{{ $t('components.fileViewer.fileOfType', [fileType.name]) }}</a>
 			</div>			
-			<div class="code-viewer" v-else>
+			<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != ''">
 				<table class="line-table">
 					<tr v-for="(line, index) in file.content.data.split('\n')" :key="index">
 						<td class="line-number">{{ index + 1}}</td>
 						<td class="code"><pre>{{line}}</pre></td>
 					</tr>
 				</table>
+			</div>
+			<div class="icon-preview" v-else-if="file.content.loaded">
+				<a :href="fileLink" target="_blank"><img :src="iconPath"></a>
+				<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
+				<a :href="fileLink" target="_blank" class="subtitle">{{ fileType ? $t('components.fileViewer.fileOfType', [fileType.name]) : $t('components.fileViewer.file') }}</a>
 			</div>
 		</div>
 	</div>
@@ -79,6 +86,9 @@ export default Vue.extend({
 		},
 		rawLink() : string {
 			return `https://github.com/${this.repo.owner.login}/${this.repo.name}/raw/${this.repo.analysis.id != -1 ? this.repo.analysis.commitId : this.repo.defaultBranch}`;
+		},
+		fileLink() : string {
+			return `${this.rawLink}/${this.file.path}`;
 		}
 	},
 	methods: {
@@ -161,16 +171,34 @@ export default Vue.extend({
 	padding: 40px;
 }
 
-.image-viewer {
+.image-viewer, .icon-preview {
 	width: 100%;
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	padding: 40px;
 	box-sizing: border-box;
+	color: $grey-blue;
+
+	.title {
+		font-size: 1.3em;
+		margin-top: 10px;
+	}
+
+	.subtitle {
+		font-size: 0.85em;
+		font-weight: 600;
+	}
 	
 	img {
 		max-width: 100%;
+	}
+}
+
+.icon-preview {
+	img {
+		width: 150px;
 	}
 }
 
