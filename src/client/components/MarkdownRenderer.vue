@@ -56,4 +56,9 @@ export default Vue.extend({
 </script>
 <style lang="scss">
 @import "~github-markdown-css";
+.markdown-body {
+	img {
+		border-radius: 5px;
+	}
+}
 </style>
