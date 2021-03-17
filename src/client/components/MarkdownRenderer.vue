@@ -6,20 +6,11 @@
 import Vue, { PropType } from "vue";
 import MarkdownIt from "markdown-it";
 
-// Replacement function.
-var replacementFunction : (url: string, env: any) => string = (url, env) => url;
-
-// MarkdownIt instance.
-// @ts-ignore
-const md = MarkdownIt({
-	replaceLink: (url: string, env: any) => replacementFunction(url, env),
-	html: true
-}).use(require("markdown-it-replace-link"));
-
 export default Vue.extend({
 	computed: {
-		html() {
-			return md.render(this.source);
+		html() : string {
+			if (!this.md) return "";
+			return this.md.render(this.source);
 		}
 	},
 	data() {
@@ -44,8 +35,12 @@ export default Vue.extend({
 		}
 	},
 	mounted() {
-		// Set link replacement function.
-		replacementFunction = this.replaceLink;
+		// Create MarkdownIt instance.
+		// @ts-ignore
+		this.md = MarkdownIt({
+			replaceLink: (url: string, env: any) => this.replaceLink(url, env),
+			html: true
+		}).use(require("markdown-it-replace-link"));
 	},
 	props: {
 		source: {

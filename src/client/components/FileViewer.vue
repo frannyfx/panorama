@@ -233,7 +233,7 @@ export default Vue.extend({
 			}
 
 			.action.enabled {
-				background-color: $blue;
+				background-color: $grey-blue;
 				color: white;
 			}
 
