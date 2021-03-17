@@ -38,9 +38,9 @@
 			</div>			
 			<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != ''">
 				<table class="line-table">
-					<tr v-for="(line, index) in file.content.data.split('\n')" :key="index">
+					<tr v-for="(line, index) in highlightedLines" :key="index">
 						<td class="line-number">{{ index + 1}}</td>
-						<td class="code"><pre>{{line}}</pre></td>
+						<td class="code"><pre v-html="line"></pre></td>
 					</tr>
 				</table>
 			</div>
@@ -67,11 +67,12 @@ import { FileType } from "../../shared/models/FileType";
 // Components
 import MarkdownRenderer from "../components/MarkdownRenderer.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import hljs from "highlight.js";
 
 export default Vue.extend({
 	components: {
 		MarkdownRenderer,
-		FontAwesomeIcon
+		FontAwesomeIcon,
 	},
 	watch: {
 		path(to, from) {
@@ -83,8 +84,11 @@ export default Vue.extend({
 		file() : File {
 			return this.$store.state.Repositories.object[this.repo.fullName].content.files[this.path];
 		},
+		extension() : string {
+			return this.file.name.split(".").pop()!;
+		},
 		fileType() : FileType {
-			return Extensions.state.map[this.file.name.split(".").pop()!];
+			return Extensions.state.map[this.extension];
 		},
 		iconPath() : string {
 			// Return folder icon.
@@ -113,6 +117,16 @@ export default Vue.extend({
 		},
 		canViewStats() : boolean {
 			return this.file.analysis != null;
+		},
+		highlightedLines() : string[] {
+			var state : Language | CompiledMode | undefined = undefined;
+			let lines = this.content.split("\n").map(line => {
+				let result = hljs.highlight(this.extension, line, true, state);
+				state = result.top;
+				return result.value;
+			});
+			
+			return lines;
 		}
 	},
 	data() {
@@ -331,5 +345,13 @@ export default Vue.extend({
 		}
 	}
 }
+</style>
+<style lang="scss">
+@import "~highlight.js/scss/mono-blue.scss";
 
+.code {
+	.hljs {
+		background: transparent !important;
+	}
+}
 </style>

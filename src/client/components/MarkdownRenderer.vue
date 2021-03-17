@@ -39,8 +39,8 @@ export default Vue.extend({
 		// @ts-ignore
 		this.md = MarkdownIt({
 			replaceLink: (url: string, env: any) => this.replaceLink(url, env),
-			html: true
-		}).use(require("markdown-it-replace-link"));
+			html: true,
+		}).use(require("markdown-it-replace-link")).use(require("markdown-it-highlightjs"), { auto: false });
 	},
 	props: {
 		source: {
@@ -56,5 +56,4 @@ export default Vue.extend({
 </script>
 <style lang="scss">
 @import "~github-markdown-css";
-
 </style>
