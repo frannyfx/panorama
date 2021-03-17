@@ -10,7 +10,8 @@
 export interface FileType {
 	typeId: number,
 	name: string,
-	icon: string
+	icon: string,
+	language?: string
 };
 
 /**

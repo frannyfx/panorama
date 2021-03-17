@@ -28,7 +28,8 @@ async function lookupExtensions(extensions: string[]) : Promise<ExtensionMap> {
 		extensionMap[extension.extension] = {
 			typeId: extension.typeId,
 			name: extension.name,
-			icon: extension.icon
+			icon: extension.icon,
+			language: extension.language
 		};
 	});
 
@@ -54,7 +55,8 @@ async function lookupTypes(types: string[]) : Promise<ExtensionMap> {
 		typeMap[type.typeId] = {
 			typeId: type.typeId,
 			name: type.name,
-			icon: type.icon
+			icon: type.icon,
+			language: type.language
 		};
 	});
 
