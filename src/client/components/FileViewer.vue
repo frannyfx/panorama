@@ -1,7 +1,10 @@
 <template>
 	<div class="file-viewer-wrapper">
 		<div class="list-item first margins header">
-			<div class="file-icon">
+			<div class="file-icon" v-tooltip="{ 
+				theme: 'panorama', 
+				content: fileType ? $t('components.fileViewer.fileOfType', [fileType.name]) : $t('components.fileViewer.file')
+			}">
 				<img :src="iconPath">
 			</div>
 			<div class="details">
@@ -12,8 +15,8 @@
 			</div>
 		</div>
 		<div class="file-viewer list-item">
-			<markdown-renderer class="markdown-renderer" v-if="fileType.name == 'Markdown'" :source="file.content.data" :relativeLinkRoot="rawLink"/>
-			<div class="image-viewer" v-else-if="fileType.name == 'Image'">
+			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown'" :source="file.content.data" :relativeLinkRoot="rawLink"/>
+			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
 				<img :src="`${rawLink}/${file.path}`">
 			</div>			
 			<div class="code-viewer" v-else>
@@ -86,6 +89,8 @@ export default Vue.extend({
 				if (!content) console.log(`File ${this.file.path} from ${this.repo.fullName} failed to load.`);
 				this.$store.commit("Repositories/setFileContent", { file: this.file, content });
 			}
+
+			console.log(this.file);
 		}
 	},
 	props: {

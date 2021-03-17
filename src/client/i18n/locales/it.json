@@ -107,7 +107,9 @@
 			"directory": "Cartella"
 		},
 		"fileViewer": {
-			"viewSource": "Mostra sorgente"
+			"viewSource": "Mostra sorgente",
+			"fileOfType": "File {0}",
+			"file": "File"
 		}
 	}
 }

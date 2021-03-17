@@ -107,7 +107,9 @@
 			"directory": "Carpeta"
 		},
 		"fileViewer": {
-			"viewSource": "View source"
+			"viewSource": "View source",
+			"fileOfType": "Archivo {0}",
+			"file": "Archivo"
 		}
 	}
 }
