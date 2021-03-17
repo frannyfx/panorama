@@ -20,6 +20,7 @@ export interface File {
 	},
 	content: {
 		loaded: boolean,
+		loading: boolean,
 		data: string
 	},
 	analysis?: Analysis
@@ -43,6 +44,7 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 		},
 		content: {
 			loaded: false,
+			loading: false,
 			data: ""
 		},
 		analysis: analysis ? toAnalysis(analysis) : undefined

@@ -63,6 +63,9 @@ const mutations : MutationTree<RepositoriesState> = {
 	setFileChildrenLoading(state: RepositoriesState, data: { file: File, loading: boolean }) {
 		data.file.children.loading = data.loading;
 	},
+	setFileContentLoading(state: RepositoriesState, data: { file: File, loading: boolean }) {
+		data.file.content.loading = data.loading;
+	},
 	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
 		// Sort children.
 		let sortedFiles = data.files.sort((a: File, b: File) => {

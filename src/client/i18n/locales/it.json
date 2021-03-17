@@ -108,6 +108,7 @@
 		},
 		"fileViewer": {
 			"viewSource": "Mostra sorgente",
+			"viewStats": "Mostra statistiche",
 			"fileOfType": "File {0}",
 			"file": "File"
 		}

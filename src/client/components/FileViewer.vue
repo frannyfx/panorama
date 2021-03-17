@@ -11,11 +11,24 @@
 				<span>{{ file.name }}</span>
 			</div>
 			<div class="actions">
-				<font-awesome-icon icon="code" v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewSource') }"/>
+				<button class="action clean"
+					:class="{ enabled: viewSource.enabled }"
+					@click="toggleViewSource"
+					:disabled="!canViewSource || !canNotViewSource"
+					v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewSource') }">
+					<font-awesome-icon icon="code"/>
+				</button>
+				<button class="action clean" 
+					:class="{ enabled: viewStats.enabled }"
+					@click="toggleViewStats"
+					:disabled="!canViewStats"
+					v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewStats') }">
+					<font-awesome-icon icon="eye"/>
+				</button>
 			</div>
 		</div>
 		<div class="file-viewer list-item">
-			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown'" :source="file.content.data" :relativeLinkRoot="rawLink"/>
+			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled" :source="file.content.data" :relativeLinkRoot="rawLink"/>
 			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
 				<a :href="fileLink" target="_blank"><img :src="`${rawLink}/${file.path}`"></a>
 				<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
@@ -89,16 +102,53 @@ export default Vue.extend({
 		},
 		fileLink() : string {
 			return `${this.rawLink}/${this.file.path}`;
+		},
+		canViewSource() : boolean {
+			return this.file.content.data != null && this.file.content.data != "";
+		},
+		canNotViewSource() : boolean {
+			return this.fileType.name == "Markdown";
+		},
+		canViewStats() : boolean {
+			return this.file.analysis != null;
 		}
+	},
+	data() {
+		return {
+			viewSource: {
+				enabled: false
+			},
+			viewStats: {
+				enabled: false
+			}
+		};
 	},
 	methods: {
 		async loadContent() {
 			// If the file has not had its content loaded, fetch the content from GitHub.
 			if (!this.file.content.loaded) {
+				// Set loading animation.
+				this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: true });
+
+				// Fetch the file.
 				let content = await getFileContent(this.repo, this.file);
 				if (!content) console.log(`File ${this.file.path} from ${this.repo.fullName} failed to load.`);
+
+				// Set the content
+				this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: false });
 				this.$store.commit("Repositories/setFileContent", { file: this.file, content });
 			}
+
+			// If the file is not Markdown and the data loaded successfully, then enable viewSource.
+			this.viewSource.enabled = this.canViewSource && !this.canNotViewSource;
+		},
+		toggleViewSource() {
+			if (!this.canViewSource) return;
+			this.viewSource.enabled = !this.viewSource.enabled;
+		},
+		toggleViewStats() {
+			if (!this.canViewStats) return;
+			this.viewStats.enabled = !this.viewStats.enabled;
 		}
 	},
 	props: {
@@ -157,8 +207,39 @@ export default Vue.extend({
 		}
 
 		.actions {
-			color: $grey-blue;
+			display: flex;
 
+			.action {
+				color: $grey-blue;
+				width: 30px;
+				height: 30px;
+				border-radius: 30px;
+				font-size: 1.1em;
+				
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				transition: transform .3s, background-color .3s, color .3s, opacity .3s;
+
+				&:disabled {
+					opacity: .4;
+				}
+
+				&:not(:disabled) {
+					&:hover {
+						transform: scale(1.1);
+					}
+				}
+			}
+
+			.action.enabled {
+				background-color: $blue;
+				color: white;
+			}
+
+			> :not(:last-child) {
+				margin-right: 10px;
+			}
 		}
 	}
 	

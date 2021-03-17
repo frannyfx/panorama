@@ -213,13 +213,23 @@ a {
 
 /* Buttons */
 button {
+	/* Clear formatting */
 	border: none;
-	padding: 12px 30px;
-	color: white;
-	background-color: $grey-blue;
-	border-radius: 30px;
-	font-size: 0.8em;
 	outline: none;
+	background-color: transparent;
+	
+	&:not(.clean) {
+		padding: 12px 30px;
+		color: white;
+		background-color: $grey-blue;
+		border-radius: 30px;
+		font-size: 0.8em;
+
+		> svg {
+			margin-right: 10px;
+			font-size: 1.2em;
+		}
+	}
 
 	&.primary {
 		background-color: $blue;
@@ -227,11 +237,6 @@ button {
 	
 	&:not(:disabled) {
 		cursor: pointer;
-	}
-
-	> svg {
-		margin-right: 10px;
-		font-size: 1.2em;
 	}
 
 	&.transparent {

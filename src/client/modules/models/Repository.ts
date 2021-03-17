@@ -59,6 +59,7 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 		},
 		content: {
 			loaded: false,
+			loading: false,
 			data: ""
 		}
 	};

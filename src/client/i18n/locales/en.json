@@ -108,6 +108,7 @@
 		},
 		"fileViewer": {
 			"viewSource": "View source",
+			"viewStats": "View stats",
 			"fileOfType": "{0} file",
 			"file": "File"
 		}

@@ -1,5 +1,5 @@
 <template>
-	<div class="file-wrapper" :class="{ 'loading': file.children.loading }">
+	<div class="file-wrapper" :class="{ 'loading': loading }" v-on:animationiteration="onAnimationIteration">
 		<div class="list-item clickable margins file" :class="{ 'first': index == 0 }">
 			<div class="file-icon" v-tooltip="{ 
 				theme: 'panorama', 
@@ -35,6 +35,27 @@ export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
 		FilePercentage
+	},
+	watch: {
+		"file.children.loading": function (to : boolean) {
+			this.handleLoadingChanged(to);
+		},
+		"file.content.loading": function (to : boolean) {
+			this.handleLoadingChanged(to);
+		}
+	},
+	data() {
+		return {
+			loading: false
+		};
+	},
+	methods: {
+		handleLoadingChanged(loading: boolean) {
+			if (loading) this.loading = true;
+		},
+		onAnimationIteration() {
+			if (!this.file.children.loading && !this.file.content.loading) this.loading = false;
+		}
 	},
 	computed: {
 		extension() : string {
@@ -76,7 +97,6 @@ export default Vue.extend({
 			required: false
 		}
 	}
-	
 });
 </script>
 <style lang="scss" scoped>
@@ -123,6 +143,8 @@ export default Vue.extend({
 }
 
 .file-wrapper {
+	animation-fill-mode: forwards;
+
 	&.loading {
 		background: white;
 		background: linear-gradient(to right, rgba($very-white-blue, 0) 25%, $very-white-blue 50%, rgba($very-white-blue, 0) 75%);
