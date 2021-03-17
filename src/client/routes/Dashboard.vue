@@ -110,7 +110,7 @@ export default Vue.extend({
 		},
 		getRepo(repo: Repository) {
 			// Create a modal if the repository has not yet been analysed.
-			if (repo.lastAnalysis.id == -1) {
+			if (repo.analysis.id == -1) {
 				createCustomModal({
 					title: this.$i18n.t("modals.custom.repoNotAnalysed.title").toString(),
 					description: this.$i18n.t("modals.custom.repoNotAnalysed.description", [repo.fullName]).toString(),

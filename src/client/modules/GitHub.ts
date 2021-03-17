@@ -135,7 +135,7 @@ export async function enrichRepository(repository: any) : Promise<Repository> {
 	
 	// Get analysis data.
 	let analysis = await send(Method.GET, `repo/${repository.full_name}/analysis`);
-	return toRepository(repository, contributors, analysis.status.ok ? analysis.result!.analysisId : -1);
+	return toRepository(repository, contributors, analysis.result);
 }
 
 /**
@@ -149,7 +149,8 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
 	let result = await getOctokit().repos.getContent({
 		owner: repository.owner.login,
 		repo: repository.name,
-		path
+		path,
+		ref: repository.analysis.commitId ? repository.analysis.commitId : undefined
 	});
 
 	if (result.status != 200) return [];
@@ -169,10 +170,10 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
  */
 export async function getEnrichedRepositoryContributors(repository: Repository) : Promise<boolean> {
 	// Check the repository has a valid analysis available.
-	if (repository.lastAnalysis.id == -1) return false;
+	if (repository.analysis.id == -1) return false;
 
 	// Get all analysed contributors from repository.
-	let contributorData = await send(Method.GET, `analysis/${repository.lastAnalysis.id}/contributors`);
+	let contributorData = await send(Method.GET, `analysis/${repository.analysis.id}/contributors`);
 	if (!contributorData.status.ok) return false;
 
 	// Check which contributors have not had their GitHub data fetched.

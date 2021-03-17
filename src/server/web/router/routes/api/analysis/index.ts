@@ -5,8 +5,6 @@
 
 // Imports
 import Joi from "joi";
-import fs from "fs";
-import path from "path";
 import crypto from "crypto";
 
 // Config
@@ -46,10 +44,15 @@ let route : Array<Route> = [{
 		if (!repository.status.ok) return send(response, Codes.Forbidden);
 
 		// Get the latest ID for the repository.
-		let analysisId = await DatabaseAnalysis.getLatestId(request.params!.owner, request.params!.repo);
-		send(response, Codes.OK, {
-			analysisId
+		let analysis = await DatabaseAnalysis.getLatest(request.params!.owner, request.params!.repo);
+
+		// Return -1 as the ID if a suitable analysis was not found.
+		if (!analysis) return send(response, Codes.OK, {
+			analysisId: -1,
 		});
+		
+		// Return the analysis ID and the analysed commit.
+		send(response, Codes.OK, analysis);
 	}
 }, {
 	method: Method.GET,
@@ -82,14 +85,11 @@ let route : Array<Route> = [{
 	}
 }, {
 	method: Method.GET,
-	url: "/api/analysis/:id",
+	url: "/api/analysis/:id/ticket",
 	auth: true,
 	schemas: {
 		params: Joi.object({
 			id: Joi.number()
-		}),
-		query: Joi.object({
-			path: Joi.string().required()
 		})
 	},
 	handler: async (request: Request, response: any) => {
@@ -103,9 +103,43 @@ let route : Array<Route> = [{
 		let repository = await getRepository(`${analysis.owner}/${analysis.repositoryName}`, request.auth!.token!);
 		if (!repository.status.ok) return send(response, Codes.Forbidden);
 
+		// Generate ticket.
+		let analysisTicket = await ticket.sign({
+			analysisId: request.params!.id,
+			accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex")
+		});
+
+		// If the ticket generation failed, send server error, otherwise send ticket.
+		if (!analysisTicket) return send(response, Codes.ServerError);
+		return send(response, Codes.OK, {
+			ticket: analysisTicket!
+		});
+	}
+}, {
+	method: Method.GET,
+	url: "/api/analysis/:id/items",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			id: Joi.number()
+		}),
+		query: Joi.object({
+			path: Joi.string().required(),
+			ticket: Joi.string().required()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		// Check ticket to prevent checking ownership every time.
+		let ticketValidation = await ticket.verify(request.query!.ticket);
+		if (!ticketValidation.ok) return send(response, Codes.Forbidden);
+
+		// Check ticket information matches requested analysis ID and access token.
+		if (ticketValidation.decoded!.analysisId != request.params!.id || ticketValidation.decoded!.accessTokenHash != crypto.createHash("sha256").update(request.auth!.token!).digest("hex"))
+			return send(response, Codes.Forbidden);
+
 		// Get the files in the current folder.
 		let analysisItems = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
-
+		
 		// Create an object that maps paths to the analysed item.
 		let analysisObject : {[key: string]: AnalysedItem} = {};
 		analysisItems.map(item => analysisObject[item.path] = item);

@@ -7,7 +7,7 @@
 					<span class="owner">{{repo.owner.login}}</span>
 					<span class="slash">/</span>
 					<span class="name">{{repo.name}}</span>
-					<span class="analysed" v-show="repo.lastAnalysis.id != -1" v-tooltip="{ theme: 'panorama', content: $t('components.repositoryListItem.analysed') }">
+					<span class="analysed" v-show="repo.analysis.id != -1" v-tooltip="{ theme: 'panorama', content: $t('components.repositoryListItem.analysed') }">
 						<font-awesome-icon icon="check"/>
 					</span>
 				</div>

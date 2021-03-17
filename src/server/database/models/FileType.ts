@@ -35,6 +35,32 @@ async function lookupExtensions(extensions: string[]) : Promise<ExtensionMap> {
 	return extensionMap;
 }
 
+/**
+ * Get an object mapping type IDs to file types.
+ * @param types The IDs of the types to fetch.
+ * @returns The type map.
+ */
+async function lookupTypes(types: string[]) : Promise<ExtensionMap> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return {};
+
+	// Get matching types.
+	let matchingTypes = await connection.select("*").from("FileType").whereIn("typeId", types);
+
+	// Map type ID to FileType.
+	let typeMap : ExtensionMap = {};
+	matchingTypes.map(type => {
+		typeMap[type.typeId] = {
+			typeId: type.typeId,
+			name: type.name,
+			icon: type.icon
+		};
+	});
+
+	return typeMap;
+}
+
 export default {
-	lookupExtensions
+	lookupExtensions, lookupTypes
 };

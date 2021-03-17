@@ -15,6 +15,7 @@ export interface DatabaseAnalysis {
 	analysisId?: number,
 	repositoryId: number,
 	requestedBy: number,
+	commitId?: string,
 	queuedAt: Date,
 	startedAt?: Date,
 	completedAt?: Date
@@ -50,6 +51,7 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 	await connection("Analysis").where({ analysisId: analysis.analysisId }).update({
 		repositoryId: analysis.repositoryId,
 		requestedBy: analysis.requestedBy,
+		commitId: analysis.commitId,
 		queuedAt: analysis.queuedAt,
 		startedAt: analysis.startedAt!,
 		completedAt: analysis.completedAt!
@@ -58,29 +60,33 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 }
 
 /**
- * Get the ID of the latest analysis of a repository.
+ * Get the latest analysis of a repository.
  * @param owner The owner of the repository.
  * @param repo The name of the repository.
- * @returns The ID of the latest analysis of that repository or -1.
+ * @returns The information about the latest analysis of that repository.
  */
-async function getLatestId(owner: string, repo: string) : Promise<number> {
-	// TODO: Use a join.
+async function getLatest(owner: string, repo: string) : Promise<Data | null> {
 	// Get connection.
 	let connection = await getConnection();
-	if (!connection) return -1;
-
-	// Get owner ID.
-	let ownerRow = await connection("User").where({ login: owner }).select("userId").first();
-	if (!ownerRow) return -1;
-
-	// Get repository ID.
-	let repositoryRow = await connection("Repository").where({ ownerId: ownerRow.userId, name: repo }).select("repositoryId").first();
-	if (!repositoryRow) return -1;
+	if (!connection) return null;
 
 	// Get analysis with repo name and owner ID.
-	let analysisRow = await connection("Analysis").where({ repositoryId: repositoryRow.repositoryId }).select("analysisId").orderBy("completedAt", "desc").first();
-	if (!analysisRow) return -1;
-	return analysisRow.analysisId;
+	let analysisRow = await connection("Analysis")
+		.where({ "User.login": owner, "Repository.name": repo })
+		.orderBy("completedAt", "desc")
+		.join("Repository", { "Analysis.repositoryId": "Repository.repositoryId"})
+		.join("User", { "Repository.ownerId": "User.userId"})
+		.select(
+			"Analysis.analysisId",
+			"Analysis.commitId",
+			"Analysis.queuedAt",
+			"Analysis.startedAt",
+			"Analysis.completedAt",
+			"Repository.name as repositoryName",
+			"User.login as owner"
+		).first();
+
+	return analysisRow;
 }
 
 /**
@@ -97,10 +103,19 @@ async function get(analysisId: number) : Promise<Data | null> {
 		.where({ analysisId })
 		.join("Repository", { "Analysis.repositoryId": "Repository.repositoryId"})
 		.join("User", { "Repository.ownerId": "User.userId"})
-		.select("Analysis.*", "Repository.name as repositoryName", "User.login as owner").first();
+		.select(
+			"Analysis.analysisId",
+			"Analysis.commitId",
+			"Analysis.queuedAt",
+			"Analysis.startedAt",
+			"Analysis.completedAt",
+			"Repository.name as repositoryName",
+			"User.login as owner"
+		).first();
+		
 	return analysisRow;
 }
 
 export default {
-	insert, update, getLatestId, get
+	insert, update, getLatest, get
 };

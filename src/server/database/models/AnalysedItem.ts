@@ -5,7 +5,7 @@
 // Imports
 import { getConnection } from "../";
 import { ContributorMap } from "../../analysis/blame";
-import { AdvancedLineStats, AnalysedItem, ContributorStats, ContributorStatsMap } from "../../analysis/Item";
+import { AdvancedLineStats, AnalysedItem, ContributorStats, ContributorStatsMap, ExtensionMap } from "../../analysis/Item";
 import { processFilePath } from "../../utils";
 import { DatabaseAnalysis } from "./Analysis";
 
@@ -395,15 +395,20 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 	// Get AggregateStats for the files in the folder.
 	let aggregateStats : DatabaseAnalysedItemAggregateStats[] = await connection("AnalysedItemAggregateStats").where({analysisId}).whereIn("path", pathsInFolder);
 
+	// Get AggregateFileTypes for the sub-folders.
+	let aggregateFileTypes : DatabaseAnalysedItemAggregateFileType[] = await connection("AnalysedItemAggregateFileType").where({analysisId}).whereIn("path", pathsInFolder);
+
 	// Loop through the items in the folder and aggregate each with the relevant data.
 	let results : AnalysedItem[] = itemsInFolder.map(item => {
 		// Create all the sub-items for the current item.
 		let itemContributorStats : ContributorStatsMap = {};
 		let itemAggregateStats : AdvancedLineStats = {};
+		let itemExtensionMap : ExtensionMap = {};
 		
-		// Get contributor data for the current item.
+		// Get data for the current item.
 		let itemContributorData = contributors.filter(contributor => contributor.path == item.path);
 		let itemAggregateStatsData = aggregateStats.filter(aggregate => aggregate.path == item.path);
+		let itemAggregateFileTypeData = aggregateFileTypes.filter(type => type.path == item.path);
 
 		// Loop through the contributors for this item.
 		itemContributorData.map(contributor => {
@@ -436,11 +441,20 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 			};
 		});
 
+		// Loop through the file types for this item.
+		if (!item.isFile) itemAggregateFileTypeData.map(type => {
+			itemExtensionMap[type.fileType] = {
+				numLines: type.numLines,
+				percentage: type.percentage
+			};
+		});
+
 		// Return complete AnalysedItem.
 		return {
 			path: item.path,
 			contributors: itemContributorStats,
 			aggregateLineStats: itemAggregateStats,
+			extensions: itemExtensionMap,
 			numLines: item.numLines,
 			isFile: item.isFile == true
 		};

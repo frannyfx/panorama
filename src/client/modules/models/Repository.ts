@@ -21,8 +21,10 @@ export interface Repository {
 		list: User[]	
 	},
 	updatedAt: Date,
-	lastAnalysis: {
-		id: number
+	analysis: {
+		id: number,
+		commitId?: string,
+		ticket?: string
 	},
 	content: {
 		loaded: boolean,
@@ -43,7 +45,7 @@ export interface RepositoryObject {
  * @param contributors Set of loaded contributors to show.
  * @returns A Repository object representing the input data.
  */
-export function toRepository(input: Data, contributors: Data[], analysisId: number) : Repository {
+export function toRepository(input: Data, contributors: Data[], analysis: Data | undefined = undefined) : Repository {
 	// Generate root directory file.
 	let root : File = {
 		type: "dir",
@@ -68,8 +70,9 @@ export function toRepository(input: Data, contributors: Data[], analysisId: numb
 			list: contributors.map(c => toUser(c))
 		},
 		updatedAt: new Date(input.pushed_at!),
-		lastAnalysis: {
-			id: analysisId
+		analysis: {
+			id: analysis!.analysisId,
+			commitId: analysis!.commitId
 		},
 		content: {
 			loaded: false,

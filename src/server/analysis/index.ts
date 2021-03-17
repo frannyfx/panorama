@@ -189,17 +189,21 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 	return cloneResult.result!.repository;
 }
 
+async function getLatestCommit(repository: Git.Repository) : Promise<Git.Commit> {
+	let branch = (await repository.getCurrentBranch()).shorthand();
+	let masterCommit = await repository.getBranchCommit(branch);
+	return masterCommit;
+}
+
 /**
  * Get files from the repository.
  * @param repository The repository to get the files from.
  * @param directory The directory to search.
  */
-function getRepoFiles(repository: Git.Repository) : Promise<string[] | null> {
+function getRepoFiles(commit: Git.Commit) : Promise<string[] | null> {
 	return new Promise(async resolve => {
 		// Get the main branch from the repo.
-		let branch = (await repository.getCurrentBranch()).shorthand();
-		let masterCommit = await repository.getBranchCommit(branch);
-		let fileTree = await masterCommit.getTree();
+		let fileTree = await commit.getTree();
 
 		// Explore the file tree.
 		let walker = fileTree.walk();
@@ -238,13 +242,18 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let repository = await getJobRepository(job);
 	if (!repository) return done(new Error("Could not retrieve the repository."));
 
+	// Set the repository commit ID being analysed.
+	let analysisCommit = await getLatestCommit(repository);
+	analysis.commitId = analysisCommit.id().tostrS();
+	Analysis.update(analysis);
+
 	// Set stage to lexing.
 	reportJobProgress(job, AnalysisStage.Lexing);
 	logger.info(`Lexing code from repository '${job.data.repository.full_name}'.`);
 
 	// Get the files from the repository.
 	// TODO: Filter .panoramaignore files.
-	let files = await getRepoFiles(repository);
+	let files = await getRepoFiles(analysisCommit);
 	if (!files) return done(new Error("Could not analyse repository files."));
 
 	// Get the repo directory.

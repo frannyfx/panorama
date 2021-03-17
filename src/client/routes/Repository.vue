@@ -9,7 +9,7 @@
 			</h3>
 			<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
 			<div class="files">
-				<div class="list-item first header">
+				<div class="list-item first header file-header">
 					<div class="breadcrumbs">
 						<transition-group name="breadcrumb">
 							<span v-for="(component, index) in breadcrumbs" :key="index + component">
@@ -21,6 +21,14 @@
 							</span>
 						</transition-group>
 					</div>
+					<transition-group name="type" tag="div" class="extensions">
+						<div v-for="type in repo.content.files[currentPath].analysis ? repo.content.files[currentPath].analysis.typeList : []" :key="type" class="extension" v-tooltip="{ theme: 'panorama', content: $store.state.Extensions.typeMap[type] ? $store.state.Extensions.typeMap[type].name : '' }">
+							<div class="extension-icon">
+								<img :src="$store.state.Extensions.typeMap[type] ? `${config.repositories.extensions.icons.path}/${$store.state.Extensions.typeMap[type].icon}.${config.repositories.extensions.icons.extension}` : ''">
+							</div>
+							<span class="percentage">{{Math.round(repo.content.files[currentPath].analysis.typeObject[type].percentage * 100)}}%</span>
+						</div>
+					</transition-group>
 				</div>
 				<transition name="list">
 					<repository-file-list-item
@@ -52,6 +60,7 @@ import Vue from "vue";
 import Store from "../store";
 
 // Modules
+import config from "../config";
 import { send, waitForAuth } from "../modules/API";
 import { i18n } from "../i18n";
 import { getEnrichedRepositoryContributors, getFiles, getRepository } from "../modules/GitHub";
@@ -101,7 +110,7 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 		let extensionSet = dedupe(validExtensions, (a: string, b: string) => a == b);
 
 		// Get the extension data.
-		let extensionData = await send(Method.GET, `extensions?list=${extensionSet.join(",")}`);
+		let extensionData = await send(Method.GET, `files/extensions?list=${extensionSet.join(",")}`);
 
 		// If the extension data was returned successfully, add them.
 		if (extensionData.status.ok) {
@@ -121,20 +130,34 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 			});
 		}
 	}
-	
+
 	// Get analysis data for the current folder.
 	let analysis : AnalysisMap = {};
-	if (repository.lastAnalysis.id != -1) {
+	if (repository.analysis.id != -1) {
 		// Send request
-		let analysisResult = await send(Method.GET, `analysis/${repository.lastAnalysis.id}?path=${path == '' ? '/' : path}`);
+		let analysisResult = await send(Method.GET, `analysis/${repository.analysis.id}/items?path=${path == '' ? '/' : path}&ticket=${repository.analysis.ticket!}`);
 
 		// If the request was successful, add converted analysis data to the object.
-		if (analysisResult.status.ok) Object.keys(analysisResult.result!).map(path => analysis[path] = toAnalysis(analysisResult.result![path]));
+		if (analysisResult.status.ok) {
+			Object.keys(analysisResult.result!).map(path => analysis[path] = toAnalysis(analysisResult.result![path]));
+
+			// Lookup unknown file types.
+			let typeSet : Set<string> = new Set();
+			Object.keys(analysis).map(path => analysis[path].typeList.map(type => typeSet.add(type)));
+			
+			// Remove known types.
+			let types = Array.from(typeSet).filter(type => !Extensions.state.typeMap[type]);
+
+			// Request types and add to store.
+			if (types.length > 0) {
+				let typeData = await send(Method.GET, `files/types?list=${types.join(",")}`);
+				if (typeData.status.ok) Store.commit("Extensions/addTypes", typeData.result!);
+			}
+		}
 	}
 
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });
-
 	return true;
 }
 
@@ -164,17 +187,17 @@ export default Vue.extend({
 			return parentPath;
 		},
 		currentFiles() : string[] {
-			let files : string[] = this.$store.state.Repositories.object[this.repoFullName].content.files[this.currentPath].children.list;
+			let files : string[] = this.repo.content.files[this.currentPath].children.list;
 			return files;
+		},
+		config() {
+			return config;
 		}
 	},
 	methods: {
 		async setPath(path: string) {
-			// Get current repository.
-			let repository : Repository = this.$store.state.Repositories.object[this.repoFullName];
-
 			// Get file for selected path and prevent navigation if it is not a directory.
-			let file = repository.content.files[path];
+			let file = this.repo.content.files[path];
 			if (file && file.type != "dir") return;
 
 			// Fetch the children first, before navigating. This allows the UI to update.
@@ -215,8 +238,18 @@ export default Vue.extend({
 			Store.commit("Repositories/addSingle", repository);
 		}
 
+		// Check if ticket has not yet been requested.
+		if (!repository.analysis.ticket && repository.analysis.id != -1) {
+			// Request analysis ticket for repository. (TODO: Handle failure).
+			let ticketResponse = await send(Method.GET, `analysis/${repository.analysis.id}/ticket`);
+			if (!ticketResponse.status.ok) return next(false);
+
+			// Set the ticket on the repository.
+			Store.commit("Repositories/setTicket", { repository, ticket: ticketResponse.result!.ticket });
+		}
+
 		// Check if enriched contributors have been fetched for the repository.
-		if (!repository.contributors.enriched && repository.lastAnalysis.id != -1) {
+		if (!repository.contributors.enriched && repository.analysis.id != -1) {
 			if (!await getEnrichedRepositoryContributors(repository)) {
 				// TODO: Handle failure.
 				return next(false);
@@ -321,6 +354,7 @@ export default Vue.extend({
 	}
 }
 
+/* Transitions */
 .breadcrumb-enter-active, .breadcrumb-leave-active {
 	transition: opacity .3s, transform .3s;
 	display: inline-block;
@@ -333,6 +367,69 @@ export default Vue.extend({
 
 .breadcrumb-enter-to, .breadcrumb-leave {
 	opacity: 1;
+}
+
+.type-enter-active, .type-leave-active, .type-move {
+	transition: all .5s;
+
+	* {
+		transition: margin-right .5s;
+	}
+}
+
+.type-enter, .type-leave-to {
+	opacity: 0;
+	max-width: 0;
+	margin-right: 0px !important;
+	transform: scale(0);
+
+	* {
+		margin-right: 0px;
+	}
+}
+
+.type-enter-to, .type-leave {
+	opacity: 1;
+	max-width: 63px;
+}
+
+.extensions {
+	display: flex;
+	align-items: center;
+
+	.extension {
+		display: flex;
+		align-items: center;
+
+		&:not(:last-child) {
+			margin-right: 10px;
+		}
+
+		.extension-icon {
+			width: 20px;
+			height: 20px;
+			margin-right: 10px;
+			position: relative;
+		}
+
+		img {
+			position: absolute;
+			margin-right: 10px;
+			width: 20px;
+		}
+
+		.percentage {
+			color: $grey-blue;
+			font-size: 0.8em;
+			font-weight: 600;
+		}
+	}
+}
+
+.file-header {
+	.breadcrumbs {
+		flex-grow: 1;
+	}
 }
 
 .files {

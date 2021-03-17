@@ -89,6 +89,10 @@ const mutations : MutationTree<RepositoriesState> = {
 			if (logins.indexOf(contributor.login) == -1) data.repository.contributors.list.push(contributor);
 		});
 	},
+	setTicket(state: RepositoriesState, data: { repository: Repository, ticket: string }) {
+		// Set analysis data retrieval ticket for repository.
+		data.repository.analysis.ticket = data.ticket;
+	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).
 		Object.keys(state.object).map(key => {

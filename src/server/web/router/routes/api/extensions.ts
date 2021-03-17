@@ -16,7 +16,7 @@ import DatabaseFileType from "../../../../database/models/FileType";
 
 let route : Array<Route> = [{
 	method: Method.GET,
-	url: "/api/extensions",
+	url: "/api/files/extensions",
 	schemas: {
 		query: Joi.object({
 			list: Joi.string()
@@ -29,6 +29,22 @@ let route : Array<Route> = [{
 		// Lookup extensions.
 		let extensionsMap = await DatabaseFileType.lookupExtensions(extensions);
 		send(response, Codes.OK, extensionsMap);
+	}
+}, {
+	method: Method.GET,
+	url: "/api/files/types",
+	schemas: {
+		query: Joi.object({
+			list: Joi.string()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		// Split types by commas.
+		let types = request.query!.list.split(",");
+
+		// Lookup types.
+		let typeMap = await DatabaseFileType.lookupTypes(types);
+		send(response, Codes.OK, typeMap);
 	}
 }];
 
