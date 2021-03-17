@@ -11,20 +11,22 @@
 				<span>{{ file.name }}</span>
 			</div>
 			<div class="actions">
-				<button class="action clean"
-					:class="{ enabled: viewSource.enabled }"
-					@click="toggleViewSource"
-					:disabled="!canViewSource || !canNotViewSource"
-					v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewSource') }">
-					<font-awesome-icon icon="code"/>
-				</button>
-				<button class="action clean" 
-					:class="{ enabled: viewStats.enabled }"
-					@click="toggleViewStats"
-					:disabled="!canViewStats"
-					v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewStats') }">
-					<font-awesome-icon icon="eye"/>
-				</button>
+				<div v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewSource') }">
+					<button class="action clean"
+						:class="{ enabled: viewSource.enabled }"
+						@click="toggleViewSource"
+						:disabled="!canViewSource || !canNotViewSource">
+						<font-awesome-icon icon="code"/>
+					</button>
+				</div>
+				<div v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewStats') }">
+					<button class="action clean" 
+						:class="{ enabled: viewStats.enabled }"
+						@click="toggleViewStats"
+						:disabled="!canViewStats">
+						<font-awesome-icon icon="eye"/>
+					</button>
+				</div>
 			</div>
 		</div>
 		<div class="file-viewer list-item">
