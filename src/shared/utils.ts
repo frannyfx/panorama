@@ -20,3 +20,28 @@ export function sleep(length: number) : Promise<void> {
 export function dedupe<T>(list: T[], comparator: (a: T, b: T) => boolean) : T[] {
 	return list.filter((v, i, a) => a.findIndex(t => comparator(t, v)) === i);
 }
+
+/**
+ * Convert file size to a human readable string with an appropriate unit.
+ * @param bytes The number of bytes.
+ * @param decimalPlaces The number of decimal places to show.
+ * @returns The string representation of a file size.
+ */
+export function humanFileSize(bytes: number, decimalPlaces: number = 0) : string {
+	// Units array.
+	const units = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+	const r = 10**decimalPlaces;
+
+	// Do not deal with sizes less than 1024 bytes.
+	if (bytes < 1024) return `${bytes} B`;
+
+	// Loop through the units.
+	let finalIndex = 0;
+	for (var i = 0; i < units.length; i++) {
+		bytes /= 1024;
+		finalIndex = i;
+		if (Math.round(Math.abs(bytes) * r) / r < 1024) break;
+	}
+
+	return `${bytes.toFixed(decimalPlaces)} ${units[finalIndex]}`;
+}

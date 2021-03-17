@@ -13,6 +13,7 @@ export interface File {
 	name: string,
 	path: string,
 	parent?: File,
+	size: number,
 	children: {
 		loaded: boolean,
 		loading: boolean,
@@ -37,6 +38,7 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 		name: input.name,
 		path: input.path,
 		parent,
+		size: input.size,
 		children: {
 			loaded: false,
 			loading: false,

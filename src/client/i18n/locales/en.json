@@ -109,6 +109,7 @@
 		"fileViewer": {
 			"viewSource": "View source",
 			"viewStats": "View stats",
+			"fileSize": "File size",
 			"fileOfType": "{0} file",
 			"file": "File"
 		}

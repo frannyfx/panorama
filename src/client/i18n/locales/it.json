@@ -109,6 +109,7 @@
 		"fileViewer": {
 			"viewSource": "Mostra sorgente",
 			"viewStats": "Mostra statistiche",
+			"fileSize": "Dimensione del file",
 			"fileOfType": "File {0}",
 			"file": "File"
 		}

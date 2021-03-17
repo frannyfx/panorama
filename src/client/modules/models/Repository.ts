@@ -52,6 +52,7 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 		type: "dir",
 		name: "root",
 		path: "",
+		size: 0,
 		children: {
 			loaded: false,
 			loading: false,
