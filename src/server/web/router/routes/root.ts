@@ -15,7 +15,7 @@ const config : Config = loadConfig();
 // Modules
 import getRoot from "../../../utils/root";
 import { Method } from "../../../../shared/Method";
-import { Route } from "../Route";
+import { Request, Route } from "../Route";
 import { getValidLocales } from "../..";
 
 /**
@@ -65,6 +65,17 @@ let routes : Array<Route> = [{
 		})
 	},
 	handler: getIndex
+}, {
+	method: Method.GET,
+	url: "/:locale/error",
+	schemas: {
+		params: Joi.object({
+			locale: Joi.string().valid(...getValidLocales())
+		})
+	},
+	handler: (request: Request, response: any) => {
+		response.redirect(`/${request.params!.locale}`);
+	}
 }];
 
 export default routes;

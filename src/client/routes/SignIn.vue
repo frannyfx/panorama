@@ -97,9 +97,7 @@ export default Vue.extend({
 
 		// If we're authenticated, redirect to dashboard.
 		if (Store.state.auth.status) return next({ name: "dashboard", params: { locale: i18n.locale } });
-		next(vm => {
-			vm.$store.commit("setLoading", false);
-		});
+		next(vm => vm.$store.commit("setLoading", false));
 	},
 	mounted: async function() {
 		// Add event listener to receive data from pop-up.

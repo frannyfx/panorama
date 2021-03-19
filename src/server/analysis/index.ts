@@ -9,6 +9,7 @@ import path from "path";
 import BeeQueue from "bee-queue";
 import Git, { Branch } from "nodegit";
 import util from "util";
+import GitIgnoreParser from "gitignore-parser";
 
 // Config
 import loadConfig, { Config } from "../Config";
@@ -32,6 +33,7 @@ import { getRepositoryContributors } from "../github";
 import { insertOrUpdate } from "../database/models/AnalysisContributor";
 import { dedupe, lerp } from "../../shared/utils";
 import { extractVibrant } from "./colours";
+
 /**
  * Start the analysis system.
  */
@@ -228,6 +230,22 @@ function getRepoFiles(commit: Git.Commit) : Promise<string[] | null> {
 }
 
 /**
+ * Filter out files specified in .panoramaignore.
+ * @param files The files to apply the filter to.
+ * @param repoDir The directory where the repository is stored.
+ */
+async function filterIgnoredFiles(files: string[], repoDir: string) : Promise<string[]> {
+	try {
+		// Load .panoramaignore
+		let panoramaIgnore = (await fs.readFile(path.join(repoDir, ".panoramaignore"))).toString("utf-8");
+		let compiled = GitIgnoreParser.compile(panoramaIgnore);
+		return files.filter(compiled.accepts);
+	} catch (e) {
+		return files;
+	}
+}
+
+/**
  * Handler for analysing a queued repository.
  * @param job The job queued and the repository's data.
  * @param done Callback for when the job is complete.
@@ -263,13 +281,15 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	reportJobProgress(job, AnalysisStage.Lexing);
 	logger.info(`Lexing code from repository '${job.data.repository.full_name}'.`);
 
-	// Get the files from the repository.
-	// TODO: Filter .panoramaignore files.
-	let files = await getRepoFiles(analysisCommit);
-	if (!files) throw new Error("Could not analyse repository files.");
-
 	// Get the repo directory.
 	let repoDir = path.join(getCacheDir(), job.data.repository.full_name);
+
+	// Get the files from the repository.
+	var files = await getRepoFiles(analysisCommit);
+	if (!files) throw new Error("Could not analyse repository files.");
+
+	// Filter files specified in .panoramaignore.
+	files = await filterIgnoredFiles(files, repoDir);
 
 	// Create list to hold the results of the analysis of each file.
 	let analysisResults : AnalysedItem[] = [];

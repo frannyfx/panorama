@@ -15,6 +15,7 @@ import Repositories from "./modules/Repositories";
 import Modals from "./modules/Modals";
 import Extensions from "./modules/Extensions";
 import Users from "./modules/Users";
+import { Error } from "../modules/Error";
 
 // Use plugin
 Vue.use(Vuex);
@@ -34,6 +35,9 @@ export interface RootState {
 		avatarUrl: string,
 		name: string,
 		email: string
+	},
+	error: {
+		name?: Error
 	}
 };
 
@@ -52,7 +56,8 @@ const state : RootState = {
 		avatarUrl: "",
 		name: "",
 		email: ""
-	}
+	},
+	error: {}
 };
 
 // Store mutations.
@@ -78,6 +83,9 @@ const mutations : MutationTree<RootState> = {
 		state.user.avatarUrl = user.avatar_url;
 		state.user.name = user.name;
 		state.user.email = user.email;
+	},
+	setError(state: RootState, error: Error) {
+		state.error.name = error;
 	},
 	clear(state : RootState) {
 		// TODO: ...

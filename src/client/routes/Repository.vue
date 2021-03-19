@@ -1,5 +1,5 @@
 <template>
-	<div class="page nav no-select">
+	<div class="page nav">
 		<div class="content container">
 			<div class="header">
 				<div class="title">
@@ -21,8 +21,7 @@
 					</button>
 				</div>
 			</div>
-			
-			<div class="files">
+			<div class="files no-select">
 				<div class="list-item first header margins file-header">
 					<div class="breadcrumbs">
 						<transition-group name="breadcrumb">
@@ -92,6 +91,8 @@ import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
+import { Error, showError } from "../modules/Error";
+import { createI18NAlert } from "../modules/Notifications";
 
 /**
  * Get analysis data for a path.
@@ -149,7 +150,6 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 	if (!repository) return false;
 
 	// If the directory does not yet exist, fetch upwards until necessary.
-	// TODO: This may not necessarily be required.
 	let parentDirectory = repository.content.files[path];
 	if (!parentDirectory) {
 		let pathSplit = path.split("/");
@@ -321,22 +321,22 @@ export default Vue.extend({
 	async beforeRouteEnter(to: any, from: any, next: Function) {
 		// Set loading.
 		Store.commit("setLoading", true);
-		
+
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
-		if (!Store.state.auth.status) return next({
-			name: "sign-in",
-			params: {
-				locale: i18n.locale
-			}
-		});
+		if (!Store.state.auth.status) return next({ name: "sign-in", params: { locale: i18n.locale } });
 
 		// Check if repository already exists in the Repositories state object.
 		var repository = Repositories.state.object[`${to.params.owner}/${to.params.repo}`];
 		if (!repository) {
-			// Fetch the requested repository. (TODO: Handle failure).
+			// Fetch the requested repository.
 			let fetchedRepository = await getRepository(to.params.owner, to.params.repo);
-			if (!fetchedRepository) return next(false);
+			if (!fetchedRepository) {
+				createI18NAlert("WARNING", "repoFetchFailed");
+				return next({ name: "dashboard", params: { locale: i18n.locale } });
+			}
+
+			// Set the repository to the new fetched repo.
 			repository = fetchedRepository;
 
 			// Add the repository to the store.
@@ -345,25 +345,30 @@ export default Vue.extend({
 
 		// Check if ticket has not yet been requested.
 		if (!repository.analysis.ticket && repository.analysis.id != -1) {
-			if (!await getTicket(repository)) return next(false);
+			// If fetching the ticket fails, show an error and remove analysis from repository.
+			if (!await getTicket(repository)) {
+				createI18NAlert("WARNING", "ticketFetchFailed");
+				Store.commit("Repositories/setAnalysis", { repository, analysis: { id: -1 }})
+			} 
 		}
 
 		// Check if enriched contributors have been fetched for the repository.
 		if (!repository.contributors.enriched && repository.analysis.id != -1) {
 			if (!await getEnrichedRepositoryContributors(repository)) {
-				// TODO: Handle failure.
-				return next(false);
+				createI18NAlert("WARNING", "repoFetchFailed");
+				return next({ name: "dashboard", params: { locale: i18n.locale } });
 			}
 		}
 
 		// Load files from the root directory if necessary.
 		let addFileChildrenResult = await addFileChildren(to.params.owner, to.params.repo, to.query.path ? to.query.path : "");
-		if (!addFileChildrenResult) return next(false);
+		if (!addFileChildrenResult) {
+			createI18NAlert("WARNING", "repoFetchFailed");
+			return next({ name: "dashboard", params: { locale: i18n.locale } });
+		}
 
 		// Set loading to false.
-		next((vm: any) => {
-			vm.$store.commit("setLoading", false);
-		});
+		next((vm: any) => vm.$store.commit("setLoading", false));
 	}
 });
 </script>
@@ -414,14 +419,7 @@ export default Vue.extend({
 			margin: 0px;
 		}
 	}
-
-	> .details {
-
-	}
 }
-
-
-
 
 .breadcrumbs {
 	display: flex;

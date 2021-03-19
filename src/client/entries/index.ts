@@ -24,6 +24,7 @@ const SignIn = () => import(/* webpackChunkName: "sign-in" */ /* webpackMode: "l
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ /* webpackMode: "lazy" */  "../routes/Dashboard.vue");
 const Test = () => import(/* webpackChunkName: "test" */ /* webpackMode: "lazy" */  "../routes/Test.vue");
 const Repository = () => import(/* webpackChunkName: "repository" */ /* webpackMode: "lazy" */ "../routes/Repository.vue");
+const Error = () => import(/* webpackChunkName: "error" */ /* webpackMode: "lazy" */ "../routes/Error.vue");
 
 // Set up plugins.
 Vue.use(VueRouter);
@@ -57,12 +58,11 @@ const routes = [{
 	path: "/:locale/repo/:owner/:repo/",
 	component: Repository,
 	name: "repo"
-}, /*, {
-	path: "/:locale/repo/:owner/:repo/path/",
-	component: Repository,
-	name: "repo-path",
-	props: (route : any) => ({ query: route.query.q })
-}*/];
+}, {
+	path: "/:locale/error",
+	component: Error,
+	name: "error"
+}];
 
 const router = new VueRouter({
 	mode: "history",

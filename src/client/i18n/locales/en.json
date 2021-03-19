@@ -28,6 +28,9 @@
 			"reAnalyse": "Re-analyse",
 			"analysisInProgress": "Analysing...",
 			"analysed": "Analysed"
+		},
+		"error": {
+			"refresh": "Refresh"
 		}
 	},
 	"alerts": {
@@ -44,6 +47,10 @@
 			"description": "Something went wrong. Please try again later."
 		},
 		"repoFetchFailed": {
+			"title": "Unable to fetch repository.",
+			"description": "Something went wrong. Please try again later."
+		},
+		"reposFetchFailed": {
 			"title": "Unable to fetch repositories.",
 			"description": "Something went wrong. Please try again later."
 		},
@@ -56,6 +63,10 @@
 				"Finalising": "Almost done...",
 				"Done": "Done."
 			}
+		},
+		"ticketFetchFailed": {
+			"title": "Unable to fetch analysis data for the repository.",
+			"description": "Something went wrong. Please try again later."
 		},
 		"analysisQueueFailed": {
 			"title": "Unable to queue {0} for analysis.",
@@ -124,6 +135,12 @@
 			"fileSize": "File size",
 			"fileOfType": "{0} file",
 			"file": "File"
+		}
+	},
+	"errors": {
+		"general": {
+			"title": "An error occurred.",
+			"description": "Something went wrong. Please try again later."
 		}
 	}
 }

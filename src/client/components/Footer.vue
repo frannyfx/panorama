@@ -1,5 +1,5 @@
 <template>
-	<div class="footer">
+	<div class="footer no-select">
 		<div class="line"></div>
 		<font-awesome-icon icon="eye"/>
 		<div class="line"></div>

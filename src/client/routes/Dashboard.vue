@@ -36,7 +36,7 @@ import Repositories from "../store/modules/Repositories";
 // Modules
 import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
-import { send, waitForAuth } from "../modules/API";
+import { clearAuthenticationData, send, waitForAuth } from "../modules/API";
 import { addNotification, createI18NAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
@@ -72,7 +72,7 @@ export default Vue.extend({
 
 			// Fetch more repos and handle error.
 			let repos : Repository[] | null = await getRepositories(this.$store.state.Repositories.page + 1);
-			if (!repos) return createI18NAlert("WARNING", "repoFetchFailed");
+			if (!repos) return createI18NAlert("WARNING", "reposFetchFailed");
 
 			// Add the loaded repositories to the store.
 			this.$store.commit("Repositories/add", { repositories: repos, page: this.$store.state.Repositories.page + 1 });
@@ -84,12 +84,7 @@ export default Vue.extend({
 	async beforeRouteEnter (to, from, next) {
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
-		if (!Store.state.auth.status) return next({
-			name: "sign-in",
-			params: {
-				locale: i18n.locale
-			}
-		});
+		if (!Store.state.auth.status) return next({ name: "sign-in", params: { locale: i18n.locale } });
 
 		// Load repos if they have not yet been loaded.
 		var repos : Repository[] | null = null;
@@ -100,9 +95,9 @@ export default Vue.extend({
 
 			// Handle repo fetch error.
 			if (!repos) {
-				createI18NAlert("WARNING", "repoFetchFailed");
-				next(false);
-				return;
+				createI18NAlert("WARNING", "reposFetchFailed");
+				clearAuthenticationData();
+				return next({ name: "sign-in", params: { locale: i18n.locale } });
 			}
 
 			// Add the loaded repositories.
@@ -113,9 +108,7 @@ export default Vue.extend({
 		}
 		
 		// Navigate once the repositories have been added.
-		next(vm => {
-			vm.$store.commit("setLoading", false);
-		});
+		next(vm => vm.$store.commit("setLoading", false));
 	}
 });
 </script>
