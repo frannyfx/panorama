@@ -11,10 +11,10 @@ const logger = require("../../utils/logger")("lexer");
  * The type of code that a token has matched.
  */
 export enum TokenType {
-	Documentation,
-	Code,
-	Whitespace,
-	String
+	Documentation = 0,
+	Code = 1,
+	Whitespace = 2,
+	String = 3
 };
 
 // Interfaces

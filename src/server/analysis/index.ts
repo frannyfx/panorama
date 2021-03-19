@@ -220,7 +220,7 @@ function getRepoFiles(commit: Git.Commit) : Promise<string[] | null> {
  * @param job The job queued and the repository's data.
  * @param done Callback for when the job is complete.
  */
-export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) {
+export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) : Promise<RepoJobResult> {
 	logger.info(`Analysing repository '${job.data.repository.full_name}'.`);
 
 	// Fix badly parsed date (BeeQueue serialisation error due to Redis? TODO: Look into this).
@@ -240,7 +240,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 	// Get the repository.
 	let repository = await getJobRepository(job);
-	if (!repository) return done(new Error("Could not retrieve the repository."));
+	if (!repository) throw new Error("Could not retrieve the repository.");
 
 	// Set the repository commit ID being analysed.
 	let analysisCommit = await getLatestCommit(repository);
@@ -254,7 +254,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	// Get the files from the repository.
 	// TODO: Filter .panoramaignore files.
 	let files = await getRepoFiles(analysisCommit);
-	if (!files) return done(new Error("Could not analyse repository files."));
+	if (!files) throw new Error("Could not analyse repository files.");
 
 	// Get the repo directory.
 	let repoDir = path.join(getCacheDir(), job.data.repository.full_name);
@@ -328,9 +328,12 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 		// Call the job completion callback returning the analysis ID.
 		logger.success(`Successfully completed analysis ${analysis.analysisId!} of '${job.data.repository.full_name}'.`);
-		done(null, { analysisId: analysis.analysisId! });
+		return { 
+			analysisId: analysis.analysisId!,
+			commitId: analysis.commitId!
+		};
 	} catch (e) {
-		done(new Error("Database insertion failed."));
+		throw new Error("Database insertion failed.");
 	}
 }
 

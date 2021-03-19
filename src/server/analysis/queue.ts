@@ -24,7 +24,8 @@ export interface RepoJob {
 };
 
 export interface RepoJobResult {
-	analysisId: number
+	analysisId: number,
+	commitId: string
 };
 
 // Connection and queue

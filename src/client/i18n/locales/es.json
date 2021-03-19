@@ -23,10 +23,17 @@
 		"repo": {
 			"noDescription": "Sin descripción.",
 			"public": "Público",
-			"private": "Privado"
+			"private": "Privado",
+			"analyse": "Analyse",
+			"analysisInProgress": "Analysing...",
+			"analysed": "Analysed"
 		}
 	},
 	"alerts": {
+		"generalError": {
+			"title": "Something went wrong.",
+			"description": "Please try again later."
+		},
 		"signInFailed": {
 			"title": "No has efectuado el acceso.",
 			"description": "Efectuar el acceso con GitHub para utilisar Panorama."

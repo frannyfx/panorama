@@ -37,7 +37,7 @@ import Repositories from "../store/modules/Repositories";
 import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
 import { send, waitForAuth } from "../modules/API";
-import { addNotification, createAlert } from "../modules/Notifications";
+import { addNotification, createI18NAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
 import { subscribeToJobProgress } from "../modules/Queue";
@@ -63,35 +63,7 @@ export default Vue.extend({
 	},
 	methods: {
 		getRepo(repo: Repository) {
-			// Create a modal if the repository has not yet been analysed.
-			if (repo.analysis.id == -1) {
-				createCustomModal({
-					title: this.$i18n.t("modals.custom.repoNotAnalysed.title").toString(),
-					description: this.$i18n.t("modals.custom.repoNotAnalysed.description", [repo.fullName]).toString(),
-					icon: ["fab", "github"],
-					theme: "NORMAL",
-					actions: [{
-						type: "NORMAL",
-						id: "CANCEL",
-						icon: ["fas", "chevron-left"],
-						content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.cancel").toString(),
-					}, {
-						type: "PRIMARY",
-						id: "OK",
-						icon: ["fas", "check"],
-						content: () => this.$i18n.t("modals.custom.repoNotAnalysed.actions.analyseRepo").toString()
-					}]
-				}, (modal : Modal, actionId: string) => {
-					// If user does not want to analyse the repo, return.
-					if (actionId != "OK") return;
-					
-					// Otherwise, push the repo onto the router and analyse it.
-					// TODO: Send analysis request.
-					this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
-				});
-			} else {
-				this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
-			}
+			this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
 		},
 		async loadMoreRepos() {
 			// Check and set flag.
@@ -100,7 +72,7 @@ export default Vue.extend({
 
 			// Fetch more repos and handle error.
 			let repos : Repository[] | null = await getRepositories(this.$store.state.Repositories.page + 1);
-			if (!repos) return createAlert("WARNING", this.$i18n.t("alerts.repoFetchFailed.title").toString(), this.$i18n.t("alerts.repoFetchFailed.description").toString());
+			if (!repos) return createI18NAlert("WARNING", "repoFetchFailed");
 
 			// Add the loaded repositories to the store.
 			this.$store.commit("Repositories/add", { repositories: repos, page: this.$store.state.Repositories.page + 1 });
@@ -128,7 +100,7 @@ export default Vue.extend({
 
 			// Handle repo fetch error.
 			if (!repos) {
-				createAlert("WARNING", i18n.t("alerts.repoFetchFailed.title").toString(), i18n.t("alerts.repoFetchFailed.description").toString());
+				createI18NAlert("WARNING", "repoFetchFailed");
 				next(false);
 				return;
 			}

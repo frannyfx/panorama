@@ -23,10 +23,17 @@
 		"repo": {
 			"noDescription": "No description.",
 			"public": "Public",
-			"private": "Private"
+			"private": "Private",
+			"analyse": "Analyse",
+			"analysisInProgress": "Analysing...",
+			"analysed": "Analysed"
 		}
 	},
 	"alerts": {
+		"generalError": {
+			"title": "Something went wrong.",
+			"description": "Please try again later."
+		},
 		"signInFailed": {
 			"title": "You did not sign in.",
 			"description": "Please sign in with GitHub to use Panorama."
@@ -48,6 +55,10 @@
 				"Finalising": "Almost done...",
 				"Done": "Done."
 			}
+		},
+		"analysisQueueFailed": {
+			"title": "Unable to queue {0} for analysis.",
+			"description": "Something went wrong. Please try again later."
 		},
 		"jobProgressSubscriptionFailed": {
 			"title": "Failed to subscribe to repo updates.",

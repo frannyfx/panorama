@@ -4,12 +4,13 @@
  */
 
 // Modules
-import { addNotification, createAlert, Notification, NotificationData, toggleNotificationExpiry } from "./Notifications";
+import { addNotification, createI18NAlert, Notification, NotificationData, toggleNotificationExpiry } from "./Notifications";
 import { i18n } from "../i18n";
 import { Response } from "../../shared/Response";
 import Store from "../store";
 import Notifications from "../store/modules/Notifications";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
+import { Data } from "../../shared/Result";
 
 // Interfaces
 interface NotificationMap {
@@ -20,11 +21,15 @@ interface QueueJob {
 	jobId: string,
 	repositoryName: string,
 	notificationId: string,
+	successCallback?: JobSuccessCallback,
+	failureCallback?: Function
 };
 
 interface JobMap {
 	[key: string]: QueueJob
 };
+
+type JobSuccessCallback = (result: Data) => unknown;
 
 // Variables
 let socket : WebSocket | null = null;
@@ -59,10 +64,8 @@ async function onMessage(event : MessageEvent) {
 	try {
 		data = JSON.parse(event.data);
 	} catch (e) {
-		console.warn("Invalid data received from server.");
+		return console.warn("Invalid data received from server.");
 	}
-
-	console.log("New progress", data);
 
 	// Fail if data was invalid.
 	if (!data || !data.status.ok || !subscribedJobs[data.result!.jobId]) return;
@@ -78,12 +81,16 @@ async function onMessage(event : MessageEvent) {
 		// Make dismissable and enable the expiry in the data section to prevent hoevering from glitching out.
 		Store.commit("Notifications/setDismissable", { id: notification.id, dismissable: true });
 		Store.commit("Notifications/setDataExpiry", { id: notification.id, expiry: true });
-
+		
 		// Toggle expiry.
 		toggleNotificationExpiry(notification, true);
 
 		// Remove the job from the list of subscribed jobs.
 		delete subscribedJobs[job.jobId];
+
+		// Call callbacks.
+		if (data.result!.status == "succeeded" && job.successCallback) job.successCallback(data.result!.result);
+		if (data.result!.status == "failed" && job.failureCallback) job.failureCallback();
 	}
 
 	// Check if the job has failed.
@@ -91,7 +98,7 @@ async function onMessage(event : MessageEvent) {
 		console.warn("Job failed!", job.jobId);
 		
 		// Create localised alert.
-		createAlert("WARNING", i18n.t("alerts.analysisFailed.title").toString(), i18n.t("alerts.analysisFailed.description", [job.repositoryName]).toString());
+		createI18NAlert("WARNING", "analysisFailed");
 		return;
 	}
 
@@ -131,10 +138,10 @@ async function getSocket() : Promise<WebSocket | null> {
  * @param ticket The ticket to access the job information.
  * @param accessToken The user's access token.
  */
-export async function subscribeToJobProgress(name: string, jobId: string, ticket: string, accessToken: string) {
+export async function subscribeToJobProgress(name: string, jobId: string, ticket: string, accessToken: string, successCallback: JobSuccessCallback | undefined = undefined, failureCallback: Function | undefined = undefined) {
 	// Connect the WebSocket. If failure occurs, show error.
 	let socket = await getSocket();
-	if (!socket) return createAlert("WARNING", i18n.t("analysis.jobProgressSubscriptionFailed.title").toString(), i18n.t("analysis.jobProgressSubscriptionFailed.description").toString());
+	if (!socket) return createI18NAlert("WARNING", "jobProgressSubscriptionFailed");
 	
 	// Send ticket and access token over the socket.
 	socket.send(JSON.stringify({
@@ -158,6 +165,8 @@ export async function subscribeToJobProgress(name: string, jobId: string, ticket
 	subscribedJobs[jobId] = {
 		jobId,
 		repositoryName: name,
-		notificationId
+		notificationId,
+		successCallback,
+		failureCallback
 	};
 }

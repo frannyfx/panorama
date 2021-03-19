@@ -28,6 +28,22 @@ import DatabaseAnalysedItem from "../../../../../database/models/AnalysedItem";
 import DatabaseAnalysisContributor from "../../../../../database/models/AnalysisContributor";
 import { AnalysedItem } from "../../../../../analysis/Item";
 
+/**
+ * Validate a user's ticket to access an analysis.
+ * @param analysisId The ID of the analysis data being requested.
+ * @param accessToken The user's access tkoen.
+ * @param userTicket The user's ticket.
+ * @returns Whether the validation was successful.
+ */
+async function verifyTicket(analysisId: number, accessToken: string, userTicket: string) : Promise<boolean> {
+	// Check ticket to prevent checking ownership every time.
+	let ticketValidation = await ticket.verify(userTicket);
+	if (!ticketValidation.ok) return false;
+
+	// Check ticket information matches requested analysis ID and access token.
+	return ticketValidation.decoded!.analysisId == analysisId && ticketValidation.decoded!.accessTokenHash == crypto.createHash("sha256").update(accessToken).digest("hex");
+}
+
 let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/repo/:owner/:repo/analysis",
@@ -129,13 +145,8 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		// Check ticket to prevent checking ownership every time.
-		let ticketValidation = await ticket.verify(request.query!.ticket);
-		if (!ticketValidation.ok) return send(response, Codes.Forbidden);
-
-		// Check ticket information matches requested analysis ID and access token.
-		if (ticketValidation.decoded!.analysisId != request.params!.id || ticketValidation.decoded!.accessTokenHash != crypto.createHash("sha256").update(request.auth!.token!).digest("hex"))
-			return send(response, Codes.Forbidden);
+		// Verify the ticket provided.
+		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
 
 		// Get the files in the current folder.
 		let analysisItems = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
@@ -146,6 +157,27 @@ let route : Array<Route> = [{
 
 		// Return the object.
 		send(response, Codes.OK, analysisObject);
+	}
+}, {
+	method: Method.GET,
+	url: "/api/analysis/:id/chunks",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			id: Joi.number()
+		}),
+		query: Joi.object({
+			path: Joi.string().required(),
+			ticket: Joi.string().required()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		// Verify the ticket provided.
+		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
+
+		// Get the file's analysis chunks.
+		//let fileChunks = await DatabaseAnalysedItem.getChunks(request.params!.id, request.query!.path);
+		send(response, Codes.OK);
 	}
 }, {
 	method: Method.PUT,

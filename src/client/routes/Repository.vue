@@ -1,13 +1,24 @@
 <template>
 	<div class="page nav no-select">
 		<div class="content container">
-			<h3 class="title">
-				<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('routes.repo.private') : $t('routes.repo.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
-				<span class="minor">{{$route.params.owner}}</span>
-				<span class="separator">/</span>
-				<span class="major">{{$route.params.repo}}</span>
-			</h3>
-			<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
+			<div class="header">
+				<div class="title">
+					<h3>
+						<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('routes.repo.private') : $t('routes.repo.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
+						<span class="minor">{{$route.params.owner}}</span>
+						<span class="separator">/</span>
+						<span class="major">{{$route.params.repo}}</span>
+					</h3>
+					<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
+				</div>
+				<div class="actions">
+					<button class="primary" @click="analyseRepo" :disabled="repo.analysis.id != -1 || repo.analysis.inProgress">
+						<font-awesome-icon :icon="repo.analysis.id == -1 ? repo.analysis.inProgress ? 'sync' : 'chevron-right' : 'check'" :spin="repo.analysis.inProgress"/>
+						<span>{{ repo.analysis.id == -1 ? repo.analysis.inProgress ? $t("routes.repo.analysisInProgress") : $t("routes.repo.analyse") : $t("routes.repo.analysed") }}</span>
+					</button>
+				</div>
+			</div>
+			
 			<div class="files">
 				<div class="list-item first header margins file-header">
 					<div class="breadcrumbs">
@@ -62,7 +73,7 @@ import Store from "../store";
 
 // Modules
 import config from "../config";
-import { send, waitForAuth } from "../modules/API";
+import { analyseRepo, send, waitForAuth } from "../modules/API";
 import { i18n } from "../i18n";
 import { getEnrichedRepositoryContributors, getFiles, getRepository } from "../modules/GitHub";
 import Repositories from "../store/modules/Repositories";
@@ -78,6 +89,53 @@ import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
+
+/**
+ * Get analysis data for a path.
+ * @param repository The repository to fetch analysis data from.
+ * @param path The path to fetch data for.
+ */
+async function getAnalysisData(repository: Repository, path: string) : Promise<AnalysisMap> {
+	// Get analysis data for the current folder.
+	let analysis : AnalysisMap = {};
+	if (repository.analysis.id != -1) {
+		// Send request
+		let analysisResult = await send(Method.GET, `analysis/${repository.analysis.id}/items?path=${path == '' ? '/' : path}&ticket=${repository.analysis.ticket!}`);
+
+		// If the request was successful, add converted analysis data to the object.
+		if (analysisResult.status.ok) {
+			Object.keys(analysisResult.result!).map(path => analysis[path] = toAnalysis(analysisResult.result![path]));
+
+			// Lookup unknown file types.
+			let typeSet : Set<string> = new Set();
+			Object.keys(analysis).map(path => analysis[path].typeList.map(type => typeSet.add(type)));
+			
+			// Remove known types.
+			let types = Array.from(typeSet).filter(type => !Extensions.state.typeMap[type]);
+
+			// Request types and add to store.
+			if (types.length > 0) {
+				let typeData = await send(Method.GET, `files/types?list=${types.join(",")}`);
+				if (typeData.status.ok) Store.commit("Extensions/addTypes", typeData.result!);
+			}
+		}
+	}
+
+	return analysis;
+}
+
+/**
+ * 
+ */
+async function getTicket(repository: Repository) : Promise<boolean> {
+	// Request analysis ticket for repository.
+	let ticketResponse = await send(Method.GET, `analysis/${repository.analysis.id}/ticket`);
+	if (!ticketResponse.status.ok) return false;
+
+	// Set the ticket on the repository.
+	Store.commit("Repositories/setTicket", { repository, ticket: ticketResponse.result!.ticket });
+	return true;
+}
 
 /**
  * Load children for a path.
@@ -133,30 +191,8 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 		}
 	}
 
-	// Get analysis data for the current folder.
-	let analysis : AnalysisMap = {};
-	if (repository.analysis.id != -1) {
-		// Send request
-		let analysisResult = await send(Method.GET, `analysis/${repository.analysis.id}/items?path=${path == '' ? '/' : path}&ticket=${repository.analysis.ticket!}`);
-
-		// If the request was successful, add converted analysis data to the object.
-		if (analysisResult.status.ok) {
-			Object.keys(analysisResult.result!).map(path => analysis[path] = toAnalysis(analysisResult.result![path]));
-
-			// Lookup unknown file types.
-			let typeSet : Set<string> = new Set();
-			Object.keys(analysis).map(path => analysis[path].typeList.map(type => typeSet.add(type)));
-			
-			// Remove known types.
-			let types = Array.from(typeSet).filter(type => !Extensions.state.typeMap[type]);
-
-			// Request types and add to store.
-			if (types.length > 0) {
-				let typeData = await send(Method.GET, `files/types?list=${types.join(",")}`);
-				if (typeData.status.ok) Store.commit("Extensions/addTypes", typeData.result!);
-			}
-		}
-	}
+	// Get analysis data for the current children.
+	let analysis = await getAnalysisData(repository, path);
 
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });
@@ -169,6 +205,24 @@ export default Vue.extend({
 		RepositoryFileListItem,
 		FileViewer,
 		ContentFooter
+	},
+	watch: {
+		"repo.analysis.id": async function (to: number, from: number) {
+			// Analysis completed successfully.
+			if (from == -1 && to != -1) {
+				// Reset repository content data.
+				Store.commit("Repositories/resetChildren", this.repo);
+
+				// Fetch analysis ticket.
+				await getTicket(this.repo);
+
+				// Get enriched collaborators.
+				await getEnrichedRepositoryContributors(this.repo);
+
+				// Fetch children for the current path again.
+				await this.getChildren(this.repo.content.files[this.currentPath], this.currentPath);
+			}
+		}
 	},
 	computed: {
 		currentPath() : string {
@@ -223,17 +277,17 @@ export default Vue.extend({
 				if (path == this.selectedFile) return;
 
 				// Otherwise, push the route.
-				this.$router.push({
-					name: "repo",
-					params: this.$route.params,
-					query: {
-						path: this.$route.query.path || "",
-						file: file.path
-					}
-				});
+				this.$router.push({ name: "repo", params: this.$route.params, query: { path: this.$route.query.path || "", file: file.path } });
 				return;
 			}
+			
+			// Get children.
+			await this.getChildren(file, path);			
 
+			// Push update.
+			this.$router.push({ name: "repo", params: this.$route.params, query: { path } });
+		},
+		async getChildren(file: File, path: string) {
 			// Set the folder's children loading state to true, which will play an animation.
 			this.$store.commit("Repositories/setFileChildrenLoading", { file, loading: true });
 
@@ -242,15 +296,14 @@ export default Vue.extend({
 
 			// Loading done, end the animation.
 			this.$store.commit("Repositories/setFileChildrenLoading", { file, loading: false });
-
-			// Push update.
-			this.$router.push({
-				name: "repo",
-				params: this.$route.params,
-				query: {
-					path
-				}
-			});
+		},
+		async analyseRepo() {
+			// Unset selected file before analysing.
+			if (this.$route.query.file) this.$router.push({ name: "repo", params: this.$route.params, query: { path: this.$route.query.path || "" } });
+			
+			// Send a request to analyse the repo.
+			console.log(this.repo);
+			await analyseRepo(this.repo);
 		}
 	},
 	async beforeRouteEnter(to: any, from: any, next: Function) {
@@ -280,12 +333,7 @@ export default Vue.extend({
 
 		// Check if ticket has not yet been requested.
 		if (!repository.analysis.ticket && repository.analysis.id != -1) {
-			// Request analysis ticket for repository. (TODO: Handle failure).
-			let ticketResponse = await send(Method.GET, `analysis/${repository.analysis.id}/ticket`);
-			if (!ticketResponse.status.ok) return next(false);
-
-			// Set the ticket on the repository.
-			Store.commit("Repositories/setTicket", { repository, ticket: ticketResponse.result!.ticket });
+			if (!await getTicket(repository)) return next(false);
 		}
 
 		// Check if enriched contributors have been fetched for the repository.
@@ -314,38 +362,54 @@ export default Vue.extend({
 	color: black;
 }
 
-.title {
+.header {
 	display: flex;
 	align-items: center;
-	font-weight: 600;
 
-	.repo-icon {
-		color: $grey-blue;
-		font-size: 0.7em;
-		margin-right: 15px;
+	> .title {
+		flex-grow: 1;
+
+		h3 {
+			display: flex;
+			align-items: center;
+			font-weight: 600;
+
+			.repo-icon {
+				color: $grey-blue;
+				font-size: 0.7em;
+				margin-right: 15px;
+			}
+
+			.minor, .major {
+				font-size: 0.9em;
+				color: $blue;
+			}
+
+			.minor {
+				font-weight: 300;
+			}
+
+			.separator {
+				color: $grey-blue;
+				margin: 0px 5px;
+				font-weight: 400;
+			}
+		}
+
+		.description {
+			font-size: 0.8em;
+			color: $grey-blue;
+			margin: 0px;
+		}
 	}
 
-	.minor, .major {
-		font-size: 0.9em;
-		color: $blue;
-	}
+	> .details {
 
-	.minor {
-		font-weight: 300;
-	}
-
-	.separator {
-		color: $grey-blue;
-		margin: 0px 5px;
-		font-weight: 400;
 	}
 }
 
-.description {
-	font-size: 0.8em;
-	color: $grey-blue;
-	margin-top: 0px;
-}
+
+
 
 .breadcrumbs {
 	display: flex;

@@ -81,6 +81,9 @@ export default Vue.extend({
 			// Watch for changes on the path so new content can be loaded.
 			this.loadContent();
 		},
+		"file.content.loaded": function (to, from) {
+			if (!to) this.loadContent();
+		}
 	},
 	computed: {
 		file() : File {
@@ -199,6 +202,7 @@ export default Vue.extend({
 </script>
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
+
 .file-viewer-wrapper {
 	width: 100%;
 	margin: 20px 0px;
@@ -382,6 +386,14 @@ export default Vue.extend({
 </style>
 <style lang="scss">
 @import "~highlight.js/scss/mono-blue.scss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
+pre, .markdown-body pre code {
+	font-family: 'Roboto Mono', monospace;
+}
+
+.code-viewer pre {
+	font-size: 0.8em;
+}
 
 .code {
 	.hljs {

@@ -3,7 +3,7 @@
 		<div class="content">
 			<h1 class="title"><font-awesome-icon icon="eye"/>{{ $t("general.title")}}</h1>
 			<button @click="signIn" class="transparent blur" :disabled="$store.state.auth.status || $store.state.auth.clientId == ''">
-				<font-awesome-icon :icon="['fab', 'github']"/>{{ $t("routes.signIn.signInWithGitHub") }}
+				<font-awesome-icon :icon="['fab', 'github']"/><span>{{ $t("routes.signIn.signInWithGitHub") }}</span>
 			</button>
 		</div>
 	</div>
@@ -23,7 +23,7 @@ import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
 import { getProfile, getRedirectURI } from '../modules/GitHub';
-import { createAlert } from "../modules/Notifications";
+import { createI18NAlert } from "../modules/Notifications";
 
 // Modules
 import { i18n } from "../i18n";
@@ -63,7 +63,7 @@ export default Vue.extend({
 			if (result == undefined) return;
 
 			// If authentication was not successful, show alert.
-			if (!result.status.ok) return createAlert("INFO", this.$i18n.t("alerts.signInFailed.title").toString(), this.$i18n.t("alerts.signInFailed.description").toString());
+			if (!result.status.ok) return createI18NAlert("INFO", "signInFailed");
 
 			// If successful, save the data.
 			saveAccessToken(result.result?.accessToken);
@@ -78,7 +78,7 @@ export default Vue.extend({
 			this.$store.commit("setUser", profileResult.result);
 
 			// If unable to retrieve user data, show error.
-			if (!profileResult.status.ok) return createAlert("WARNING", this.$i18n.t("alerts.profileFetchFailed.title").toString(), this.$i18n.t("alerts.profileFetchFailed.description").toString());
+			if (!profileResult.status.ok) return createI18NAlert("WARNING", "profileFetchFailed");
 
 			// Navigate to dashboard.
 			this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } }, undefined, () => {

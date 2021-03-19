@@ -219,11 +219,29 @@ button {
 	background-color: transparent;
 	
 	&:not(.clean) {
+		display: flex;
+		align-items: center;
 		padding: 12px 30px;
 		color: white;
 		background-color: $grey-blue;
 		border-radius: 30px;
 		font-size: 0.8em;
+		border: 2px solid transparent;
+		box-sizing: border-box;
+		transition: border-color 0.3s, transform 0.3s, background-color 0.3s;
+
+		&:not(:disabled) {
+			&:hover, &:focus {
+				border-color: rgba(white, .6);
+			}
+	
+			&:active {
+				transition: border-color 0.15s, transform 0.15s, background-color 0.15s;
+				background-color: $deep;
+				border-color: $blue;
+				transform: scale(0.9);
+			}
+		}
 
 		> svg {
 			margin-right: 10px;
@@ -231,7 +249,7 @@ button {
 		}
 	}
 
-	&.primary {
+	&.primary:not(:disabled) {
 		background-color: $blue;
 	}
 	
@@ -241,22 +259,19 @@ button {
 
 	&.transparent {
 		background-color: rgba(white, 0.2);
-		border: 2px solid transparent;
-		box-sizing: border-box;
-		transition: border-color 0.3s, transform 0.3s, background-color 0.3s;
-		
+
 		&:not(:disabled) {
 			&:hover, &:focus {
 				border-color: rgba(white, 0.5);
 			}
 	
 			&:active {
-				transition: border-color 0.15s, transform 0.15s, background-color 0.15s;
-				transform: scale(0.9);
 				background-color: rgba(black, 0.1);
 				border-color: rgba($blue, 0.5);
 			}
 		}
+
+		
 
 		&.blur {
 			backdrop-filter: blur(5px);

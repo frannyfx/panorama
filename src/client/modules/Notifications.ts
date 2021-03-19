@@ -8,6 +8,7 @@ import Store from "../store";
 
 // Modules
 import config from "../config";
+import { i18n } from "../i18n";
 
 // Interfaces
 /**
@@ -132,6 +133,15 @@ export function createAlert(type: "INFO" | "WARNING", title: string, description
 		dismissable: true,
 		expiry: true
 	});
+}
+
+/**
+ * Create an internationalised alert.
+ * @param type The type of alert.
+ * @param alert The i18n domain of the alert.
+ */
+export function createI18NAlert(type: "INFO" | "WARNING", alert: string) {
+	return createAlert(type, i18n.t(`alerts.${alert}.title`).toString(), i18n.t(`alerts.${alert}.description`).toString());
 }
 
 /**

@@ -66,6 +66,23 @@ const mutations : MutationTree<RepositoriesState> = {
 	setFileContentLoading(state: RepositoriesState, data: { file: File, loading: boolean }) {
 		data.file.content.loading = data.loading;
 	},
+	setAnalysisInProgress(state: RepositoriesState, data: { repository: Repository, inProgress: boolean }) {
+		data.repository.analysis.inProgress = data.inProgress;
+	},
+	setAnalysis(state: RepositoriesState, data: { repository: Repository, analysisId: number, commitId: string }) {
+		data.repository.analysis.id = data.analysisId;
+		data.repository.analysis.commitId = data.commitId;
+	},
+	resetChildren(state: RepositoriesState, repository: Repository) {
+		Object.keys(repository.content.files).map(file => {
+			// Reset children.
+			repository.content.files[file].children.loaded = false;
+			repository.content.files[file].children.list.splice(0, repository.content.files[file].children.list.length);
+
+			// Reset content.
+			repository.content.files[file].content.loaded = false;
+		});
+	},
 	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
 		// Sort children.
 		let sortedFiles = data.files.sort((a: File, b: File) => {

@@ -16,7 +16,7 @@ import { Method } from "../../../../../../shared/Method";
 import { Request, Route } from "../../../Route";
 import { SocketStream } from "fastify-websocket";
 import { Data } from "../../../../../../shared/Result";
-import queue from "../../../../../analysis/queue";
+import queue, { RepoJobResult } from "../../../../../analysis/queue";
 import ticket, { TicketVerificationResult } from "../../../../../crypto/ticket";
 import { buildResponse, Codes } from "../../../API";
 import { checkAuth } from "../../../../../github";
@@ -43,8 +43,8 @@ function send(connection: SocketStream, data: Data) {
  * @param status The status of the job.
  * @param progress The current progress.
  */
-function sendJobProgress(connection: SocketStream, jobId: number, status: string, progress: RepoJobProgress) {
-	send(connection, buildResponse(Codes.OK, { jobId, status, progress }));
+function sendJobProgress(connection: SocketStream, jobId: number, status: string, progress: RepoJobProgress, result: RepoJobResult | null = null) {
+	send(connection, buildResponse(Codes.OK, { jobId, status, progress, result }));
 }
 
 let route : Route = {
@@ -92,7 +92,7 @@ let route : Route = {
 			// TODO: Prevent instant success from bugging out the progress reporting (sends zero instead of RepoJobProgress object).
 			sendJobProgress(connection, jobId, job!.status, job!.progress);
 			job.on("progress", progress => sendJobProgress(connection, jobId, job!.status, progress));
-			job.on("succeeded", () => sendJobProgress(connection, jobId, "succeeded", { value: 1, stage: AnalysisStage.Done }));
+			job.on("succeeded", (result : RepoJobResult) => sendJobProgress(connection, jobId, "succeeded", { value: 1, stage: AnalysisStage.Done }, result));
 			job.on("failed", () => sendJobProgress(connection, jobId, "failed", job!.progress));
 			job.on("retrying", () => sendJobProgress(connection, jobId, "retrying", job!.progress));
 			logger.success(`Subscribed to updates on job ${job.id}.`);

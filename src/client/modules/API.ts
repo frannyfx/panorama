@@ -6,9 +6,12 @@
 // Imports
 import { Method } from "../../shared/Method";
 import { Response, isResponse } from "../../shared/Response";
+import { Data } from "../../shared/Result";
 import Store from "../store";
 import { getProfile } from "./GitHub";
-import { createAlert } from "./Notifications";
+import { Repository } from "./models/Repository";
+import { createI18NAlert } from "./Notifications";
+import { subscribeToJobProgress } from "./Queue";
 
 // Interfaces
 interface Params {
@@ -51,7 +54,7 @@ export async function performAuth() {
 	if (clientIdResponse.status.ok) Store.commit("setClientId", clientIdResponse.result?.clientId);
 	else {
 		setNotAuthenticated();
-		return createAlert("WARNING", "Something went wrong.", "Please try to sign in again later.");
+		return;
 	}
 
 	// Load cached auth info.
@@ -196,4 +199,28 @@ export function formatURL(url: string, params: Params) : string {
 	});
 
 	return newURL;
+}
+
+/**
+ * Analyse a repository.
+ * @param repository The repository to analyse.
+ */
+export async function analyseRepo(repository: Repository) {
+	// Set the repo to be in progress.
+	Store.commit("Repositories/setAnalysisInProgress", { repository, inProgress: true });
+
+	// Ask for a ticket to subscribe to this repository's analysis.
+	let ticketResponse = await send(Method.PUT, "repo/queue", { name: repository.fullName });
+
+	// If the request failed, show an error.
+	if (!ticketResponse.status.ok || !ticketResponse.result?.ticket) return createI18NAlert("WARNING", "analysisQueueFailed");
+	
+	// Use the ticket to subscribe to the events.
+	subscribeToJobProgress(repository.fullName, ticketResponse.result!.jobId, ticketResponse.result!.ticket, Store.state.auth.accessToken, (result: Data) => {
+		// The repo was analysed successfully.
+		Store.commit("Repositories/setAnalysisInProgress", { repository, inProgress: false });
+
+		// Set analysis ID.
+		Store.commit("Repositories/setAnalysis", { repository, analysisId: result.analysisId, commitId: result.commitId });
+	});
 }
