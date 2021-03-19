@@ -142,10 +142,22 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 		
 		// Open the repository.
 		try {
+			// Open the repository.
 			let repository = await Git.Repository.open(cachedRepository.path);
-			// TODO: Pull changes, update analysis date.
-			// ...
 
+			// Get current branch. 
+			let branchName = (await repository.getCurrentBranch()).shorthand();
+
+			// Fetch and pull changes.
+			await repository.fetch(branchName, {
+				callbacks: {
+					credentials: () => Git.Cred.userpassPlaintextNew(job.data.access_token, "x-oauth-basic"),
+					certificateCheck: () => 1
+				}
+			});
+
+			// Merge branches.
+			await repository.mergeBranches(branchName, `refs/remotes/origin/${branchName}`);
 			return repository;
 		} catch (e) {
 			// Remove repository from cache.
