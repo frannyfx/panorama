@@ -302,7 +302,6 @@ export default Vue.extend({
 			if (this.$route.query.file) this.$router.push({ name: "repo", params: this.$route.params, query: { path: this.$route.query.path || "" } });
 			
 			// Send a request to analyse the repo.
-			console.log(this.repo);
 			await analyseRepo(this.repo);
 		}
 	},
