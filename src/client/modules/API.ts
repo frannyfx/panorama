@@ -221,6 +221,6 @@ export async function analyseRepo(repository: Repository) {
 		Store.commit("Repositories/setAnalysisInProgress", { repository, inProgress: false });
 
 		// Set analysis ID.
-		Store.commit("Repositories/setAnalysis", { repository, analysisId: result.analysisId, commitId: result.commitId });
+		Store.commit("Repositories/setAnalysis", { repository, analysis: result.analysis });
 	});
 }

@@ -24,8 +24,9 @@ export interface Repository {
 	updatedAt: Date,
 	analysis: {
 		id: number,
-		inProgress: boolean,
 		commitId?: string,
+		startedAt?: Date,
+		inProgress: boolean,
 		ticket?: string
 	},
 	content: {
@@ -82,8 +83,9 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 		updatedAt: new Date(input.pushed_at!),
 		analysis: {
 			id: analysis!.analysisId,
+			commitId: analysis!.commitId,
+			startedAt: new Date(analysis!.startedAt),
 			inProgress: false,
-			commitId: analysis!.commitId
 		},
 		content: {
 			loaded: false,

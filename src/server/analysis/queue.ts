@@ -6,6 +6,7 @@
 // Imports
 import Queue from "bee-queue";
 import redis, { RedisClient } from "redis";
+import { Data } from "../../shared/Result";
 
 // Config
 import loadConfig, { Config } from "../Config";
@@ -24,8 +25,7 @@ export interface RepoJob {
 };
 
 export interface RepoJobResult {
-	analysisId: number,
-	commitId: string
+	analysis: Data
 };
 
 // Connection and queue

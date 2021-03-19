@@ -12,9 +12,12 @@
 					<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
 				</div>
 				<div class="actions">
-					<button class="primary" @click="analyseRepo" :disabled="repo.analysis.id != -1 || repo.analysis.inProgress">
-						<font-awesome-icon :icon="repo.analysis.id == -1 ? repo.analysis.inProgress ? 'sync' : 'chevron-right' : 'check'" :spin="repo.analysis.inProgress"/>
-						<span>{{ repo.analysis.id == -1 ? repo.analysis.inProgress ? $t("routes.repo.analysisInProgress") : $t("routes.repo.analyse") : $t("routes.repo.analysed") }}</span>
+					<button class="primary" @click="analyseRepo" :disabled="(!canBeReAnalysed && repo.analysis.id != -1) || repo.analysis.inProgress">
+						<font-awesome-icon :icon="repo.analysis.inProgress ? 'sync' : repo.analysis.id == -1 || canBeReAnalysed ? 'chevron-right' : 'check'" :spin="repo.analysis.inProgress"/>
+						<span v-if="repo.analysis.inProgress">{{$t("routes.repo.analysisInProgress")}}</span>
+						<span v-else-if="repo.analysis.id == -1">{{$t("routes.repo.analyse")}}</span>
+						<span v-else-if="canBeReAnalysed">{{$t("routes.repo.reAnalyse")}}</span>
+						<span v-else>{{$t("routes.repo.analysed")}}</span>
 					</button>
 				</div>
 			</div>
@@ -209,7 +212,7 @@ export default Vue.extend({
 	watch: {
 		"repo.analysis.id": async function (to: number, from: number) {
 			// Analysis completed successfully.
-			if (from == -1 && to != -1) {
+			if (to != -1) {
 				// Reset repository content data.
 				Store.commit("Repositories/resetChildren", this.repo);
 
@@ -264,6 +267,13 @@ export default Vue.extend({
 
 			// Otherwise, return an empty string.
 			return "";
+		},
+		canBeReAnalysed() : boolean {
+			// If it has not been analysed in the first place then return true.
+			if (this.repo.analysis.id == -1 || !this.repo.analysis.startedAt) return true;
+
+			// If the repo was updated after the last analysis started, we know the content has changed.
+			return this.repo.updatedAt >= this.repo.analysis.startedAt;
 		}
 	},
 	methods: {
@@ -303,7 +313,7 @@ export default Vue.extend({
 			
 			// Go back to root directory if we're currently exploring outdated files.
 			if (this.repo.analysis.id != -1 && this.currentPath != "") this.$router.push({name: "repo", params: this.$route.params });
-			
+
 			// Send a request to analyse the repo.
 			await analyseRepo(this.repo);
 		}

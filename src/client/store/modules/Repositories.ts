@@ -13,6 +13,7 @@ import { File } from "../../modules/models/File";
 import { AnalysisMap } from "../../modules/models/Analysis";
 import { User } from "../../modules/models/User";
 import Vue from "vue";
+import { Data } from "../../../shared/Result";
 
 // State interface.
 export interface RepositoriesState {
@@ -69,9 +70,10 @@ const mutations : MutationTree<RepositoriesState> = {
 	setAnalysisInProgress(state: RepositoriesState, data: { repository: Repository, inProgress: boolean }) {
 		data.repository.analysis.inProgress = data.inProgress;
 	},
-	setAnalysis(state: RepositoriesState, data: { repository: Repository, analysisId: number, commitId: string }) {
-		data.repository.analysis.id = data.analysisId;
-		data.repository.analysis.commitId = data.commitId;
+	setAnalysis(state: RepositoriesState, data: { repository: Repository, analysis: Data }) {
+		data.repository.analysis.id = data.analysis.analysisId;
+		data.repository.analysis.commitId = data.analysis.commitId;
+		data.repository.analysis.startedAt = data.analysis.startedAt;
 	},
 	resetChildren(state: RepositoriesState, repository: Repository) {
 		Object.keys(repository.content.files).map(file => {

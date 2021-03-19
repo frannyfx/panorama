@@ -334,10 +334,12 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 		// Call the job completion callback returning the analysis ID.
 		logger.success(`Successfully completed analysis ${analysis.analysisId!} of '${job.data.repository.full_name}'.`);
-		return { 
-			analysisId: analysis.analysisId!,
-			commitId: analysis.commitId!
+
+		// Fetch final analysis data with joins and return it.
+		return {
+			analysis: (await Analysis.get(analysis.analysisId!))!
 		};
+
 	} catch (e) {
 		throw new Error("Database insertion failed.");
 	}
