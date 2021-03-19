@@ -347,7 +347,7 @@ export default Vue.extend({
 		if (!repository.analysis.ticket && repository.analysis.id != -1) {
 			// If fetching the ticket fails, show an error and remove analysis from repository.
 			if (!await getTicket(repository)) {
-				createI18NAlert("WARNING", "ticketFetchFailed");
+				createI18NAlert("WARNING", "ticketFetchFailed", [repository.fullName]);
 				Store.commit("Repositories/setAnalysis", { repository, analysis: { id: -1 }})
 			} 
 		}

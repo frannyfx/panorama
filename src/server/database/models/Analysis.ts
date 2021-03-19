@@ -9,6 +9,16 @@ import { Data } from "../../../shared/Result";
 
 // Interfaces
 /**
+ * The enum matching the 'status' parameter in an Analysis row in the database.
+ */
+export enum DatabaseAnalysisStatus {
+	QUEUED = 1,
+	STARTED = 2,
+	COMPLETED = 3,
+	FAILED = 4
+};
+
+/**
  * The interface matching the Analysis table in the database.
  */
 export interface DatabaseAnalysis {
@@ -16,6 +26,8 @@ export interface DatabaseAnalysis {
 	repositoryId: number,
 	requestedBy: number,
 	commitId?: string,
+	status: DatabaseAnalysisStatus,
+	jobId?: string,
 	queuedAt: Date,
 	startedAt?: Date,
 	completedAt?: Date
@@ -52,6 +64,8 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 		repositoryId: analysis.repositoryId,
 		requestedBy: analysis.requestedBy,
 		commitId: analysis.commitId,
+		jobId: analysis.jobId,
+		status: analysis.status,
 		queuedAt: analysis.queuedAt,
 		startedAt: analysis.startedAt!,
 		completedAt: analysis.completedAt!
@@ -73,12 +87,14 @@ async function getLatest(owner: string, repo: string) : Promise<Data | null> {
 	// Get analysis with repo name and owner ID.
 	let analysisRow = await connection("Analysis")
 		.where({ "User.login": owner, "Repository.name": repo })
-		.orderBy("completedAt", "desc")
+		.orderBy("queuedAt", "desc")
 		.join("Repository", { "Analysis.repositoryId": "Repository.repositoryId"})
 		.join("User", { "Repository.ownerId": "User.userId"})
 		.select(
 			"Analysis.analysisId",
 			"Analysis.commitId",
+			"Analysis.status",
+			"Analysis.jobId",
 			"Analysis.queuedAt",
 			"Analysis.startedAt",
 			"Analysis.completedAt",
@@ -106,6 +122,8 @@ async function get(analysisId: number) : Promise<Data | null> {
 		.select(
 			"Analysis.analysisId",
 			"Analysis.commitId",
+			"Analysis.status",
+			"Analysis.jobId",
 			"Analysis.queuedAt",
 			"Analysis.startedAt",
 			"Analysis.completedAt",

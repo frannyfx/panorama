@@ -14,6 +14,7 @@ const config : Config = loadConfig();
 
 // Modules
 import { Result, buildResult, Data } from "../../shared/Result";
+import { getRepoName } from "../../shared/utils";
 
 // Types
 let octokitForTypes = new Octokit();
@@ -83,14 +84,14 @@ export async function getRepository(name: string, accessToken: string) : Promise
 	});
 
 	// Get owner and repo name.
-	let split = name.split("/");
-	if (split.length != 2) return buildResult(false);
+	let split = getRepoName(name);
+	if (!split) return buildResult(false);
 
 	// Get repository.
 	try {
 		let result = await octokit.repos.get({
-			owner: split[0],
-			repo: split[1]
+			owner: split.owner,
+			repo: split.repo
 		});
 		
 		return buildResult(result.status == 200, result.data);
@@ -106,12 +107,12 @@ export async function getRepositoryContributors(name: string, accessToken: strin
 	});
 
 	// Get owner and repo name.
-	let split = name.split("/");
-	if (split.length != 2) return buildResult(false);
+	let split = getRepoName(name);
+	if (!split) return buildResult(false);
 
 	let result = await octokit.repos.listContributors({
-		owner: split[0],
-		repo: split[1]
+		owner: split.owner,
+		repo: split.repo
 	});
 
 	return buildResult(result.status == 200, result.data);

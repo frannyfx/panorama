@@ -44,6 +44,10 @@
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
 		"repoFetchFailed": {
+			"title": "Caricamento dell'archivio fallito.",
+			"description": "Qualcosa è andato storto, provare più tardi."
+		},
+		"reposFetchFailed": {
 			"title": "Caricamento degli archivi fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
@@ -57,12 +61,20 @@
 				"Done": "Finito."
 			}
 		},
+		"ticketFetchFailed": {
+			"title": "Caricamento delle analisi di {0} fallito.",
+			"description": "Qualcosa è andato storto, provare più tardi."
+		},
+		"analysisQueueFailed": {
+			"title": "Non è stato possibile mettere {0} in coda per analizzarlo.",
+			"description": "Qualcosa è andato storto, provare più tardi."
+		},
 		"jobProgressSubscriptionFailed": {
-			"title": "Caricamento del progresso analisi fallito.",
+			"title": "Caricamento del progresso delle analisi di {0} fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
 		"analysisFailed": {
-			"title": "Analisi archivio fallita.",
+			"title": "Analisi {0} fallita.",
 			"description": "Errore durante l'analisi di {0}. Provare più tardi."
 		}
 	},

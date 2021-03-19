@@ -21,12 +21,13 @@ import { getRepository } from "../../../../../github";
 import ticket from "../../../../../crypto/ticket";
 
 // Models
-import DatabaseAnalysis from "../../../../../database/models/Analysis";
+import DatabaseAnalysis, { DatabaseAnalysisStatus } from "../../../../../database/models/Analysis";
 import DatabaseRepository from "../../../../../database/models/Repository";
 import DatabaseUser, { DatabaseUser as User } from "../../../../../database/models/User";
 import DatabaseAnalysedItem from "../../../../../database/models/AnalysedItem";
 import DatabaseAnalysisContributor from "../../../../../database/models/AnalysisContributor";
 import { AnalysedItem } from "../../../../../analysis/Item";
+import { getRepoName, sleep } from "../../../../../../shared/utils";
 
 /**
  * Validate a user's ticket to access an analysis.
@@ -181,7 +182,7 @@ let route : Array<Route> = [{
 	}
 }, {
 	method: Method.PUT,
-	url: "/api/repo/queue",
+	url: "/api/analysis/queue",
 	auth: true,
 	schemas: {
 		body: Joi.object({
@@ -189,10 +190,30 @@ let route : Array<Route> = [{
 		})
 	},
 	handler: async (request: Request, response: any) => {
-		// TODO: Check if the repo is already enqueued.
+		// Check validity of the name passed.
+		let repoName = getRepoName(request.body!.name);
+		if (!repoName) return send(response, Codes.BadRequest);
+
+		// Get latest analysis of repository.
+		let analysis = await DatabaseAnalysis.getLatest(repoName.owner, repoName.repo);
+
 		// Get repository information.
 		let repositoryResult = await getRepository(request.body!.name, request.auth!.token!);
-		if (!repositoryResult.status.ok) return send(response, Codes.BadRequest);
+		if (!repositoryResult.status.ok) return send(response, Codes.Forbidden);
+
+		// Check that an analysis for that repository is not already in progress.
+		if (analysis && (analysis.status == DatabaseAnalysisStatus[DatabaseAnalysisStatus.QUEUED] || analysis.status == DatabaseAnalysisStatus[DatabaseAnalysisStatus.STARTED])) {
+			// Check that the analysis has a jobId set.
+			if (!analysis.jobId) return send(response, Codes.OK, { jobId: null, ticket: null });
+
+			// Generate ticket to listen to job events.
+			let jobTicket = await ticket.sign({ jobId: analysis.jobId, accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex") });
+			return send(response, Codes.OK, { jobId: analysis.jobId, ticket: jobTicket });
+		}
+
+		// If the last analysis was performed after the repository was last updated, then return OK.
+		if (analysis && analysis.status == DatabaseAnalysisStatus[DatabaseAnalysisStatus.COMPLETED] && new Date(analysis.startedAt) >= new Date(repositoryResult.result!.pushed_at))
+			return send(response, Codes.OK, { jobId: null, ticket: null });
 
 		// Create job.
 		try {
@@ -225,9 +246,11 @@ let route : Array<Route> = [{
 			let databaseAnalysis = await DatabaseAnalysis.insert({
 				repositoryId: repositoryResult.result!.id,
 				requestedBy: request.auth!.payload!.id,
+				status: DatabaseAnalysisStatus.QUEUED,
 				queuedAt: new Date()
 			});
 
+			// If analysis insertion failed return server error.
 			if (!databaseAnalysis.analysisId) return send(response, Codes.ServerError);
 
 			// Add the job to the queue.
@@ -237,15 +260,12 @@ let route : Array<Route> = [{
 				access_token: request.auth!.token!
 			}).save();
 
+			// Update analysis with job ID.
+			databaseAnalysis.jobId = job.id;
+			DatabaseAnalysis.update(databaseAnalysis);
+
 			// Generate ticket to listen to job events.
-			let jobTicket = await ticket.sign({
-				jobId: job.id,
-				accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex")
-			});
-
-			// TODO: Handle failed job ticket generation.
-
-			// Send the job ID and the ticket to the user.
+			let jobTicket = await ticket.sign({ jobId: job.id, accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex") });
 			send(response, Codes.OK, {
 				jobId: job.id,
 				ticket: jobTicket

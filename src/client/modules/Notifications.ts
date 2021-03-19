@@ -140,8 +140,8 @@ export function createAlert(type: "INFO" | "WARNING", title: string, description
  * @param type The type of alert.
  * @param alert The i18n domain of the alert.
  */
-export function createI18NAlert(type: "INFO" | "WARNING", alert: string) {
-	return createAlert(type, i18n.t(`alerts.${alert}.title`).toString(), i18n.t(`alerts.${alert}.description`).toString());
+export function createI18NAlert(type: "INFO" | "WARNING", alert: string, titleStrings: string[] = [], descriptionStrings: string[] = []) {
+	return createAlert(type, i18n.t(`alerts.${alert}.title`, titleStrings).toString(), i18n.t(`alerts.${alert}.description`, descriptionStrings).toString());
 }
 
 /**

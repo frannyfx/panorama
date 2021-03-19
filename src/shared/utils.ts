@@ -58,3 +58,22 @@ export function humanFileSize(bytes: number, decimalPlaces: number = 0) : string
 
 	return `${bytes.toFixed(decimalPlaces)} ${units[finalIndex]}`;
 }
+
+/**
+ * The repo name interface.
+ */
+export interface RepoName {
+	owner: string,
+	repo: string
+};
+
+/**
+ * Split a repository's name into owner and repo.
+ * @param name The name of the repository to split.
+ * @returns The split name.
+ */
+export function getRepoName(name: string) : RepoName | null {
+	let split = name.split("/");
+	if (split.length != 2) null;
+	return { owner: split[0], repo: split[1] };
+}

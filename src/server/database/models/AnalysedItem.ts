@@ -363,8 +363,6 @@ async function getPathsInFolder(analysisId: number, path: string) : Promise<stri
 
 	// Get one layer deep files and folders.
 	let results = await connection("AnalysedItem").where({analysisId}).andWhere("path", "like", `${path}%`).andWhereNot("path", "like", `${path}%/%`).select("path");
-
-	// TODO: Return results.
 	return results.map(row => row.path).filter(path => path != "");
 }
 

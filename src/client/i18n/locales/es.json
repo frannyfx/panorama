@@ -44,6 +44,10 @@
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		},
 		"repoFetchFailed": {
+			"title": "No ha sido posible encontrar el repositorio.",
+			"description": "Algo ha fallado. Por favor intentar otra vez."
+		},
+		"reposFetchFailed": {
 			"title": "No ha sido posible encontrar tus repositorios.",
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		},
@@ -57,12 +61,20 @@
 				"Done": "Terminado."
 			}
 		},
+		"ticketFetchFailed": {
+			"title": "Unable to fetch analysis data for the {0}.",
+			"description": "Something went wrong. Please try again later."
+		},
+		"analysisQueueFailed": {
+			"title": "Unable to queue {0} for analysis.",
+			"description": "Something went wrong. Please try again later."
+		},
 		"jobProgressSubscriptionFailed": {
-			"title": "Failed to subscribe to repo updates.",
+			"title": "Failed to subscribe to repo updates for {0}.",
 			"description": "Could not connect to the server. Please try again later."
 		},
 		"analysisFailed": {
-			"title": "Repository analysis failed.",
+			"title": "Analysis failed for {0}.",
 			"description": "Failed to analyse {0}. Please try again later."
 		}
 	},

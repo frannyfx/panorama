@@ -91,7 +91,6 @@ async function verifyIntegrity() : Promise<boolean> {
  */
 async function purgeCache() {
 	try {
-		// TODO: Handle permissions.
 		await fs.rmdir(cacheDir, { recursive: true });
 	} catch (e) {
 		logger.error("Unable to purge cache.");

@@ -27,11 +27,11 @@ import { generateTokenGroups } from "./lexing/Lexer";
 import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item";
 
 // Models
-import Analysis, { DatabaseAnalysis } from "../database/models/Analysis";
+import Analysis, { DatabaseAnalysis, DatabaseAnalysisStatus } from "../database/models/Analysis";
 import DatabaseAnalysedItem from "../database/models/AnalysedItem";
 import { getRepositoryContributors } from "../github";
 import { insertOrUpdate } from "../database/models/AnalysisContributor";
-import { dedupe, lerp } from "../../shared/utils";
+import { dedupe, lerp, sleep } from "../../shared/utils";
 import { extractVibrant } from "./colours";
 
 /**
@@ -110,6 +110,16 @@ async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
 
 		// Create repository path.
 		let repositoryPath = path.join(getCacheDir(), job.data.repository.full_name);
+
+		// Check whether the path is empty and clear it if it isn't.
+		try {
+			await fs.readdir(repositoryPath);
+			await fs.rmdir(repositoryPath, { recursive: true });
+		} catch (e) {
+			// Path does not exist, ignore the error.
+		}
+		
+		// Create path to store the repository.
 		await fs.mkdir(repositoryPath, { recursive: true});
 
 		// Clone the repository.
@@ -151,7 +161,7 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 			let branchName = (await repository.getCurrentBranch()).shorthand();
 
 			// Fetch and pull changes.
-			await repository.fetch(branchName, {
+			await repository.fetch("origin", {
 				callbacks: {
 					credentials: () => Git.Cred.userpassPlaintextNew(job.data.access_token, "x-oauth-basic"),
 					certificateCheck: () => 1
@@ -253,16 +263,17 @@ async function filterIgnoredFiles(files: string[], repoDir: string) : Promise<st
 export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue.DoneCallback<RepoJobResult>) : Promise<RepoJobResult> {
 	logger.info(`Analysing repository '${job.data.repository.full_name}'.`);
 
-	// Fix badly parsed date (BeeQueue serialisation error due to Redis? TODO: Look into this).
+	// Update the database analysis model.
 	let analysis : DatabaseAnalysis = {
 		analysisId: job.data.analysis.analysisId,
 		repositoryId: job.data.analysis.repositoryId,
 		requestedBy: job.data.analysis.requestedBy,
-		queuedAt: new Date(job.data.analysis.queuedAt)
+		status: DatabaseAnalysisStatus.STARTED,
+		jobId: job.id,
+		queuedAt: new Date(job.data.analysis.queuedAt),
+		startedAt: new Date()
 	};
 
-	// Update the database analysis model.
-	analysis.startedAt = new Date();
 	Analysis.update(analysis);
 
 	// Report to the user that the job is starting.
@@ -362,6 +373,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 
 		// Set the job completion date.
 		analysis.completedAt = new Date();
+		analysis.status = DatabaseAnalysisStatus.COMPLETED;
 		Analysis.update(analysis);
 
 		// Call the job completion callback returning the analysis ID.

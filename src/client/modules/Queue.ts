@@ -98,7 +98,7 @@ async function onMessage(event : MessageEvent) {
 		console.warn("Job failed!", job.jobId);
 		
 		// Create localised alert.
-		createI18NAlert("WARNING", "analysisFailed");
+		createI18NAlert("WARNING", "analysisFailed", [job.repositoryName], [job.repositoryName]);
 		return;
 	}
 
@@ -141,7 +141,7 @@ async function getSocket() : Promise<WebSocket | null> {
 export async function subscribeToJobProgress(name: string, jobId: string, ticket: string, accessToken: string, successCallback: JobSuccessCallback | undefined = undefined, failureCallback: Function | undefined = undefined) {
 	// Connect the WebSocket. If failure occurs, show error.
 	let socket = await getSocket();
-	if (!socket) return createI18NAlert("WARNING", "jobProgressSubscriptionFailed");
+	if (!socket) return createI18NAlert("WARNING", "jobProgressSubscriptionFailed", [name]);
 	
 	// Send ticket and access token over the socket.
 	socket.send(JSON.stringify({
