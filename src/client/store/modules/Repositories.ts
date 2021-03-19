@@ -77,6 +77,7 @@ const mutations : MutationTree<RepositoriesState> = {
 		Object.keys(repository.content.files).map(file => {
 			// Reset children.
 			repository.content.files[file].children.loaded = false;
+			repository.content.files[file].analysis = undefined;
 			repository.content.files[file].children.list.splice(0, repository.content.files[file].children.list.length);
 
 			// Reset content.

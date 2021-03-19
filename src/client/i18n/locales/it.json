@@ -25,6 +25,7 @@
 			"public": "Pubblico",
 			"private": "Privato",
 			"analyse": "Analizza",
+			"reAnalyse": "Rianalizza",
 			"analysisInProgress": "Analisi in corso...",
 			"analysed": "Analizzato"
 		}

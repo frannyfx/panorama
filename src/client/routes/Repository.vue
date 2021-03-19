@@ -301,6 +301,9 @@ export default Vue.extend({
 			// Unset selected file before analysing.
 			if (this.$route.query.file) this.$router.push({ name: "repo", params: this.$route.params, query: { path: this.$route.query.path || "" } });
 			
+			// Go back to root directory if we're currently exploring outdated files.
+			if (this.repo.analysis.id != -1 && this.currentPath != "") this.$router.push({name: "repo", params: this.$route.params });
+			
 			// Send a request to analyse the repo.
 			await analyseRepo(this.repo);
 		}
