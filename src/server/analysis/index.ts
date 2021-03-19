@@ -30,7 +30,7 @@ import Analysis, { DatabaseAnalysis } from "../database/models/Analysis";
 import DatabaseAnalysedItem from "../database/models/AnalysedItem";
 import { getRepositoryContributors } from "../github";
 import { insertOrUpdate } from "../database/models/AnalysisContributor";
-import { dedupe } from "../../shared/utils";
+import { dedupe, lerp } from "../../shared/utils";
 import { extractVibrant } from "./colours";
 /**
  * Start the analysis system.
@@ -66,26 +66,26 @@ export async function stop() {
  * @param job The job.
  * @param progressStage The current stage of analysis.
  */
-function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage) {
+function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage, subProgress: number = 0) {
 	// Create progress object.
 	let progress : RepoJobProgress | null= null;
 
 	// Switch stage.
 	switch (stage) {
 	case AnalysisStage.Starting: {
-		progress = { value: .1, stage };
+		progress = { value: lerp(.1, .3, subProgress), stage };
 		break;
 	}
 	case AnalysisStage.Cloning: {
-		progress = { value: .3, stage };
+		progress = { value: lerp(.3, .4, subProgress), stage };
 		break;
 	}
 	case AnalysisStage.Lexing: {
-		progress = { value: .4, stage };
+		progress = { value: lerp(.4, .9, subProgress), stage };
 		break;
 	}
 	case AnalysisStage.Finalising: {
-		progress = { value: .9, stage };
+		progress = { value: lerp(.9, 1, subProgress), stage };
 		break;
 	}
 	case AnalysisStage.Done: {
@@ -268,7 +268,10 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let failedFiles = 0;
 
 	// Lex and process blame on files, combining the analysis.
-	for (let file of files) {
+	for (var i = 0; i < files.length; i++) {
+		// Get file.
+		let file = files[i];
+
 		// Run lexing.
 		let result = await lexFile(repoDir, file);
 
@@ -284,6 +287,9 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 			if (result.extension) unknownExtensions.add(result.extension);
 			failedFiles++;
 		}
+
+		// Update progress.
+		reportJobProgress(job, AnalysisStage.Lexing, i / files.length);
 	}
 
 	// Log a successful analysis.

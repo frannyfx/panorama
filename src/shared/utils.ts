@@ -22,6 +22,19 @@ export function dedupe<T>(list: T[], comparator: (a: T, b: T) => boolean) : T[] 
 }
 
 /**
+ * Linear interpolation function.
+ * @param a 
+ * @param b 
+ * @param amount 
+ * @returns 
+ */
+export function lerp(a: number, b: number, amount: number) {
+	amount = amount < 0 ? 0 : amount;
+	amount = amount > 1 ? 1 : amount;
+	return a + (b - a) * amount;
+}
+
+/**
  * Convert file size to a human readable string with an appropriate unit.
  * @param bytes The number of bytes.
  * @param decimalPlaces The number of decimal places to show.
