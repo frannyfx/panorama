@@ -24,10 +24,14 @@
 			"noDescription": "Sin descripción.",
 			"public": "Público",
 			"private": "Privado",
-			"analyse": "Analyse",
-			"reAnalyse": "Re-analyse",
-			"analysisInProgress": "Analysing...",
-			"analysed": "Analysed"
+			"analyse": "Analiza",
+			"reAnalyse": "Reanalizar",
+			"analysisInProgress": "Analizando...",
+			"analysed": "Analizado",
+			"upToDate": "Actualizado"
+		},
+		"error": {
+			"refresh": "Recargar"
 		}
 	},
 	"alerts": {
@@ -131,7 +135,14 @@
 			"viewStats": "View stats",
 			"fileSize": "File size",
 			"fileOfType": "Archivo {0}",
-			"file": "Archivo"
+			"file": "Archivo",
+			"anonymous": "Anonimo"
+		}
+	},
+	"errors": {
+		"general": {
+			"title": "Error",
+			"description": "Algo ha fallado. Por favor intentar otra vez."
 		}
 	}
 }

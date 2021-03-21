@@ -41,6 +41,12 @@
 				<table class="line-table">
 					<tr v-for="(line, index) in highlightedLines" :key="index">
 						<td class="line-number">{{ index + 1}}</td>
+						<td
+							class="analysis-chunk"
+							v-if="file.analysis && file.analysis.chunks.loaded && file.analysis.chunks.object[index + 1]"
+							:rowspan="(file.analysis.chunks.object[index + 1].end - file.analysis.chunks.object[index + 1].start) + 1">
+							{{ file.analysis.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}
+						</td>
 						<td class="code"><pre v-html="line"></pre></td>
 					</tr>
 				</table>
@@ -71,6 +77,8 @@ import MarkdownRenderer from "../components/MarkdownRenderer.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import hljs from "highlight.js";
 import { humanFileSize } from "../../shared/utils";
+import { send } from "../modules/API";
+import { Method } from "../../shared/Method";
 
 export default Vue.extend({
 	components: {
@@ -163,6 +171,8 @@ export default Vue.extend({
 	},
 	methods: {
 		async loadContent() {
+			if (this.file.content.loading) return;
+
 			// If the file has not had its content loaded, fetch the content from GitHub.
 			if (!this.file.content.loaded) {
 				// Set loading animation.
@@ -173,9 +183,24 @@ export default Vue.extend({
 				if (!content) console.log(`File ${this.file.path} from ${this.repo.fullName} failed to load.`);
 
 				// Set the content
-				this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: false });
 				this.$store.commit("Repositories/setFileContent", { file: this.file, content });
 			}
+
+			// Fetch analysis content for the file if possible & necessary.
+			if (this.repo.analysis.id != -1 && this.file.analysis && !this.file.analysis.chunks.loaded && this.repo.analysis.ticket) {
+				// Set loading animation.
+				if (!this.file.content.loading) this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: true });
+
+				// Fetch the file chunks.
+				let chunks = await send(Method.GET, `analysis/${this.repo.analysis.id}/chunks?path=${this.file.path}&ticket=${this.repo.analysis.ticket!}`);
+				if (!chunks.status.ok) console.log(`Chunks for file ${this.file.path} from ${this.repo.fullName} failed to load.`);
+
+				// Set the chunks.
+				this.$store.commit("Repositories/setFileChunks", { file: this.file, chunks: chunks.result! });
+			}
+
+			// Stop loading animation.
+			this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: false });
 
 			// If the file is not Markdown and the data loaded successfully, then enable viewSource.
 			this.viewSource.enabled = this.canViewSource && !this.canNotViewSource;
@@ -221,7 +246,7 @@ export default Vue.extend({
 		justify-content: flex-start;
 
 		box-sizing: border-box;
-		padding: 10px 0px;
+		padding: 10px 30px;
 		height: 50px;
 
 		font-size: 0.85em;
@@ -350,12 +375,24 @@ export default Vue.extend({
 		table-layout: fixed;
 		
 		tr {
-			&:first-child > .line-number {
-				padding-top: 8px;
+			&:first-child {
+				> .line-number {
+					padding-top: 8px;
+				}
+
+				> .analysis-chunk {
+					border-top: none;
+				}
 			}
 
-			&:last-child > .line-number {
-				padding-bottom: 8px;
+			&:last-child {
+				> .line-number {
+					padding-bottom: 8px;
+				}
+
+				> .analysis-chunk {
+					border-bottom: none;
+				}
 			}
 
 			> :first-child {
@@ -374,6 +411,16 @@ export default Vue.extend({
 				padding: 4px 8px;
 
 				/* Use box-shadow for border since border gets cut off when sticky */
+				box-shadow: inset -1px 0px 0 rgba($deep, .1);
+			}
+
+			.analysis-chunk {
+				text-align: center;
+				font-size: 0.8em;
+				font-weight: 600;
+				padding: 0px 10px;
+				border-top: 1px solid rgba($deep, .1);
+				border-bottom: 1px solid rgba($deep, .1);
 				box-shadow: inset -1px 0px 0 rgba($deep, .1);
 			}
 

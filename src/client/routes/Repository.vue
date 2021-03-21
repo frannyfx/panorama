@@ -17,7 +17,7 @@
 						<span v-if="repo.analysis.inProgress">{{$t("routes.repo.analysisInProgress")}}</span>
 						<span v-else-if="repo.analysis.id == -1">{{$t("routes.repo.analyse")}}</span>
 						<span v-else-if="canBeReAnalysed">{{$t("routes.repo.reAnalyse")}}</span>
-						<span v-else>{{$t("routes.repo.analysed")}}</span>
+						<span v-else>{{$t("routes.repo.upToDate")}}</span>
 					</button>
 				</div>
 			</div>

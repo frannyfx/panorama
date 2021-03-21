@@ -27,7 +27,8 @@
 			"analyse": "Analizza",
 			"reAnalyse": "Rianalizza",
 			"analysisInProgress": "Analisi in corso...",
-			"analysed": "Analizzato"
+			"analysed": "Analizzato",
+			"upToDate": "Aggiornato"
 		}
 	},
 	"alerts": {
@@ -62,7 +63,7 @@
 			}
 		},
 		"ticketFetchFailed": {
-			"title": "Caricamento delle analisi di {0} fallito.",
+			"title": "Caricamento dell'analisi di {0} fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
 		"analysisQueueFailed": {
@@ -131,7 +132,14 @@
 			"viewStats": "Mostra statistiche",
 			"fileSize": "Dimensione del file",
 			"fileOfType": "File {0}",
-			"file": "File"
+			"file": "File",
+			"anonymous": "Anonimo"
+		}
+	},
+	"errors": {
+		"general": {
+			"title": "Errore",
+			"description": "Qualcosa è andato storto, provare più tardi."
 		}
 	}
 }

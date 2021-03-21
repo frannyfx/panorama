@@ -15,8 +15,21 @@ export interface Analysis {
 	typeObject: {
 		[key: string]: AggregateLineStats
 	}
-	numLines: number
+	numLines: number,
+	chunks: {
+		loaded: boolean,
+		list: AnalysisChunk[],
+		object: {
+			[key: string]: AnalysisChunk
+		}
+	}
 };
+
+export interface AnalysisChunk {
+	login?: string,
+	start: number,
+	end: number
+}
 
 export interface AnalysisMap {
 	[key: string]: Analysis
@@ -56,6 +69,11 @@ export function toAnalysis(input: Data) : Analysis {
 		aggregateLineStats: input.aggregateLineStats,
 		typeList: typeList,
 		typeObject: input.extensions,
-		numLines: input.numLines		
+		numLines: input.numLines,
+		chunks: {
+			loaded: false,
+			list: [],
+			object: {}
+		}		
 	};
 }

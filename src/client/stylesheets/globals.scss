@@ -293,6 +293,7 @@ button {
 
 /* Lists */
 .list-item {
+	box-sizing: border-box;
 	border-top: 1px solid rgba($deep, .1);
 	transition: background-color 0.3s;
 
@@ -306,14 +307,8 @@ button {
 	}
 
 	&.margins {
-		> :first-child {
-			margin-left: 30px;
-		}
-	
-		> :last-child {
-			margin-right: 30px;
-		}
-	
+		padding: 0px 30px;
+
 		> *:not(:last-child) {
 			margin-right: 30px;
 		}

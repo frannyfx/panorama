@@ -177,8 +177,9 @@ let route : Array<Route> = [{
 		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
 
 		// Get the file's analysis chunks.
-		//let fileChunks = await DatabaseAnalysedItem.getChunks(request.params!.id, request.query!.path);
-		send(response, Codes.OK);
+		let fileChunks = await DatabaseAnalysedItem.getChunks(request.params!.id, request.query!.path);
+		if (!fileChunks) return send(response, Codes.BadRequest);
+		send(response, Codes.OK, fileChunks);
 	}
 }, {
 	method: Method.PUT,

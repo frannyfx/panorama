@@ -54,3 +54,15 @@ export function processFilePath(path: string) : string {
 	// Return the final processed path.
 	return processedPath;
 }
+
+/**
+ * Check if two sets are equal.
+ * @param a The first set.
+ * @param b The second set.
+ * @returns Whether the sets are equal.
+ */
+export function areSetsEqual<T>(a: Set<T>, b: Set<T>) : boolean {
+	if (a.size != b.size) return false;
+	for (var i of a) if (!b.has(i)) return false;
+	return true;
+}

@@ -4,6 +4,7 @@
 
 // Imports
 import { getConnection } from "../";
+import { Data } from "../../../shared/Result";
 import { ContributorMap } from "../../analysis/blame";
 import { AdvancedLineStats, AnalysedItem, ContributorStats, ContributorStatsMap, ExtensionMap } from "../../analysis/Item";
 import { processFilePath } from "../../utils";
@@ -461,8 +462,35 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 	return results;
 }
 
+/**
+ * Get code chunks.
+ * @param analysisId The ID of the analysis where to fetch the file from.
+ * @param path The path of the file.
+ * @returns The code chunks.
+ */
+async function getChunks(analysisId: number, path: string) : Promise<Data[] | null> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return null;
+
+	// Get the item's chunks in order.
+	let chunks = await connection("AnalysedItemChunk")
+		.where({ analysisId, path })
+		.orderBy("start", "asc")
+		.leftJoin("User", { "AnalysedItemChunk.contributorId": "User.userId" })
+		.select(
+			"AnalysedItemChunk.start",
+			"AnalysedItemChunk.end",
+			"User.login"
+		);
+
+	// Return the chunks.
+	return chunks;
+}
+
 export default {
 	convertAndInsert,
 	getPathsInFolder,
-	getItemsInFolder
+	getItemsInFolder,
+	getChunks
 };

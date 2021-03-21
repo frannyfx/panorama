@@ -27,7 +27,8 @@
 			"analyse": "Analyse",
 			"reAnalyse": "Re-analyse",
 			"analysisInProgress": "Analysing...",
-			"analysed": "Analysed"
+			"analysed": "Analysed",
+			"upToDate": "Up to date"
 		},
 		"error": {
 			"refresh": "Refresh"
@@ -65,7 +66,7 @@
 			}
 		},
 		"ticketFetchFailed": {
-			"title": "Unable to fetch analysis data for the {0}.",
+			"title": "Unable to fetch analysis data for {0}.",
 			"description": "Something went wrong. Please try again later."
 		},
 		"analysisQueueFailed": {
@@ -134,7 +135,8 @@
 			"viewStats": "View stats",
 			"fileSize": "File size",
 			"fileOfType": "{0} file",
-			"file": "File"
+			"file": "File",
+			"anonymous": "Anonymous"
 		}
 	},
 	"errors": {
