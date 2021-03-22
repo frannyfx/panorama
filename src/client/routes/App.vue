@@ -41,7 +41,6 @@ import Vue from "vue";
 
 // Components
 import Spinner from "../components/Spinner.vue";
-import CommitCanvas from "../components/CommitCanvas.vue";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Navbar from "../components/Navbar.vue";
 import NotificationList from "../components/NotificationList.vue";
@@ -57,7 +56,6 @@ import { Error, showError } from "../modules/Error";
 export default Vue.extend({
 	components: {
 		Spinner,
-		CommitCanvas,
 		FontAwesomeIcon,
 		Navbar,
 		NotificationList,

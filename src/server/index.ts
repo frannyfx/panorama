@@ -32,6 +32,7 @@ async function initialise() {
 }
 
 async function destroy() {
+	await database.stop();
 	await web.stop();
 	await analysis.stop();
 }

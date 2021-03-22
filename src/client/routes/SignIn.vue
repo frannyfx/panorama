@@ -15,7 +15,6 @@ import Store from "../store";
 
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import CommitCanvas from "../components/CommitCanvas.vue";
 
 // API imports
 import { clearAuthenticationData, saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
@@ -30,8 +29,7 @@ import { i18n } from "../i18n";
 
 export default Vue.extend({
 	components: {
-		FontAwesomeIcon,
-		CommitCanvas
+		FontAwesomeIcon
 	},
 	data() {
 		return {
