@@ -75,6 +75,17 @@ export default Vue.extend({
 			document.title = to.meta?.title ? this.$i18n.t(to.meta.title).toString() : "Panorama";
 		}
 	},
+	methods: {
+		showGenericError() {
+			showError(Error.General);
+			this.$router.replace({
+				name: "error",
+				params: {
+					locale: this.$route.params.locale
+				}
+			});
+		}	
+	},
 	mounted: async function () {
 		// Load locale.
 		let locale = window.location.pathname.split("/")[1];
@@ -85,16 +96,8 @@ export default Vue.extend({
 		await performAuth();
 
 		// Add error event handler.
-		window.addEventListener("unhandledrejection", () => {
-			this.$router.replace({
-				name: "error",
-				params: {
-					locale: this.$route.params.locale
-				}
-			});
-			
-			showError(Error.General);
-		})
+		window.addEventListener("unhandledrejection", () => this.showGenericError)
+		window.addEventListener("error", () => this.showGenericError);
 	}
 })
 </script>
