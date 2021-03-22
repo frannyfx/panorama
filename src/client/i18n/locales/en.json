@@ -5,22 +5,24 @@
 	},
 	"routes": {
 		"callback": {
-			"title": "Signing in",
+			"title": "Signing in • Panorama",
 			"signedIn": "Signed in.",
 			"notSignedIn": "Not signed in."
 		},
 		"dashboard": {
-			"title": "Dashboard",
+			"title": "Dashboard • Panorama",
 			"activity": "Activity",
 			"repositories": "Repositories",
 			"test": "Test",
 			"viewMore": "View more"
 		},
 		"signIn": {
-			"title": "Sign in",
+			"title": "Sign in • Panorama",
 			"signInWithGitHub": "Sign in with GitHub"
 		},
 		"repo": {
+			"title": "Repository • Panorama",
+			"specificTitle": "{0} • Panorama",
 			"noDescription": "No description.",
 			"public": "Public",
 			"private": "Private",
@@ -31,6 +33,7 @@
 			"upToDate": "Up to date"
 		},
 		"error": {
+			"title": "Error • Panorama",
 			"refresh": "Refresh"
 		}
 	},

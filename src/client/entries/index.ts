@@ -45,11 +45,17 @@ Vue.use(VTooltip, {
 const routes = [{
 	path: "/:locale",
 	component: SignIn,
-	name: "sign-in"
+	name: "sign-in",
+	meta: {
+		title: "routes.signIn.title"
+	}
 }, {
 	path: "/:locale/dashboard",
 	component: Dashboard,
-	name: "dashboard"
+	name: "dashboard",
+	meta: {
+		title: "routes.dashboard.title"
+	}
 }, {
 	path: "/test",
 	component: Test,
@@ -57,11 +63,17 @@ const routes = [{
 }, {
 	path: "/:locale/repo/:owner/:repo/",
 	component: Repository,
-	name: "repo"
+	name: "repo",
+	meta: {
+		title: "routes.repo.title"
+	}
 }, {
 	path: "/:locale/error",
 	component: Error,
-	name: "error"
+	name: "error",
+	meta: {
+		title: "routes.error.title"
+	}
 }];
 
 const router = new VueRouter({

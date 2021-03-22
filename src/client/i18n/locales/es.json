@@ -5,22 +5,24 @@
 	},
 	"routes": {
 		"callback": {
-			"title": "Acceder",
+			"title": "Acceder • Panorama",
 			"signedIn": "Conectado.",
 			"notSignedIn": "Desconectado."
 		},
 		"dashboard": {
-			"title": "Panel de control",
+			"title": "Panel de control • Panorama",
 			"activity": "Actividades",
 			"repositories": "Repositorios",
 			"test": "Test",
 			"viewMore": "Ver más"
 		},
 		"signIn": {
-			"title": "Acceder",
+			"title": "Acceder • Panorama",
 			"signInWithGitHub": "Acceder con GitHub"
 		},
 		"repo": {
+			"title": "Repositorio • Panorama",
+			"specificTitle": "{0} • Panorama",
 			"noDescription": "Sin descripción.",
 			"public": "Público",
 			"private": "Privado",
@@ -31,6 +33,7 @@
 			"upToDate": "Actualizado"
 		},
 		"error": {
+			"title": "Error • Panorama",
 			"refresh": "Recargar"
 		}
 	},

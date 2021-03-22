@@ -225,6 +225,9 @@ export default Vue.extend({
 				// Fetch children for the current path again.
 				await this.getChildren(this.repo.content.files[this.currentPath], this.currentPath);
 			}
+		},
+		"repo.id": function () {
+			this.setTitle();
 		}
 	},
 	computed: {
@@ -277,6 +280,9 @@ export default Vue.extend({
 		}
 	},
 	methods: {
+		setTitle() {
+			document.title = this.$i18n.t("routes.repo.specificTitle", [this.repo.fullName]).toString();
+		},
 		async setPath(path: string) {
 			// Get file for selected path and prevent navigation if it is not a directory.
 			let file = this.repo.content.files[path];
@@ -321,7 +327,7 @@ export default Vue.extend({
 	async beforeRouteEnter(to: any, from: any, next: Function) {
 		// Set loading.
 		Store.commit("setLoading", true);
-		
+
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
 		if (!Store.state.auth.status) return next({ name: "sign-in", params: { locale: i18n.locale } });
@@ -368,7 +374,10 @@ export default Vue.extend({
 		}
 
 		// Set loading to false.
-		next((vm: any) => vm.$store.commit("setLoading", false));
+		next((vm: any) => {
+			vm.$store.commit("setLoading", false);
+			vm.setTitle();	
+		});
 	}
 });
 </script>

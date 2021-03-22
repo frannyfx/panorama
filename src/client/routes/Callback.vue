@@ -58,12 +58,15 @@ export default Vue.extend({
 
 			// Return the access token data.
 			return buildResult(true, accessTokenResponse.result);
-		}
+		},
 	},
 	mounted: async function() {	
 		// Load locale.
 		let locale = window.localStorage.getItem("locale");
 		await loadLanguageAsync(locale || "en");
+		
+		// Set title.
+		document.title = this.$i18n.t("routes.callback.title").toString();
 
 		// Wait for HCI reasons.
 		await sleep(800);

@@ -40,7 +40,9 @@ export default Vue.extend({
 		this.md = MarkdownIt({
 			replaceLink: (url: string, env: any) => this.replaceLink(url, env),
 			html: true,
-		}).use(require("markdown-it-replace-link")).use(require("markdown-it-highlightjs"), { auto: false });
+		})	.use(require("markdown-it-replace-link"))
+			.use(require("markdown-it-highlightjs"), { auto: false })
+			.use(require("markdown-it-link-attributes"), { attrs: { target: "_blank" }});
 	},
 	props: {
 		source: {

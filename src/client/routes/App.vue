@@ -52,6 +52,7 @@ import BackgroundColour from "../components/BackgroundColour.vue";
 // Modules
 import { loadLanguageAsync } from "../i18n";
 import { performAuth } from "../modules/API";
+import { Error, showError } from "../modules/Error";
 
 export default Vue.extend({
 	components: {
@@ -69,7 +70,11 @@ export default Vue.extend({
 			return this.$route.name == "dashboard" || this.$route.name == "repo";
 		}
 	},
-	methods: { },
+	watch: {
+		$route(to, from) {
+			document.title = to.meta?.title ? this.$i18n.t(to.meta.title).toString() : "Panorama";
+		}
+	},
 	mounted: async function () {
 		// Load locale.
 		let locale = window.location.pathname.split("/")[1];
@@ -78,6 +83,18 @@ export default Vue.extend({
 
 		// Perform initial authentication.
 		await performAuth();
+
+		// Add error event handler.
+		window.addEventListener("unhandledrejection", () => {
+			this.$router.replace({
+				name: "error",
+				params: {
+					locale: this.$route.params.locale
+				}
+			});
+			
+			showError(Error.General);
+		})
 	}
 })
 </script>
