@@ -321,7 +321,7 @@ export default Vue.extend({
 	async beforeRouteEnter(to: any, from: any, next: Function) {
 		// Set loading.
 		Store.commit("setLoading", true);
-
+		
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
 		if (!Store.state.auth.status) return next({ name: "sign-in", params: { locale: i18n.locale } });
@@ -549,7 +549,7 @@ export default Vue.extend({
 .files {
 	width: 100%;
 	margin: 20px 0px;
-	border: 1px solid rgba($deep, .1);
+	border: 1px solid $grey-tinted;
 	border-radius: 16px;
 	box-sizing: border-box;
 	overflow: hidden;

@@ -10,7 +10,7 @@ import { MutationTree } from "vuex";
 import { Repository, RepositoryObject } from "../../modules/models/Repository";
 import config from "../../config";
 import { File } from "../../modules/models/File";
-import { AnalysisChunk, AnalysisMap } from "../../modules/models/Analysis";
+import { Analysis, AnalysisChunk, AnalysisMap } from "../../modules/models/Analysis";
 import { User } from "../../modules/models/User";
 import Vue from "vue";
 import { Data } from "../../../shared/Result";
@@ -127,8 +127,19 @@ const mutations : MutationTree<RepositoriesState> = {
 	},
 	setFileChunks(state: RepositoriesState, data: { file: File, chunks: AnalysisChunk[] }) {
 		data.file.analysis!.chunks.loaded = true;
-		data.file.analysis!.chunks.list = data.chunks;
-		data.chunks.map(chunk => data.file.analysis!.chunks.object[chunk.start] = chunk);
+		let chunkList : AnalysisChunk[] = [];
+		for (var i = 0; i < data.chunks.length; i++) {
+			let currentChunk = data.chunks[i];
+			chunkList.push({
+				login: currentChunk.login,
+				start: currentChunk.start,
+				end: currentChunk.end,
+				index: i
+			});
+		}
+
+		data.file.analysis!.chunks.list = chunkList;
+		chunkList.map(chunk => data.file.analysis!.chunks.object[chunk.start] = chunk);
 	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).

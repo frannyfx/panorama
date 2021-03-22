@@ -19,6 +19,7 @@ export interface AnalysedItem {
 	aggregateLineStats: AdvancedLineStats,
 	numLines: number,
 	analysis?: AnalysisGroup[],
+	tokens?: TokenGroup[],
 	extensions?: ExtensionMap,
 	isFile: boolean
 };
@@ -124,7 +125,7 @@ function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[],
 
 	// Pointers to token groups.
 	var lastTokenIndex = 0;
-
+	
 	// Loop through the blame groups and combine them with the token information.
 	for (var i = 0; i < blameGroups.length; i++) {
 		// Get the blame group.
@@ -144,10 +145,6 @@ function getAnalysisGroups(tokenGroups: TokenGroup[], blameGroups: BlameGroup[],
 
 			// Exit the loop if the start of the token group is past the end of our blame group.
 			if (currentGroup.start > blameGroup.end) break;
-
-			// If the set of the next chunk is not the same as the previous, break so a new group is created.
-			// TODO: Fix this.
-			//if (childTokenGroups.length > 0 && !areSetsEqual(currentGroup.lineData, childTokenGroups[childTokenGroups.length - 1].lineData)) break;
 
 			// Add the token to the groups.
 			childTokenGroups.push(currentGroup);
@@ -280,6 +277,7 @@ export function processFileAnalysis(path: string, tokenGroups: TokenGroup[], bla
 		numLines,
 		aggregateLineStats,
 		analysis: analysisGroups,
+		tokens: tokenGroups,
 		isFile: true
 	};
 }

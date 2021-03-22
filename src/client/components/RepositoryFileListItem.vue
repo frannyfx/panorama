@@ -10,8 +10,8 @@
 			<div class="details">
 				<span>{{ overrideName ? overrideName : file.name }}</span>
 			</div>
-			<div class="statistics">
-				<file-percentage v-if="file.analysis" :analysis="file.analysis"/>
+			<div class="analysis">
+				<font-awesome-icon v-if="file.analysis" icon="check"/>
 			</div>
 		</div>
 	</div>
@@ -124,6 +124,10 @@ export default Vue.extend({
 	.details {
 		flex-grow: 1;
 		color: $grey-blue;
+	}
+
+	.analysis {
+		color: $light-grey-blue;
 	}
 
 	> *:not(:last-child) {

@@ -87,7 +87,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
 .page {
-	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
+	background: linear-gradient(to bottom, rgba($deep, 0), rgba($deep, 0.4));
 
 	/* Children */
 	.title {

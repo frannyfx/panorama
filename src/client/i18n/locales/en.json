@@ -137,6 +137,9 @@
 			"fileOfType": "{0} file",
 			"file": "File",
 			"anonymous": "Anonymous"
+		},
+		"footer": {
+			"madeWithLove": "Made with ❤️ in London"
 		}
 	},
 	"errors": {

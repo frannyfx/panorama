@@ -35,11 +35,11 @@ export default Vue.extend({
 	align-items: center;
 
 	.icon {
-		font-size: 3em;
+		font-size: 2.6em;
 	}
 	
 	.title {
-		margin-top: 10px;
+		margin-top: 0px;
 		margin-bottom: 0px;
 	}
 

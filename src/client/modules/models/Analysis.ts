@@ -28,7 +28,8 @@ export interface Analysis {
 export interface AnalysisChunk {
 	login?: string,
 	start: number,
-	end: number
+	end: number,
+	index?: number
 }
 
 export interface AnalysisMap {

@@ -1,7 +1,7 @@
 <template>
 	<div class="footer no-select">
 		<div class="line"></div>
-		<font-awesome-icon icon="eye"/>
+		<font-awesome-icon icon="eye" v-tooltip="{ theme: 'panorama', content: $t('components.footer.madeWithLove')}"/>
 		<div class="line"></div>
 	</div>
 </template>

@@ -143,7 +143,7 @@ h2 {
 		width: 300px;
 		height: 180px;
 		border-radius: 16px;
-		background-color: rgba($deep, .1);
+		background-color: $grey-tinted;
 
 		&:not(:last-child) {
 			margin-right: 20px;
@@ -154,7 +154,7 @@ h2 {
 .repos {
 	width: 100%;
 	margin: 20px 0px;
-	border: 1px solid rgba($deep, .1);
+	border: 1px solid $grey-tinted;
 	border-radius: 16px;
 	box-sizing: border-box;
 	overflow: hidden;

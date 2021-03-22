@@ -136,11 +136,12 @@ export function lex(lexer: Lexer, input: string) : Token[] {
  */
 export function generateTokenGroups(tokens: Token[]) : TokenGroup[] {
 	let groups : TokenGroup[] = [];
-	let filteredTokens = tokens.filter(token => token.type != TokenType.Whitespace);
-	for (var i = 0; i < filteredTokens.length; i++) {
+	// TODO: Think about whitespace.
+	//let filteredTokens = tokens.filter(token => token.type != TokenType.Whitespace);
+	for (var i = 0; i < tokens.length; i++) {
 		// Get the current token.
-		let token = filteredTokens[i];
-		let nextToken : Token | null = i < filteredTokens.length - 1 ? filteredTokens[i + 1] : null;
+		let token = tokens[i];
+		let nextToken : Token | null = i < tokens.length - 1 ? tokens[i + 1] : null;
 
 		// Just add the first item.
 		if (groups.length == 0) {

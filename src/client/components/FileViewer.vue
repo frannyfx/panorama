@@ -30,6 +30,7 @@
 				</div>
 			</div>
 		</div>
+		<analysis-stats v-show="viewStats.enabled"/>
 		<div class="file-viewer list-item">
 			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled" :source="file.content.data" :relativeLinkRoot="rawLink"/>
 			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
@@ -43,9 +44,10 @@
 						<td class="line-number">{{ index + 1}}</td>
 						<td
 							class="analysis-chunk"
+							:class="{ last: file.analysis.chunks.object[index + 1].index == file.analysis.chunks.list.length - 1 }"
 							v-if="file.analysis && file.analysis.chunks.loaded && file.analysis.chunks.object[index + 1]"
-							:rowspan="(file.analysis.chunks.object[index + 1].end - file.analysis.chunks.object[index + 1].start) + 1">
-							{{ file.analysis.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}
+							:rowspan="file.analysis.chunks.object[index + 1].index == file.analysis.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.chunks.object[index + 1].end - file.analysis.chunks.object[index + 1].start) + 1">
+							<div class="details">{{ file.analysis.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</div>
 						</td>
 						<td class="code"><pre v-html="line"></pre></td>
 					</tr>
@@ -71,19 +73,21 @@ import { File } from "../modules/models/File";
 import { Repository } from "../modules/models/Repository";
 import Extensions from "../store/modules/Extensions";
 import { FileType } from "../../shared/models/FileType";
-
-// Components
-import MarkdownRenderer from "../components/MarkdownRenderer.vue";
-import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import hljs from "highlight.js";
 import { humanFileSize } from "../../shared/utils";
 import { send } from "../modules/API";
 import { Method } from "../../shared/Method";
 
+// Components
+import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import MarkdownRenderer from "../components/MarkdownRenderer.vue";
+import AnalysisStats from "./AnalysisStats.vue";
+
 export default Vue.extend({
 	components: {
-		MarkdownRenderer,
 		FontAwesomeIcon,
+		MarkdownRenderer,
+		AnalysisStats
 	},
 	watch: {
 		path(to, from) {
@@ -231,11 +235,10 @@ export default Vue.extend({
 </script>
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
-
 .file-viewer-wrapper {
 	width: 100%;
 	margin: 20px 0px;
-	border: 1px solid rgba($deep, .1);
+	border: 1px solid $grey-tinted;
 	border-radius: 16px;
 	box-sizing: border-box;
 	overflow: hidden;
@@ -379,19 +382,11 @@ export default Vue.extend({
 				> .line-number {
 					padding-top: 8px;
 				}
-
-				> .analysis-chunk {
-					border-top: none;
-				}
 			}
 
 			&:last-child {
 				> .line-number {
 					padding-bottom: 8px;
-				}
-
-				> .analysis-chunk {
-					border-bottom: none;
 				}
 			}
 
@@ -411,7 +406,7 @@ export default Vue.extend({
 				padding: 4px 8px;
 
 				/* Use box-shadow for border since border gets cut off when sticky */
-				box-shadow: inset -1px 0px 0 rgba($deep, .1);
+				box-shadow: inset -1px 0px 0 $grey-tinted;
 			}
 
 			.analysis-chunk {
@@ -419,13 +414,17 @@ export default Vue.extend({
 				font-size: 0.8em;
 				font-weight: 600;
 				padding: 0px 10px;
-				border-top: 1px solid rgba($deep, .1);
-				border-bottom: 1px solid rgba($deep, .1);
-				box-shadow: inset -1px 0px 0 rgba($deep, .1);
+				color: $grey-blue;
+				z-index: 100;
+
+				&:not(.last) {
+					border-bottom: 1px solid $grey-tinted;
+				}
 			}
 
 			.code {
 				padding: 0px 20px;
+				border-left: 1px solid $grey-tinted;
 
 				pre {
 					margin: 0;

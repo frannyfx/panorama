@@ -1,6 +1,6 @@
 <template>
 	<div class="analysis-stats list-item">
-
+		
 	</div>
 </template>
 <script lang="ts">

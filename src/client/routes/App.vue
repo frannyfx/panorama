@@ -1,7 +1,8 @@
 <template>
 	<div class="app">
 		<div class="backgrounds">
-			<commit-canvas/>
+			<background-blobs/>
+			<background-colour/>
 			<div class="background fade"></div>
 		</div>
 		<transition :name="$store.state.loading ? 'zoom' : ''" mode="out-in">
@@ -45,6 +46,8 @@ import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Navbar from "../components/Navbar.vue";
 import NotificationList from "../components/NotificationList.vue";
 import ModalList from "../components/ModalList.vue";
+import BackgroundBlobs from "../components/BackgroundBlobs.vue";
+import BackgroundColour from "../components/BackgroundColour.vue";
 
 // Modules
 import { loadLanguageAsync } from "../i18n";
@@ -57,7 +60,9 @@ export default Vue.extend({
 		FontAwesomeIcon,
 		Navbar,
 		NotificationList,
-		ModalList
+		ModalList,
+		BackgroundBlobs,
+		BackgroundColour
 	},
 	computed: {
 		navbarVisible() : boolean {
@@ -87,7 +92,7 @@ export default Vue.extend({
 }
 
 .background.fade {
-	background: linear-gradient(to bottom, rgba($blue, 0), rgba($blue, 0.4));
+	background: linear-gradient(to bottom, rgba($deep, 0), rgba($deep, 0.4));
 }
 
 .route {
