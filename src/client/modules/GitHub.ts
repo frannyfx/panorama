@@ -26,10 +26,6 @@ type ContentFile = components["schemas"]["content-file"];
 // Variables
 var instance : Octokit | null = null;
 
-// Types
-//let octokitForTypes = new Octokit();
-//export type GithubRepository = GetResponseDataTypeFromEndpointMethod<typeof octokitForTypes.repos.get>;
-
 /**
  * Get the current instance of Octokit.
  */
@@ -168,9 +164,9 @@ export async function getFiles(repository: Repository, path: string) : Promise<F
 }
 
 /**
- * 
- * @param repository 
- * @returns 
+ * Find which data about a repository's contributors is unknown and fetch it appropriately.
+ * @param repository The repository whose contributors need to be fetched.
+ * @returns Whether the request executed successfully.
  */
 export async function getEnrichedRepositoryContributors(repository: Repository) : Promise<boolean> {
 	// Check the repository has a valid analysis available.
@@ -215,10 +211,10 @@ export async function getEnrichedRepositoryContributors(repository: Repository) 
 }
 
 /**
- * 
- * @param repository 
- * @param file 
- * @returns 
+ * Fetch a file's content for it to be displayed by the file viewer.
+ * @param repository The repository the file resides in.
+ * @param file The file whose content needs to be fetched.
+ * @returns Either a string representation of the file's content or null.
  */
 export async function getFileContent(repository: Repository, file: File) : Promise<string | null> {
 	// Prevent retrieving content if it's not a file.
