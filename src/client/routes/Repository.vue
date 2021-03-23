@@ -222,6 +222,7 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });
+	console.log("Added!");
 	return true;
 }
 
@@ -303,7 +304,7 @@ export default Vue.extend({
 			return this.repo.updatedAt >= this.repo.analysis.startedAt;
 		},
 		canViewStats() : boolean {
-			return this.repo.content.files[this.currentPath].analysis != null;
+			return this.repo.content.files[this.currentPath].analysis.available;
 		}
 	},
 	data() {

@@ -43,11 +43,11 @@
 					<tr v-for="(line, index) in highlightedLines" :key="index">
 						<td class="line-number">{{ index + 1}}</td>
 						<td
+							v-if="file.analysis.available && file.analysis.data.chunks.loaded && file.analysis.data.chunks.object[index + 1]"
 							class="analysis-chunk"
-							:class="{ last: file.analysis.chunks.object[index + 1].index == file.analysis.chunks.list.length - 1 }"
-							v-if="file.analysis && file.analysis.chunks.loaded && file.analysis.chunks.object[index + 1]"
-							:rowspan="file.analysis.chunks.object[index + 1].index == file.analysis.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.chunks.object[index + 1].end - file.analysis.chunks.object[index + 1].start) + 1">
-							<div class="details">{{ file.analysis.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</div>
+							:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
+							:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
+							<div class="details">{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</div>
 						</td>
 						<td class="code"><pre v-html="line"></pre></td>
 					</tr>
@@ -156,7 +156,7 @@ export default Vue.extend({
 			return this.fileType && this.fileType.name == "Markdown";
 		},
 		canViewStats() : boolean {
-			return this.file.analysis != null;
+			return this.file.analysis.available;
 		},
 		highlightedLines() : string[] {
 			// Get language from file type.
@@ -213,7 +213,7 @@ export default Vue.extend({
 			}
 
 			// Fetch analysis content for the file if possible & necessary.
-			if (this.repo.analysis.id != -1 && this.file.analysis && !this.file.analysis.chunks.loaded && this.repo.analysis.ticket) {
+			if (this.repo.analysis.id != -1 && this.file.analysis.available && !this.file.analysis.data!.chunks.loaded && this.repo.analysis.ticket) {
 				// Set loading animation.
 				if (!this.file.content.loading) this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: true });
 

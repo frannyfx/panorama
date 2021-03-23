@@ -23,12 +23,12 @@
 					</span>
 				</p>
 			</div>
-			<div class="contributors" v-if="file.analysis">
+			<div class="contributors" v-if="file.analysis.available">
 				<div class="list">
-					<contributor-bubble v-for="login in file.analysis.contributorList.slice(0, 3)" :key="login" :login="login"/>
+					<contributor-bubble v-for="login in file.analysis.data.contributorList.slice(0, 3)" :key="login" :login="login"/>
 				</div>
 				<div class="list">
-					<contributor-bubble v-for="login in file.analysis.contributorList.slice(3, 8)" :key="login" :login="login" :small="true"/>
+					<contributor-bubble v-for="login in file.analysis.data.contributorList.slice(3, 8)" :key="login" :login="login" :small="true"/>
 				</div>
 			</div>
 		</div>
@@ -102,10 +102,10 @@ export default Vue.extend({
 			return getIconPath(this.file);
 		},
 		contributorBarItems() : BarItem[] {
-			return this.file.analysis!.contributorList.map(login => {
+			return this.file.analysis.data!.contributorList.map(login => {
 				// Get contributor and contributor stats.
 				let contributor = this.$store.state.Users.object[login];
-				let contributorStats = this.file.analysis!.contributorObject[login];
+				let contributorStats = this.file.analysis.data!.contributorObject[login];
 				
 				// Convert the available data to a bar item.
 				return {
@@ -122,10 +122,10 @@ export default Vue.extend({
 			});
 		},
 		fileTypeBarItems() : BarItem[] {
-			return this.file.analysis!.typeList.map(type => {
+			return this.file.analysis.data!.typeList.map(type => {
 				// Get file type and file type stats.
 				let fileType = this.$store.state.Extensions.typeMap[type];
-				let fileTypeStats = this.file.analysis!.typeObject[type];
+				let fileTypeStats = this.file.analysis.data!.typeObject[type];
 
 				// Convert the available data to a bar item.
 				return {
@@ -142,10 +142,10 @@ export default Vue.extend({
 			});
 		},
 		codeClassificationBarItems() : BarItem[] {
-			return this.file.analysis!.tokenList.map(token => {
+			return this.file.analysis.data!.tokenList.map(token => {
 				// Get token and token stats.
 				let tokenData = this.$store.state.Tokens.map[token];
-				let tokenStats = this.file.analysis!.tokenObject[token];
+				let tokenStats = this.file.analysis.data!.tokenObject[token];
 
 				return {
 					data: {

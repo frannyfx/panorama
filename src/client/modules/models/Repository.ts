@@ -64,6 +64,9 @@ export function toRepository(input: Data, contributors: Data[], analysis: Data |
 			loaded: false,
 			loading: false,
 			data: ""
+		},
+		analysis: {
+			available: false
 		}
 	};
 

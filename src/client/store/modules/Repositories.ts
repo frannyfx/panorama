@@ -79,7 +79,8 @@ const mutations : MutationTree<RepositoriesState> = {
 		Object.keys(repository.content.files).map(file => {
 			// Reset children.
 			repository.content.files[file].children.loaded = false;
-			repository.content.files[file].analysis = undefined;
+			repository.content.files[file].analysis.available = false;
+			repository.content.files[file].analysis.data = undefined;
 			repository.content.files[file].children.list.splice(0, repository.content.files[file].children.list.length);
 
 			// Reset content.
@@ -101,12 +102,16 @@ const mutations : MutationTree<RepositoriesState> = {
 
 		// Add the files to the repository and set the analysis data.
 		data.files.map(file => {
-			Vue.set(file, "analysis", data.analysis[file.path]);
+			file.analysis.available = data.analysis[file.path] != undefined;
+			file.analysis.data = data.analysis[file.path];
 			Vue.set(data.repository.content.files, file.path, file);
 		});
 
 		// Set analysis for the directory whose children we added.
-		if (data.analysis[data.path]) data.repository.content.files[data.path].analysis = data.analysis[data.path];
+		if (data.analysis[data.path]) {
+			data.repository.content.files[data.path].analysis.available = true;
+			data.repository.content.files[data.path].analysis.data = data.analysis[data.path];	
+		}
 	},
 	updateContributors(state: RepositoriesState, data: { repository: Repository, contributors: User[] }) {
 		// Dedupe contributors.
@@ -126,7 +131,7 @@ const mutations : MutationTree<RepositoriesState> = {
 		data.file.content.data = data.content;
 	},
 	setFileChunks(state: RepositoriesState, data: { file: File, chunks: AnalysisChunk[] }) {
-		data.file.analysis!.chunks.loaded = true;
+		data.file.analysis.data!.chunks.loaded = true;
 		let chunkList : AnalysisChunk[] = [];
 		for (var i = 0; i < data.chunks.length; i++) {
 			let currentChunk = data.chunks[i];
@@ -138,8 +143,8 @@ const mutations : MutationTree<RepositoriesState> = {
 			});
 		}
 
-		data.file.analysis!.chunks.list = chunkList;
-		chunkList.map(chunk => data.file.analysis!.chunks.object[chunk.start] = chunk);
+		data.file.analysis.data!.chunks.list = chunkList;
+		chunkList.map(chunk => data.file.analysis.data!.chunks.object[chunk.start] = chunk);
 	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).

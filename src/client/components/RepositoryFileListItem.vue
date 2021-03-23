@@ -11,7 +11,7 @@
 				<span>{{ overrideName ? overrideName : file.name }}</span>
 			</div>
 			<div class="analysis">
-				<font-awesome-icon v-if="file.analysis" icon="check"/>
+				<font-awesome-icon v-if="file.analysis.available" icon="check"/>
 			</div>
 		</div>
 	</div>

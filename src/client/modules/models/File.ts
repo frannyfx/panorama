@@ -26,7 +26,10 @@ export interface File {
 		loading: boolean,
 		data: string
 	},
-	analysis?: Analysis
+	analysis: {
+		available: boolean,
+		data?: Analysis
+	}
 };
 
 /**
@@ -51,7 +54,10 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 			loading: false,
 			data: ""
 		},
-		analysis: analysis ? toAnalysis(analysis) : undefined
+		analysis: {
+			available: analysis != undefined,
+			data: analysis ? toAnalysis(analysis) : undefined
+		}
 	};
 }
 
