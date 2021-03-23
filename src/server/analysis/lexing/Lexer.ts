@@ -135,13 +135,15 @@ export function lex(lexer: Lexer, input: string) : Token[] {
  * @param tokens The tokens to put into groups.
  */
 export function generateTokenGroups(tokens: Token[]) : TokenGroup[] {
+	// Create an array to store the groups.
 	let groups : TokenGroup[] = [];
-	// TODO: Think about whitespace.
-	//let filteredTokens = tokens.filter(token => token.type != TokenType.Whitespace);
-	for (var i = 0; i < tokens.length; i++) {
+
+	// Filter out whitespaces that are one line in length.
+	let filteredTokens : Token[] = tokens.filter(token => token.type != TokenType.Whitespace || (token.position!.end - token.position!.start) > 1);
+	for (var i = 0; i < filteredTokens.length; i++) {
 		// Get the current token.
-		let token = tokens[i];
-		let nextToken : Token | null = i < tokens.length - 1 ? tokens[i + 1] : null;
+		let token = filteredTokens[i];
+		let nextToken : Token | null = i < filteredTokens.length - 1 ? filteredTokens[i + 1] : null;
 
 		// Just add the first item.
 		if (groups.length == 0) {
@@ -158,7 +160,8 @@ export function generateTokenGroups(tokens: Token[]) : TokenGroup[] {
 		let lastGroup : TokenGroup = groups[groups.length - 1];
 
 		// The current token starts on the same line as the previous group.
-		if (token.position!.start == lastGroup.end) {
+		// Do not merge any whitespace groups.
+		if (token.position!.start == lastGroup.end && token.type != TokenType.Whitespace && !lastGroup.lineData.has(TokenType.Whitespace)) {
 			// Add the first line part to the last group.
 			lastGroup.lineData.add(token.type);
 
@@ -170,19 +173,27 @@ export function generateTokenGroups(tokens: Token[]) : TokenGroup[] {
 					lineData: new Set([token.type])
 				});
 			}
-		} else if (lastGroup.lineData.has(token.type) && lastGroup.lineData.size == 1 && token.position!.start == lastGroup.end + 1 && 
+		} else if (token.type != TokenType.Whitespace && lastGroup.lineData.has(token.type) && lastGroup.lineData.size == 1 && token.position!.start == lastGroup.end + 1 && 
 				(!nextToken || nextToken!.type == token.type || nextToken.position!.start != token.position!.end)) { // Perform lookahead to avoid wrong attribution of token types.
 			// Expand the previous group if it only contains the current token type and we're on the next line.
 			lastGroup.end = token.position!.end;
 		} else {
 			// The token starts after the end of the previous group.
+			// Whitespaces must be treated differently for the line count to be accurate.
 			groups.push({
-				start: token.position!.start,
-				end: token.position!.end,
+				start: token.type == TokenType.Whitespace ? token.position!.start + 1 : token.position!.start,
+				end: token.type == TokenType.Whitespace ? token.position!.end - 1 : token.position!.end,
 				lineData: new Set([token.type])
 			});
 		}
 	}
+
+	// Remove whitespace from groups that have more than one token type.
+	groups.map(group => {
+		if (group.lineData.size > 1 && group.lineData.has(TokenType.Whitespace)) {
+			group.lineData.delete(TokenType.Whitespace);
+		}
+	});
 	
 	return groups;
 }

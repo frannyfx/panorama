@@ -49,7 +49,7 @@ const lexer : Lexer = {
 		expression: /^(\r|\n)\s*/
 	}, {
 		type: TokenType.Code,
-		expression: /^.+?(?=\/\/|\/\*|"|'|`|\r|\n|$)/
+		expression: /^[^\r\n]+?(?=\/\/|\/\*|"|'|`|\r|\n|$)/
 	}, {
 		type: TokenType.String,
 		expression: /^(("(?:[^"\\\n]|\\.)*")|('(?:[^'\\\n]|\\.)*')|(`(?:[^`\\\n]|\\.)*`))/

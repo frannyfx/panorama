@@ -157,7 +157,7 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 
 	// If the directory does not yet exist, fetch upwards until necessary.
 	let parentDirectory = repository.content.files[path];
-	if (!parentDirectory) {
+	if (path != "" && (!parentDirectory || !parentDirectory.children.loaded)) {
 		let pathSplit = path.split("/");
 		let parentPath = pathSplit.slice(0, pathSplit.length - 1).join("/");
 		await addFileChildren(owner, repo, parentPath);
