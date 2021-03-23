@@ -220,7 +220,7 @@ button {
 	outline: none;
 	background-color: transparent;
 	
-	&:not(.clean) {
+	&:not(.clean):not(.action) {
 		display: flex;
 		align-items: center;
 		padding: 12px 30px;
@@ -282,6 +282,34 @@ button {
 
 		&:disabled {
 			opacity: 0.5;
+		}
+	}
+
+	&.action {
+		color: $light-grey-blue;
+		width: 30px;
+		height: 30px;
+		border-radius: 30px;
+		font-size: 1.1em;
+		
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: transform .3s, background-color .3s, color .3s, opacity .3s;
+
+		&:disabled {
+			opacity: .4;
+		}
+
+		&:not(:disabled) {
+			&:hover {
+				transform: scale(1.1);
+			}
+		}
+
+		&.enabled {
+			background-color: $light-grey-blue;
+			color: white;
 		}
 	}
 }

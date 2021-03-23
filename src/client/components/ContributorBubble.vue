@@ -51,6 +51,12 @@ export default Vue.extend({
 		width: 20px;
 		height: 20px;
 		border: none;
+
+		&.anonymous {
+			.contributor-image {
+				font-size: 0.7em;
+			}
+		}
 	}
 
 	&:hover {

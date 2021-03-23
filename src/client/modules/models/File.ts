@@ -58,7 +58,9 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 export function getIconPath(file: File) : string {
 	// Return folder icon.
 	let icon = "file";
-	if (file.type == "dir") icon = "folder";
+	if (file.type == "dir") {
+		icon = file.path == "" ? "folder-github": "folder";	
+	}
 	else {
 		// Get extension information
 		let extension = file.name.split(".").pop()!;

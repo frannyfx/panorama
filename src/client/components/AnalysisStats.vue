@@ -5,12 +5,22 @@
 				<img :src="iconPath">
 			</div>
 			<div class="details">
-				<h3 class="file-name">{{file.name}}</h3>
+				<h3 class="file-name">
+					<span v-if="file.type == 'file' || file.path != ''">{{file.name}}</span>
+					<span v-else>{{repo.name}}</span>
+				</h3>
 				<p class="file-info">
-					<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
-					<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
-					<span v-else-if="fileType && file.parent.path == ''">{{$t("components.analysisStats.fileOfTypeInRoot", [fileType.name])}}</span>
-					<span v-else>{{$t("components.analysisStats.fileInRoot")}}</span>
+					<span v-if="file.type == 'file'">
+						<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
+						<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
+						<span v-else-if="fileType && file.parent.path == ''">{{$t("components.analysisStats.fileOfTypeInRoot", [fileType.name])}}</span>
+						<span v-else>{{$t("components.analysisStats.fileInRoot")}}</span>
+					</span>
+					<span v-else>
+						<span v-if="file.path != '' && file.parent.path == ''">{{$t("components.analysisStats.folderInRoot")}}</span>
+						<span v-else-if="file.path != ''">{{$t("components.analysisStats.folderInFolder", [file.parent.path])}}</span>
+						<span v-else>{{$t("components.analysisStats.gitRepo")}}</span>
+					</span>
 				</p>
 			</div>
 			<div class="contributors" v-if="file.analysis">

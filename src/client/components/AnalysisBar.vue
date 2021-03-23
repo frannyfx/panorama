@@ -81,11 +81,9 @@ export default Vue.extend({
 
 		.segment {
 			height: 100%;
+			min-width: 2%;
 			transition: width 1s;
-
-			&:last-child {
-				flex-grow: 1;
-			}
+			flex-shrink: 1;
 		}
 	}
 

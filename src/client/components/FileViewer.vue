@@ -13,7 +13,7 @@
 			</div>
 			<div class="actions">
 				<div v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewSource') }">
-					<button class="action clean"
+					<button class="action"
 						:class="{ enabled: viewSource.enabled }"
 						@click="toggleViewSource"
 						:disabled="!canViewSource || !canNotViewSource">
@@ -21,7 +21,7 @@
 					</button>
 				</div>
 				<div v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewStats') }">
-					<button class="action clean" 
+					<button class="action" 
 						:class="{ enabled: viewStats.enabled }"
 						@click="toggleViewStats"
 						:disabled="!canViewStats">
@@ -99,10 +99,10 @@ export default Vue.extend({
 		"viewSource.enabled": function (to: boolean, from: boolean) {
 			// Get current query string and add new view source value to it.
 			let {...query} = this.$route.query;
-			query.source = to ? "1" : "0";
+			query["view-file-source"] = to ? "1" : "0";
 
 			// Prevent duplicate navigation.
-			if (query.source == this.$route.query.source) return;
+			if (query["view-file-source"] == this.$route.query["view-file-source"]) return;
 
 			// Replace current route with view source route.
 			this.$router.replace({
@@ -114,10 +114,10 @@ export default Vue.extend({
 		"viewStats.enabled": function (to: boolean, from: boolean) {
 			// Get current query string and add new stats value to it.
 			let {...query} = this.$route.query;
-			query.stats = to ? "1" : "0";
+			query["view-file-stats"] = to ? "1" : "0";
 
 			// Prevent duplicate navigation.
-			if (query.stats == this.$route.query.stats) return;
+			if (query["view-file-stats"] == this.$route.query["view-file-stats"]) return;
 
 			// Replace current route with stats route.
 			this.$router.replace({
@@ -229,8 +229,8 @@ export default Vue.extend({
 			this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: false });
 
 			// Remember the user's preferences with viewing the source code and viewing the stats, but adjust them on whether it is possible.
-			this.viewSource.enabled = this.$route.query.source == "1" || (this.canViewSource && !this.canNotViewSource);
-			this.viewStats.enabled = this.$route.query.stats == "1";
+			this.viewSource.enabled = this.$route.query["view-file-source"] == "1" || (this.canViewSource && !this.canNotViewSource);
+			this.viewStats.enabled = this.$route.query["view-file-stats"] == "1";
 		},
 		toggleViewSource() {
 			if (!this.canViewSource) return;
@@ -310,34 +310,6 @@ export default Vue.extend({
 
 		.actions {
 			display: flex;
-
-			.action {
-				color: $light-grey-blue;
-				width: 30px;
-				height: 30px;
-				border-radius: 30px;
-				font-size: 1.1em;
-				
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				transition: transform .3s, background-color .3s, color .3s, opacity .3s;
-
-				&:disabled {
-					opacity: .4;
-				}
-
-				&:not(:disabled) {
-					&:hover {
-						transform: scale(1.1);
-					}
-				}
-			}
-
-			.action.enabled {
-				background-color: $light-grey-blue;
-				color: white;
-			}
 
 			> :not(:last-child) {
 				margin-right: 10px;

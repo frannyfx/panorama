@@ -142,10 +142,13 @@
 			"anonymous": "Anonimo"
 		},
 		"analysisStats": {
-			"fileOfTypeInFolder": "Archivo {0} en la carpeta '{1}'.",
-			"fileInFolder": "Archivo en la carpeta '{0}'.",
-			"fileOfTypeInRoot": "Archivo {0} en el directorio raíz.",
-			"fileInRoot": "Archivo en el directorio raíz.",
+			"fileOfTypeInFolder": "Archivo {0} en la carpeta '{1}'",
+			"fileInFolder": "Archivo en la carpeta '{0}'",
+			"fileOfTypeInRoot": "Archivo {0} en el directorio raíz",
+			"fileInRoot": "Archivo en el directorio raíz",
+			"folderInFolder": "Carpeta en la carpeta '{0}'",
+			"folderInRoot": "Carpeta en el directorio raíz",
+			"gitRepo": "Repositorio",
 			"anonymous": "Anonimo",
 			"linesOfCode": "Ninguna linea | Una line | {0} lineas"
 		},

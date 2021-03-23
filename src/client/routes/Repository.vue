@@ -34,15 +34,24 @@
 							</span>
 						</transition-group>
 					</div>
-					<transition-group name="type" tag="div" class="extensions">
+					<!--<transition-group name="type" tag="div" class="extensions">
 						<div v-for="type in repo.content.files[currentPath].analysis ? repo.content.files[currentPath].analysis.typeList : []" :key="type" class="extension" v-tooltip="{ theme: 'panorama', content: $store.state.Extensions.typeMap[type] ? $store.state.Extensions.typeMap[type].name : '' }">
 							<div class="extension-icon">
 								<img :src="$store.state.Extensions.typeMap[type] ? `${config.repositories.extensions.icons.path}/${$store.state.Extensions.typeMap[type].icon}.${config.repositories.extensions.icons.extension}` : ''">
 							</div>
 							<span class="percentage">{{Math.round(repo.content.files[currentPath].analysis.typeObject[type].percentage * 100)}}%</span>
 						</div>
-					</transition-group>
+					</transition-group>-->
+					<div class="actions">
+						<button class="action" 
+							:class="{ enabled: viewStats.enabled }"
+							@click="toggleViewStats"
+							:disabled="!canViewStats">
+							<font-awesome-icon icon="eye"/>
+						</button>
+					</div>
 				</div>
+				<analysis-stats v-if="viewStats.enabled && canViewStats" :repo="repo" :path="currentPath"/>
 				<transition name="list">
 					<repository-file-list-item
 						v-show="($route.query.path || '') != ''"
@@ -85,15 +94,16 @@ import Extensions from "../store/modules/Extensions";
 import { File } from "../modules/models/File";
 import { dedupe, sleep } from "../../shared/utils";
 import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
+import { Error, showError } from "../modules/Error";
+import { createI18NAlert } from "../modules/Notifications";
+import { Data } from "../../shared/Result";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
-import { Error, showError } from "../modules/Error";
-import { createI18NAlert } from "../modules/Notifications";
-import { Data } from "../../shared/Result";
+import AnalysisStats from "../components/AnalysisStats.vue";
 
 /**
  * Get analysis data for a path.
@@ -208,7 +218,8 @@ export default Vue.extend({
 		FontAwesomeIcon,
 		RepositoryFileListItem,
 		FileViewer,
-		ContentFooter
+		ContentFooter,
+		AnalysisStats
 	},
 	watch: {
 		"repo.analysis.id": async function (to: number, from: number) {
@@ -278,7 +289,17 @@ export default Vue.extend({
 
 			// If the repo was updated after the last analysis started, we know the content has changed.
 			return this.repo.updatedAt >= this.repo.analysis.startedAt;
+		},
+		canViewStats() : boolean {
+			return this.repo.content.files[this.currentPath].analysis != null;
 		}
+	},
+	data() {
+		return {
+			viewStats: {
+				enabled: false
+			}
+		};
 	},
 	methods: {
 		setTitle() {
@@ -327,6 +348,10 @@ export default Vue.extend({
 
 			// Send a request to analyse the repo.
 			await analyseRepo(this.repo);
+		},
+		toggleViewStats() {
+			if (!this.canViewStats) return;
+			this.viewStats.enabled = !this.viewStats.enabled;
 		}
 	},
 	async beforeRouteEnter(to: any, from: any, next: Function) {
@@ -557,6 +582,10 @@ export default Vue.extend({
 .file-header {
 	.breadcrumbs {
 		flex-grow: 1;
+	}
+
+	.actions {
+		font-size: 0.85em;
 	}
 }
 
