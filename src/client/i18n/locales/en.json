@@ -168,5 +168,11 @@
 			"title": "An error occurred.",
 			"description": "Something went wrong. Please try again later."
 		}
+	},
+	"tokens": {
+		"Documentation": "Documentation",
+		"Code": "Code",
+		"Whitespace": "Whitespace",
+		"String": "String"
 	}
 }

@@ -151,8 +151,8 @@ function wrapRoute(route : Route, options: Options) : Function {
 			newRequest.params = schemasResult.result?.params;
 			newRequest.body = schemasResult.result?.body;
 		}
-
 		
+		// Handle exceptions thrown inside route handlers.
 		try {
 			// Handle WS.
 			if (route.method == Method.WS) {
@@ -173,13 +173,14 @@ function wrapRoute(route : Route, options: Options) : Function {
 			} else {
 				// Call regular HTTP requests.
 				newRequest.request = request;
-				route.handler!(newRequest, response);
+				
+				// Ensure the handler is awaited if it's a promise, otherwise we won't catch exceptions.
+				await route.handler!(newRequest, response);
 			}
 		} catch (e) {
 			logger.error(`Unhandled error at route ${Method[route.method]} ${route.url} - ${e.message}.`);
 			send(response, Codes.ServerError);
 		}
-		
 	};
 }
 

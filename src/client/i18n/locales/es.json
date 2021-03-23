@@ -168,5 +168,11 @@
 			"title": "Error",
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		}
+	},
+	"tokens": {
+		"Documentation": "Documentación",
+		"Code": "Codigo",
+		"Whitespace": "Espacio en blanco",
+		"String": "Cadena de caracteres"
 	}
 }

@@ -31,14 +31,7 @@ export interface Auth {
 }
 
 // The interface for the route handler function.
-export interface Handler {
-	(request: Request, response: any): void
-};
-
-/*
-export interface EventHandler {
-	(connection: SocketStream, request: FastifyRequest): void
-}*/
+export type Handler = (request: Request, response: any) => Promise<unknown>;
 
 // The interface for the route.
 export interface Route {

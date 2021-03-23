@@ -57,7 +57,7 @@
 				</div>
 				<div class="actions"></div>
 			</div>
-			<analysis-bar :items="[]"/>
+			<analysis-bar :items="codeClassificationBarItems"/>
 		</div>
 	</div>
 </template>
@@ -139,6 +139,23 @@ export default Vue.extend({
 						description: this.$i18n.tc("components.analysisStats.linesOfCode", fileTypeStats.numLines, [fileTypeStats.numLines]).toString()
 					}
 				};
+			});
+		},
+		codeClassificationBarItems() : BarItem[] {
+			return this.file.analysis!.tokenList.map(token => {
+				// Get token and token stats.
+				let tokenStats = this.file.analysis!.tokenObject[token];
+
+				return {
+					data: {
+						id: token,
+						percentage: tokenStats.percentage * 100
+					},
+					view: {
+						label: token,
+						description: this.$i18n.tc("components.analysisStats.linesOfCode", tokenStats.numLines, [tokenStats.numLines]).toString()
+					}
+				}
 			});
 		}
 	}

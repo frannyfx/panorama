@@ -23,7 +23,7 @@ import { getValidLocales } from "../../..";
 let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/github/client-id",
-	handler: (request: Request, response: any) => {
+	handler: async (request: Request, response: any) => {
 		send(response, Codes.OK, {
 			clientId: config.github?.clientId
 		});

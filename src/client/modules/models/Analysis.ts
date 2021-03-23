@@ -10,7 +10,8 @@ import { Data } from "../../../shared/Result";
 export interface Analysis {
 	contributorList: string[],
 	contributorObject: ContributorMap,
-	aggregateLineStats: AggregateLineStats,
+	tokenList: string[],
+	tokenObject: AggregateLineStats,
 	typeList: string[],
 	typeObject: AggregateLineStats,
 	numLines: number,
@@ -61,11 +62,13 @@ export function toAnalysis(input: Data) : Analysis {
 	// Process contributors.
 	let contributorList = Object.keys(input.contributors).sort((a: string, b: string) => input.contributors[b].percentage - input.contributors[a].percentage);
 	let typeList = Object.keys(input.extensions).sort((a: string, b: string) => input.extensions[b].percentage - input.extensions[a].percentage);
+	let tokenList = Object.keys(input.aggregateLineStats).sort((a: string, b: string) => input.aggregateLineStats[b].percentage - input.aggregateLineStats[a].percentage);
 
 	return {
 		contributorList,
 		contributorObject: input.contributors,
-		aggregateLineStats: input.aggregateLineStats,
+		tokenList, 
+		tokenObject: input.aggregateLineStats,
 		typeList: typeList,
 		typeObject: input.extensions,
 		numLines: input.numLines,

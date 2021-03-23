@@ -23,7 +23,7 @@ import { getValidLocales } from "../..";
  * @param request The request.
  * @param response The response.
  */
-function getIndex(request: any, response: any) {
+async function getIndex(request: any, response: any) {
 	// Create read stream for index.html.
 	const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/index.html"));
 	response.type("text/html").send(index);
@@ -32,7 +32,7 @@ function getIndex(request: any, response: any) {
 let routes : Array<Route> = [{
 	method: Method.GET,
 	url: "/",
-	handler: (request, response) => {
+	handler: async (request, response) => {
 		// TODO: Read Accept-Language header.
 		response.redirect("/en");
 	}
@@ -73,13 +73,13 @@ let routes : Array<Route> = [{
 			locale: Joi.string().valid(...getValidLocales())
 		})
 	},
-	handler: (request: Request, response: any) => {
+	handler: async (request: Request, response: any) => {
 		response.redirect(`/${request.params!.locale}`);
 	}
 }, {
 	method: Method.GET,
 	url: "/privacy-policy",
-	handler: (request: Request, response: any) => {
+	handler: async (request: Request, response: any) => {
 		const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/privacy-policy.html"));
 		response.type("text/html").send(index);
 	}

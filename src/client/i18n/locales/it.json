@@ -168,5 +168,11 @@
 			"title": "Errore",
 			"description": "Qualcosa è andato storto, provare più tardi."
 		}
+	},
+	"tokens": {
+		"Documentation": "Documentazione",
+		"Code": "Codice",
+		"Whitespace": "Spazio in bianco",
+		"String": "Stringa di caratteri"
 	}
 }
