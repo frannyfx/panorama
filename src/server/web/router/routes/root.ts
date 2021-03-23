@@ -76,6 +76,13 @@ let routes : Array<Route> = [{
 	handler: (request: Request, response: any) => {
 		response.redirect(`/${request.params!.locale}`);
 	}
+}, {
+	method: Method.GET,
+	url: "/privacy-policy",
+	handler: (request: Request, response: any) => {
+		const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/privacy-policy.html"));
+		response.type("text/html").send(index);
+	}
 }];
 
 export default routes;

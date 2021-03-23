@@ -27,7 +27,7 @@
 					<span>&bull;</span>
 					<a href="https://github.com/frannyfx" target="_blank"><font-awesome-icon :icon="['fab', 'github']"/></a>
 					<span>&bull;</span>
-					<a href="/privacy-policy">{{ $t("general.privacyPolicy") }}</a>
+					<a href="/privacy-policy" target="_blank">{{ $t("general.privacyPolicy") }}</a>
 				</p>
 			</div>
 		</transition>
