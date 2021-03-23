@@ -79,14 +79,23 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
  * @param repo The name of the repository.
  * @returns The information about the latest analysis of that repository.
  */
-async function getLatest(owner: string, repo: string) : Promise<Data | null> {
+async function getLatest(owner: string, repo: string, status: DatabaseAnalysisStatus | undefined = undefined) : Promise<Data | null> {
 	// Get connection.
 	let connection = await getConnection();
 	if (!connection) return null;
 
+	// Conditions
+	let conditions : Data = {
+		"User.login": owner,
+		"Repository.name": repo
+	};
+
+	// Add the status condition if set.
+	if (status) conditions["Analysis.status"] = status;
+
 	// Get analysis with repo name and owner ID.
 	let analysisRow = await connection("Analysis")
-		.where({ "User.login": owner, "Repository.name": repo })
+		.where(conditions)
 		.orderBy("queuedAt", "desc")
 		.join("Repository", { "Analysis.repositoryId": "Repository.repositoryId"})
 		.join("User", { "Repository.ownerId": "User.userId"})

@@ -61,7 +61,7 @@ let route : Array<Route> = [{
 		if (!repository.status.ok) return send(response, Codes.Forbidden);
 
 		// Get the latest ID for the repository.
-		let analysis = await DatabaseAnalysis.getLatest(request.params!.owner, request.params!.repo);
+		let analysis = await DatabaseAnalysis.getLatest(request.params!.owner, request.params!.repo, DatabaseAnalysisStatus.COMPLETED);
 
 		// Return -1 as the ID if a suitable analysis was not found.
 		if (!analysis) return send(response, Codes.OK, {
