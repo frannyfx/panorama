@@ -98,6 +98,7 @@ import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
 import AnalysisStats from "../components/AnalysisStats.vue";
+import Tokens from "../store/modules/Tokens";
 
 /**
  * Get analysis data for a path.
@@ -201,6 +202,23 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 
 	// Get analysis data for the current children.
 	let analysis = await getAnalysisData(repository, path);
+	
+	// If the repository has an analysis, get the token types from the current path.
+	if (repository.analysis.id != -1 && analysis[path]) {
+		// Extract token types that we don't yet have in the map.
+		let validTokens : string[] = analysis[path].tokenList.filter(token => !Tokens.state.map[token]);
+		if (validTokens.length != 0) {
+			// Get token data.
+			let tokenData = await send(Method.GET, `tokens?list=${validTokens.join(",")}`);
+
+			// If the token data was returned successfully, add them.
+			if (tokenData.status.ok) {
+				Store.commit("Tokens/add", {
+					map: tokenData.result!
+				});
+			}
+		}
+	}
 
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });

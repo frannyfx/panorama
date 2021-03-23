@@ -45,7 +45,7 @@ export default Vue.extend({
 	box-shadow: 0px 0px 15px rgba(black, 0.2);
 	border-radius: 50%;
 	overflow: hidden;
-	transition: transform .3s;
+	transition: transform .3s, -webkit-transform .3s, -moz-transform .3s;
 
 	&.small {
 		width: 20px;
@@ -60,7 +60,9 @@ export default Vue.extend({
 	}
 
 	&:hover {
-		transform: scale(1.4);
+		transform: translate3d(0, 0, 0) scale(1.4);
+		-moz-transform: translate3d(0, 0, 0) scale(1.4);
+		-webkit-transform: translate3d(0, 0, 0) scale(1.4);
 	}
 	
 	.contributor-image {

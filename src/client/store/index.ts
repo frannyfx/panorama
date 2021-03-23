@@ -10,12 +10,15 @@ import { Data } from "../../shared/Result";
 import { Repository } from "../modules/models/Repository";
 
 // Modules
+import { Error } from "../modules/Error";
+
+// Store modules
 import Notifications from "./modules/Notifications";
 import Repositories from "./modules/Repositories";
 import Modals from "./modules/Modals";
 import Extensions from "./modules/Extensions";
 import Users from "./modules/Users";
-import { Error } from "../modules/Error";
+import Tokens from "./modules/Tokens";
 
 // Use plugin
 Vue.use(Vuex);
@@ -104,7 +107,8 @@ export default new Vuex.Store<RootState>({
 		Repositories,
 		Modals,
 		Extensions,
-		Users
+		Users,
+		Tokens
 	},
 	strict: debug
 });

@@ -144,6 +144,7 @@ export default Vue.extend({
 		codeClassificationBarItems() : BarItem[] {
 			return this.file.analysis!.tokenList.map(token => {
 				// Get token and token stats.
+				let tokenData = this.$store.state.Tokens.map[token];
 				let tokenStats = this.file.analysis!.tokenObject[token];
 
 				return {
@@ -152,7 +153,8 @@ export default Vue.extend({
 						percentage: tokenStats.percentage * 100
 					},
 					view: {
-						label: token,
+						colour: tokenData.colour,
+						label: this.$i18n.t(`tokens.${tokenData.name}`).toString(),
 						description: this.$i18n.tc("components.analysisStats.linesOfCode", tokenStats.numLines, [tokenStats.numLines]).toString()
 					}
 				}
@@ -192,7 +194,7 @@ export default Vue.extend({
 
 			.file-info {
 				font-size: 0.8em;
-				font-weight: 600;
+				font-weight: 400;
 				color: $light-grey-blue;
 				margin: 0;
 			}
