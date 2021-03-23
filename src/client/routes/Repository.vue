@@ -34,21 +34,15 @@
 							</span>
 						</transition-group>
 					</div>
-					<!--<transition-group name="type" tag="div" class="extensions">
-						<div v-for="type in repo.content.files[currentPath].analysis ? repo.content.files[currentPath].analysis.typeList : []" :key="type" class="extension" v-tooltip="{ theme: 'panorama', content: $store.state.Extensions.typeMap[type] ? $store.state.Extensions.typeMap[type].name : '' }">
-							<div class="extension-icon">
-								<img :src="$store.state.Extensions.typeMap[type] ? `${config.repositories.extensions.icons.path}/${$store.state.Extensions.typeMap[type].icon}.${config.repositories.extensions.icons.extension}` : ''">
-							</div>
-							<span class="percentage">{{Math.round(repo.content.files[currentPath].analysis.typeObject[type].percentage * 100)}}%</span>
-						</div>
-					</transition-group>-->
 					<div class="actions">
-						<button class="action" 
-							:class="{ enabled: viewStats.enabled }"
-							@click="toggleViewStats"
-							:disabled="!canViewStats">
-							<font-awesome-icon icon="eye"/>
-						</button>
+						<div v-tooltip="{ theme: 'panorama', content: $t('routes.repo.viewStats') }">
+							<button class="action" 
+								:class="{ enabled: viewStats.enabled }"
+								@click="toggleViewStats"
+								:disabled="!canViewStats">
+								<font-awesome-icon icon="eye"/>
+							</button>
+						</div>
 					</div>
 				</div>
 				<analysis-stats v-if="viewStats.enabled && canViewStats" :repo="repo" :path="currentPath"/>

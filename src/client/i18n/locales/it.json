@@ -30,7 +30,8 @@
 			"reAnalyse": "Rianalizza",
 			"analysisInProgress": "Analisi in corso...",
 			"analysed": "Analizzato",
-			"upToDate": "Aggiornato"
+			"upToDate": "Aggiornato",
+			"viewStats": "Mostra statistiche"
 		},
 		"error": {
 			"title": "Errore • Panorama",
