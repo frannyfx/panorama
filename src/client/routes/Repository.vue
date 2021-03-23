@@ -287,6 +287,7 @@ export default Vue.extend({
 		async setPath(path: string) {
 			// Get file for selected path and prevent navigation if it is not a directory.
 			let file = this.repo.content.files[path];
+			let {...query} = this.$route.query;
 
 			// Show selected file if it's not a directory.
 			if (file && file.type != "dir") {
@@ -294,7 +295,8 @@ export default Vue.extend({
 				if (path == this.selectedFile) return;
 
 				// Otherwise, push the route.
-				this.$router.push({ name: "repo", params: this.$route.params, query: { path: this.$route.query.path || "", file: file.path } });
+				query.file = file.path;
+				this.$router.push({ name: "repo", params: this.$route.params, query });
 				return;
 			}
 			
@@ -302,7 +304,9 @@ export default Vue.extend({
 			await this.getChildren(file, path);			
 
 			// Push update.
-			this.$router.push({ name: "repo", params: this.$route.params, query: { path } });
+			query.path = file.path;
+			delete query.file;
+			this.$router.push({ name: "repo", params: this.$route.params, query });
 		},
 		async getChildren(file: File, path: string) {
 			// Set the folder's children loading state to true, which will play an animation.

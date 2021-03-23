@@ -32,13 +32,13 @@
 		</div>
 		<analysis-stats v-if="viewStats.enabled && canViewStats" :repo="repo" :path="path"/>
 		<div class="file-viewer list-item">
-			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled" :source="file.content.data" :relativeLinkRoot="rawLink"/>
+			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled && canNotViewSource" :source="file.content.data" :relativeLinkRoot="rawLink"/>
 			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
 				<a :href="fileLink" target="_blank"><img :src="`${rawLink}/${file.path}`"></a>
 				<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
 				<a :href="fileLink" target="_blank" class="subtitle">{{ $t('components.fileViewer.fileOfType', [fileType.name]) }} &bull; {{humanFileSize}}</a>
 			</div>			
-			<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != ''">
+			<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != '' && canViewSource">
 				<table class="line-table">
 					<tr v-for="(line, index) in highlightedLines" :key="index">
 						<td class="line-number">{{ index + 1}}</td>
@@ -97,7 +97,16 @@ export default Vue.extend({
 			if (!to) this.loadContent();
 		},
 		"viewSource.enabled": function (to: boolean, from: boolean) {
-			// ...
+			// Get current query string and add new view source value to it.
+			let {...query} = this.$route.query;
+			query.source = to ? "1" : "0";
+
+			// Replace current route with view source route.
+			this.$router.replace({
+				name: this.$route.name!,
+				params: this.$route.params,
+				query
+			});
 		},
 		"viewStats.enabled": function (to: boolean, from: boolean) {
 			// Get current query string and add new stats value to it.
@@ -110,8 +119,6 @@ export default Vue.extend({
 				params: this.$route.params,
 				query
 			});
-
-			// TODO: Read the query value.
 		}
 	},
 	computed: {
@@ -215,9 +222,9 @@ export default Vue.extend({
 			// Stop loading animation.
 			this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: false });
 
-			// If the file is not Markdown and the data loaded successfully, then enable viewSource.
-			this.viewSource.enabled = this.canViewSource && !this.canNotViewSource;
-			this.viewStats.enabled = this.viewStats.enabled && this.canViewStats;
+			// Remember the user's preferences with viewing the source code and viewing the stats, but adjust them on whether it is possible.
+			this.viewSource.enabled = this.$route.query.source == "1" || (this.canViewSource && !this.canNotViewSource);
+			this.viewStats.enabled = this.$route.query.stats == "1";
 		},
 		toggleViewSource() {
 			if (!this.canViewSource) return;
