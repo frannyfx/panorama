@@ -101,6 +101,9 @@ export default Vue.extend({
 			let {...query} = this.$route.query;
 			query.source = to ? "1" : "0";
 
+			// Prevent duplicate navigation.
+			if (query.source == this.$route.query.source) return;
+
 			// Replace current route with view source route.
 			this.$router.replace({
 				name: this.$route.name!,
@@ -112,6 +115,9 @@ export default Vue.extend({
 			// Get current query string and add new stats value to it.
 			let {...query} = this.$route.query;
 			query.stats = to ? "1" : "0";
+
+			// Prevent duplicate navigation.
+			if (query.stats == this.$route.query.stats) return;
 
 			// Replace current route with stats route.
 			this.$router.replace({
