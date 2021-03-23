@@ -74,6 +74,21 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 }
 
 /**
+ * Lookup an analysis using its corresponding job ID.
+ * @param jobId The ID of the bee-queue job.
+ * @returns The ID of the matching analysis.
+ */
+async function getRawWithJobId(jobId: string) : Promise<DatabaseAnalysis | null> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return null;
+
+	// Get ID
+	let analysis : DatabaseAnalysis = await connection("Analysis").where({ jobId }).first();
+	return analysis;
+}
+
+/**
  * Get the latest analysis of a repository.
  * @param owner The owner of the repository.
  * @param repo The name of the repository.
@@ -144,5 +159,5 @@ async function get(analysisId: number) : Promise<Data | null> {
 }
 
 export default {
-	insert, update, getLatest, get
+	insert, update, getLatest, get, getRawWithJobId
 };

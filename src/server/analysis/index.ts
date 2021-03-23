@@ -300,7 +300,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	if (!files) throw new Error("Could not analyse repository files.");
 
 	// Filter files specified in .panoramaignore.
-	files = (await filterIgnoredFiles(files, repoDir))/*.filter(file => file == "web/main.js")*/;
+	files = (await filterIgnoredFiles(files, repoDir));
 
 	// Create list to hold the results of the analysis of each file.
 	let analysisResults : AnalysedItem[] = [];

@@ -223,5 +223,8 @@ export async function analyseRepo(repository: Repository) {
 
 		// Set analysis ID.
 		Store.commit("Repositories/setAnalysis", { repository, analysis: result.analysis });
+	}, () => {
+		// The repo failed to analyse.
+		Store.commit("Repositories/setAnalysisInProgress", { repository, inProgress: false});
 	});
 }

@@ -95,9 +95,16 @@ async function onMessage(event : MessageEvent) {
 
 	// Check if the job has failed.
 	if (data.result!.status == "failed") {
-		console.warn("Job failed!", job.jobId);
-		
-		// Create localised alert.
+		// Update progress in the job notification.
+		Store.commit("Notifications/updateNotificationProgress", {
+			id: notification.id,
+			progress: {
+				value: 1,
+				status: i18n.t("alerts.analysis.status.failed").toString()
+			}
+		});
+
+		// Create i18n alert.
 		createI18NAlert("WARNING", "analysisFailed", [job.repositoryName], [job.repositoryName]);
 		return;
 	}

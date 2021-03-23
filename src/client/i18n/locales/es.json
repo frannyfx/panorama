@@ -67,6 +67,9 @@
 				"Lexing": "Analizando el código...",
 				"Finalising": "Casi terminado...",
 				"Done": "Terminado."
+			},
+			"status": {
+				"failed": "Analysis failed."
 			}
 		},
 		"ticketFetchFailed": {

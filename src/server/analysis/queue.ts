@@ -4,18 +4,21 @@
  */
 
 // Imports
-import Queue from "bee-queue";
+import Queue, { Job } from "bee-queue";
 import redis, { RedisClient } from "redis";
-import { Data } from "../../shared/Result";
+
 
 // Config
 import loadConfig, { Config } from "../Config";
-import { DatabaseAnalysis } from "../database/models/Analysis";
+import Analysis, { DatabaseAnalysis, DatabaseAnalysisStatus } from "../database/models/Analysis";
 import { Repository } from "../github";
 const config : Config = loadConfig();
 
 // Modules
 const logger = require("../utils/logger")("queue");
+import { Data } from "../../shared/Result";
+
+// Models
 
 // Interfaces
 export interface RepoJob {
@@ -65,6 +68,23 @@ function createQueue() {
 	// Create queue.
 	repoQueue = new Queue("REPO_QUEUE", {
 		redis: redisClient!
+	});
+
+	// Handle job failure by writing the new status of the job to the database.
+	repoQueue.on("job failed", async (jobId, err) => {
+		// Log error.
+		logger.error(`Job ${jobId} failed. ${err}`);
+
+		// Get the analysis with the specified job ID.
+		let analysis = await Analysis.getRawWithJobId(jobId);
+		if (!analysis) {
+			logger.warn(`Unable to update database analysis status for job ${jobId}.`);
+			return;
+		}
+
+		// Update the analysis status.
+		analysis.status = DatabaseAnalysisStatus.FAILED;
+		await Analysis.update(analysis);
 	});
 
 	// Log status.
