@@ -12,9 +12,7 @@ export interface Analysis {
 	contributorObject: ContributorMap,
 	aggregateLineStats: AggregateLineStats,
 	typeList: string[],
-	typeObject: {
-		[key: string]: AggregateLineStats
-	}
+	typeObject: AggregateLineStats,
 	numLines: number,
 	chunks: {
 		loaded: boolean,

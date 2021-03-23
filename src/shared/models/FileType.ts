@@ -11,7 +11,8 @@ export interface FileType {
 	typeId: number,
 	name: string,
 	icon: string,
-	language?: string
+	language?: string,
+	colour?: string
 };
 
 /**

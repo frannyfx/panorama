@@ -32,14 +32,32 @@
 				</div>
 			</div>
 		</div>
-		<div class="contributor-stats">
+		<div class="panel contributor-stats">
 			<div class="stats-header">
 				<div class="details">
-					<h3>Contributors</h3>
+					<h3>{{$t("components.analysisStats.contributors")}}</h3>
 				</div>
 				<div class="actions"></div>
 			</div>
 			<analysis-bar :items="contributorBarItems"/>
+		</div>
+		<div class="panel folder-stats" v-if="file.type == 'dir'">
+			<div class="stats-header">
+				<div class="details">
+					<h3>{{$t("components.analysisStats.fileTypes")}}</h3>
+				</div>
+				<div class="actions"></div>
+			</div>
+			<analysis-bar :items="fileTypeBarItems"/>
+		</div>
+		<div class="panel token-stats">
+			<div class="stats-header">
+				<div class="details">
+					<h3>{{$t("components.analysisStats.codeClassification")}}</h3>
+				</div>
+				<div class="actions"></div>
+			</div>
+			<analysis-bar :items="[]"/>
 		</div>
 	</div>
 </template>
@@ -102,6 +120,26 @@ export default Vue.extend({
 					}
 				}
 			});
+		},
+		fileTypeBarItems() : BarItem[] {
+			return this.file.analysis!.typeList.map(type => {
+				// Get file type and file type stats.
+				let fileType = this.$store.state.Extensions.typeMap[type];
+				let fileTypeStats = this.file.analysis!.typeObject[type];
+
+				// Convert the available data to a bar item.
+				return {
+					data: {
+						id: fileType.id,
+						percentage: fileTypeStats.percentage * 100
+					},
+					view: {
+						label: fileType.name,
+						colour: fileType.colour,
+						description: this.$i18n.tc("components.analysisStats.linesOfCode", fileTypeStats.numLines, [fileTypeStats.numLines]).toString()
+					}
+				};
+			});
 		}
 	}
 });
@@ -160,7 +198,7 @@ export default Vue.extend({
 		}
 	}
 
-	.contributor-stats {
+	.panel {
 		border-top: 1px solid $grey-tinted;
 		box-sizing: border-box;
 		padding: 30px 40px;
@@ -175,8 +213,6 @@ export default Vue.extend({
 				}
 			}
 		}
-
-		
 	}
 }
 </style>

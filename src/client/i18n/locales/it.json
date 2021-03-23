@@ -151,7 +151,10 @@
 			"folderInRoot": "Cartella nella cartella base",
 			"gitRepo": "Archivio",
 			"anonymous": "Anonimo",
-			"linesOfCode": "Nessuna riga | Una riga | {0} righe"
+			"linesOfCode": "Nessuna riga | Una riga | {0} righe",
+			"contributors": "Collaboratori",
+			"fileTypes": "Tipi di file",
+			"codeClassification": "Tipologia del codice"
 		},
 		"contributorBubble": {
 			"anonymous": "Anonimo"

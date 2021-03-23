@@ -418,6 +418,7 @@ export default Vue.extend({
 
 	> .title {
 		flex-grow: 1;
+		flex-shrink: 1;
 
 		h3 {
 			display: flex;
@@ -451,6 +452,10 @@ export default Vue.extend({
 			color: $grey-blue;
 			margin: 0px;
 		}
+	}
+
+	.actions {
+		flex-shrink: 0;
 	}
 }
 
