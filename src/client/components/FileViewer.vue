@@ -30,7 +30,7 @@
 				</div>
 			</div>
 		</div>
-		<analysis-stats v-show="viewStats.enabled"/>
+		<analysis-stats v-if="viewStats.enabled && canViewStats" :repo="repo" :path="path"/>
 		<div class="file-viewer list-item">
 			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled" :source="file.content.data" :relativeLinkRoot="rawLink"/>
 			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
@@ -69,9 +69,8 @@ import { encode as encodeHTMLEntities } from "html-entities";
 // Modules
 import config from "../config";
 import { getFileContent } from "../modules/GitHub";
-import { File } from "../modules/models/File";
+import { File, getIconPath } from "../modules/models/File";
 import { Repository } from "../modules/models/Repository";
-import Extensions from "../store/modules/Extensions";
 import { FileType } from "../../shared/models/FileType";
 import hljs from "highlight.js";
 import { humanFileSize } from "../../shared/utils";
@@ -94,8 +93,25 @@ export default Vue.extend({
 			// Watch for changes on the path so new content can be loaded.
 			this.loadContent();
 		},
-		"file.content.loaded": function (to, from) {
+		"file.content.loaded": function (to: boolean, from: boolean) {
 			if (!to) this.loadContent();
+		},
+		"viewSource.enabled": function (to: boolean, from: boolean) {
+			// ...
+		},
+		"viewStats.enabled": function (to: boolean, from: boolean) {
+			// Get current query string and add new stats value to it.
+			let {...query} = this.$route.query;
+			query.stats = to ? "1" : "0";
+
+			// Replace current route with stats route.
+			this.$router.replace({
+				name: this.$route.name!,
+				params: this.$route.params,
+				query
+			});
+
+			// TODO: Read the query value.
 		}
 	},
 	computed: {
@@ -106,17 +122,10 @@ export default Vue.extend({
 			return this.file.name.split(".").pop()!;
 		},
 		fileType() : FileType {
-			return Extensions.state.map[this.extension];
+			return this.$store.state.Extensions.map[this.extension];
 		},
 		iconPath() : string {
-			// Return folder icon.
-			if (this.file.type == "dir") return `${config.repositories.extensions.icons.path}/folder.${config.repositories.extensions.icons.extension}`;
-
-			// Get extension information
-			if (this.fileType) return `${config.repositories.extensions.icons.path}/${this.fileType.icon}.${config.repositories.extensions.icons.extension}`;
-
-			// No extension information, return default file icon.
-			return `${config.repositories.extensions.icons.path}/file.${config.repositories.extensions.icons.extension}`;
+			return getIconPath(this.file);
 		},
 		content() : string {
 			return this.file.content.loaded ? this.file.content.data : "";
@@ -208,6 +217,7 @@ export default Vue.extend({
 
 			// If the file is not Markdown and the data loaded successfully, then enable viewSource.
 			this.viewSource.enabled = this.canViewSource && !this.canNotViewSource;
+			this.viewStats.enabled = this.viewStats.enabled && this.canViewStats;
 		},
 		toggleViewSource() {
 			if (!this.canViewSource) return;
@@ -416,6 +426,7 @@ export default Vue.extend({
 				padding: 0px 10px;
 				color: $grey-blue;
 				z-index: 100;
+				border-right: 1px solid $grey-tinted;
 
 				&:not(.last) {
 					border-bottom: 1px solid $grey-tinted;
@@ -424,7 +435,6 @@ export default Vue.extend({
 
 			.code {
 				padding: 0px 20px;
-				border-left: 1px solid $grey-tinted;
 
 				pre {
 					margin: 0;

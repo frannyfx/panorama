@@ -176,6 +176,9 @@ export async function getEnrichedRepositoryContributors(repository: Repository) 
 	let contributorData = await send(Method.GET, `analysis/${repository.analysis.id}/contributors`);
 	if (!contributorData.status.ok) return false;
 
+	// Handle anonymous user.
+	if (contributorData.result!["Anonymous"] && contributorData.result!["Anonymous"].userId == -1) toUser({ id: -1, login: "Anonymous" }, contributorData.result!["Anonymous"]);
+
 	// Check which contributors have not had their GitHub data fetched.
 	let unknownUserLogins = Object.keys(contributorData.result!).filter(login => Users.state.list.indexOf(login) == -1);
 

@@ -6,6 +6,8 @@
 // Imports
 import { Data } from "../../../shared/Result";
 import { Analysis, toAnalysis } from "./Analysis";
+import config from "../../config";
+import Extensions from "../../store/modules/Extensions";
 
 // Interfaces
 export interface File {
@@ -51,4 +53,19 @@ export function toFile(input: Data, analysis: Data | undefined = undefined, pare
 		},
 		analysis: analysis ? toAnalysis(analysis) : undefined
 	};
+}
+
+export function getIconPath(file: File) : string {
+	// Return folder icon.
+	let icon = "file";
+	if (file.type == "dir") icon = "folder";
+	else {
+		// Get extension information
+		let extension = file.name.split(".").pop()!;
+		let fileType = Extensions.state.map[extension];
+		if (fileType) icon = fileType.icon;
+	}
+	
+	// No extension information, return default file icon.
+	return `${config.repositories.extensions.icons.path}/${icon}.${config.repositories.extensions.icons.extension}`;
 }

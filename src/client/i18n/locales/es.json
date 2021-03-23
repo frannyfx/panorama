@@ -140,6 +140,20 @@
 			"fileOfType": "Archivo {0}",
 			"file": "Archivo",
 			"anonymous": "Anonimo"
+		},
+		"analysisStats": {
+			"fileOfTypeInFolder": "Archivo {0} en la carpeta '{1}'.",
+			"fileInFolder": "Archivo en la carpeta '{0}'.",
+			"fileOfTypeInRoot": "Archivo {0} en el directorio raíz.",
+			"fileInRoot": "Archivo en el directorio raíz.",
+			"anonymous": "Anonimo",
+			"linesOfCode": "Ninguna linea | Una line | {0} lineas"
+		},
+		"contributorBubble": {
+			"anonymous": "Anonimo"
+		},
+		"footer": {
+			"madeWithLove": "Hecho con ❤️ en Londres"
 		}
 	},
 	"errors": {

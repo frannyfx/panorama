@@ -232,18 +232,19 @@ async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalys
 	// Create lists to hold the contributors and the aggregate stats.
 	let contributors : DatabaseAnalysedItemContributor[] = [];
 	let contributorAggregateStats : DatabaseAnalysedItemContributorAggregateStats[] = [];
+	let insertAnonymous = false;
 
 	// Loop through the items.
 	analysedItems.map(item => {
 		Object.keys(item.contributors).map(contributorId => {
-			// TODO: Handle anonymous contributors.
-			if (!contributorMap[contributorId].id) return;
+			// If we have anonymous contributions, insert anyonymous.
+			if (!contributorMap[contributorId].id) insertAnonymous = true;
 
 			// Add the contributor for the item.
 			contributors.push({
 				analysisId: analysis.analysisId!,
 				path: item.path,
-				contributorId: contributorMap[contributorId].id,
+				contributorId: contributorMap[contributorId].id ? contributorMap[contributorId].id : -1,
 				numLines: item.contributors[contributorId].numLines,
 				percentage: item.contributors[contributorId].percentage
 			});
@@ -257,7 +258,7 @@ async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalys
 				contributorAggregateStats.push({
 					analysisId: analysis.analysisId!,
 					path: item.path,
-					contributorId: contributorMap[contributorId].id,
+					contributorId: contributorMap[contributorId].id ? contributorMap[contributorId].id : -1,
 					tokenType: token,
 					numLines: item.contributors[contributorId].aggregateLineStats[token].numLines,
 					percentage: item.contributors[contributorId].aggregateLineStats[token].percentage,
@@ -265,6 +266,11 @@ async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalys
 			});
 		});
 	});
+
+	// Insert an anonymous analysis contributor.
+	if (insertAnonymous) {
+		await connection("AnalysisContributor").insert({ analysisId: analysis.analysisId!, userId: -1 });
+	}
 
 	// Insert the contributors and the aggregate stats.
 	await connection("AnalysedItemContributor").insert(contributors);
@@ -386,7 +392,7 @@ async function getItemsInFolder(analysisId: number, path: string) : Promise<Anal
 	let pathsInFolder : string[] = itemsInFolder.map(row => row.path);
 
 	// Get AnalysedItemContributors for the files in the folder.
-	let contributors : any[] = await connection("AnalysedItemContributor").where({analysisId}).whereIn("path", pathsInFolder).join("User", { "AnalysedItemContributor.contributorId": "User.userId"});
+	let contributors : any[] = await connection("AnalysedItemContributor").where({analysisId}).whereIn("path", pathsInFolder).leftJoin("User", { "AnalysedItemContributor.contributorId": "User.userId"});
 
 	// Get ContributorAggregateStats for the files in the folder.
 	let contributorAggregateStats : DatabaseAnalysedItemContributorAggregateStats[] = await connection("AnalysedItemContributorAggregateStats").where({analysisId}).whereIn("path", pathsInFolder);

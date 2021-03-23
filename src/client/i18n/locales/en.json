@@ -141,6 +141,17 @@
 			"file": "File",
 			"anonymous": "Anonymous"
 		},
+		"analysisStats": {
+			"fileOfTypeInFolder": "{0} file in the '{1}' folder.",
+			"fileInFolder": "File in the '{0}' folder.",
+			"fileOfTypeInRoot": "{0} file in the root directory.",
+			"fileInRoot": "File in the root directory.",
+			"anonymous": "Anonymous",
+			"linesOfCode": "No lines | One line | {0} lines"
+		},
+		"contributorBubble": {
+			"anonymous": "Anonymous"
+		},
 		"footer": {
 			"madeWithLove": "Made with ❤️ in London"
 		}

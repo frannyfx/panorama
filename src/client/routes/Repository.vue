@@ -93,6 +93,7 @@ import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
 import { Error, showError } from "../modules/Error";
 import { createI18NAlert } from "../modules/Notifications";
+import { Data } from "../../shared/Result";
 
 /**
  * Get analysis data for a path.
@@ -254,7 +255,7 @@ export default Vue.extend({
 			let files : string[] = this.repo.content.files[this.currentPath].children.list;
 			return files;
 		},
-		config() {
+		config() : Data {
 			return config;
 		},
 		selectedFile() : string {
