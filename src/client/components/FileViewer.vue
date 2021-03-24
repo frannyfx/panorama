@@ -23,14 +23,13 @@
 				<div v-tooltip="{ theme: 'panorama', content: $t('components.fileViewer.viewStats') }">
 					<button class="action" 
 						:class="{ enabled: viewStats.enabled }"
-						@click="toggleViewStats"
-						:disabled="!canViewStats">
+						@click="toggleViewStats">
 						<font-awesome-icon icon="eye"/>
 					</button>
 				</div>
 			</div>
 		</div>
-		<analysis-stats v-if="viewStats.enabled && canViewStats" :repo="repo" :path="path"/>
+		<analysis-stats :show="viewStats.enabled" :repo="repo" :path="path"/>
 		<div class="file-viewer list-item">
 			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled && canNotViewSource" :source="file.content.data" :relativeLinkRoot="rawLink"/>
 			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
@@ -155,9 +154,6 @@ export default Vue.extend({
 		canNotViewSource() : boolean {
 			return this.fileType && this.fileType.name == "Markdown";
 		},
-		canViewStats() : boolean {
-			return this.file.analysis.available;
-		},
 		highlightedLines() : string[] {
 			// Get language from file type.
 			let language = this.fileType ? this.fileType.language : undefined;
@@ -237,7 +233,6 @@ export default Vue.extend({
 			this.viewSource.enabled = !this.viewSource.enabled;
 		},
 		toggleViewStats() {
-			if (!this.canViewStats) return;
 			this.viewStats.enabled = !this.viewStats.enabled;
 		}
 	},

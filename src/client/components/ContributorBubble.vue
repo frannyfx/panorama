@@ -1,7 +1,7 @@
 <template>
 	<div 
 		class="contributor"
-		:class="{ small, anonymous: isAnonymous }" 
+		:class="{ anonymous: isAnonymous }" 
 		v-tooltip="{ theme: 'panorama', content: isAnonymous ? $t('components.contributorBubble.anonymous') : login }">
 		<div class="contributor-image" :style="{ 'background-image': !isAnonymous ? `url('${$store.state.Users.object[login].avatarUrl}')` : undefined }">
 			<font-awesome-icon v-if="isAnonymous" icon="question"/>
@@ -27,11 +27,6 @@ export default Vue.extend({
 		login: {
 			type: String,
 			required: true
-		},
-		small: {
-			type: Boolean,
-			required: false,
-			default: false
 		}
 	}	
 });
@@ -39,30 +34,17 @@ export default Vue.extend({
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
 .contributor {
-	width: 40px;
-	height: 40px;
-	border: 3px solid white;
-	box-shadow: 0px 0px 15px rgba(black, 0.2);
+	width: 50px;
+	height: 50px;
+	box-sizing: border-box;
 	border-radius: 50%;
 	overflow: hidden;
-	transition: transform .3s, -webkit-transform .3s, -moz-transform .3s;
-
-	&.small {
-		width: 20px;
-		height: 20px;
-		border: none;
-
-		&.anonymous {
-			.contributor-image {
-				font-size: 0.7em;
-			}
-		}
-	}
+	transition: transform .3s, -webkit-transform .3s, -moz-transform .3s, width .3s, height .3s;
 
 	&:hover {
-		transform: translate3d(0, 0, 0) scale(1.4);
-		-moz-transform: translate3d(0, 0, 0) scale(1.4);
-		-webkit-transform: translate3d(0, 0, 0) scale(1.4);
+		transform: translate3d(0, 0, 0) scale(1.2);
+		-moz-transform: translate3d(0, 0, 0) scale(1.2);
+		-webkit-transform: translate3d(0, 0, 0) scale(1.2);
 	}
 	
 	.contributor-image {
@@ -77,14 +59,9 @@ export default Vue.extend({
 			display: flex;
 			align-items: center;
 			justify-content: center;
-
 			background-color: $blue;
 			color: white;
 		}
-	}
-
-	&:not(:last-child) {
-		margin-right: 10px;
 	}
 }
 </style>

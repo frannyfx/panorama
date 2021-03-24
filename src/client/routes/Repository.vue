@@ -38,14 +38,13 @@
 						<div v-tooltip="{ theme: 'panorama', content: $t('routes.repo.viewStats') }">
 							<button class="action" 
 								:class="{ enabled: viewStats.enabled }"
-								@click="toggleViewStats"
-								:disabled="!canViewStats">
+								@click="toggleViewStats">
 								<font-awesome-icon icon="eye"/>
 							</button>
 						</div>
 					</div>
 				</div>
-				<analysis-stats v-if="viewStats.enabled && canViewStats" :repo="repo" :path="currentPath"/>
+				<analysis-stats :show="viewStats.enabled" :repo="repo" :path="currentPath"/>
 				<transition name="list">
 					<repository-file-list-item
 						v-show="($route.query.path || '') != ''"
@@ -253,6 +252,21 @@ export default Vue.extend({
 		},
 		"repo.id": function () {
 			this.setTitle();
+		},
+		"viewStats.enabled": function (to: boolean, from: boolean) {
+			// Get current query string and add new stats value to it.
+			let {...query} = this.$route.query;
+			query["view-folder-stats"] = to ? "1" : "0";
+
+			// Prevent duplicate navigation.
+			if (query["view-folder-stats"] == this.$route.query["view-folder-stats"]) return;
+
+			// Replace current route with stats route.
+			this.$router.replace({
+				name: this.$route.name!,
+				params: this.$route.params,
+				query
+			});
 		}
 	},
 	computed: {
@@ -302,9 +316,6 @@ export default Vue.extend({
 
 			// If the repo was updated after the last analysis started, we know the content has changed.
 			return this.repo.updatedAt >= this.repo.analysis.startedAt;
-		},
-		canViewStats() : boolean {
-			return this.repo.content.files[this.currentPath].analysis.available;
 		}
 	},
 	data() {
@@ -337,9 +348,11 @@ export default Vue.extend({
 			// Get children.
 			await this.getChildren(file, path);			
 
-			// Push update.
+			// Remove current file being viewed from the path.
 			query.path = file.path;
 			delete query.file;
+
+			// Push to router.
 			this.$router.push({ name: "repo", params: this.$route.params, query });
 		},
 		async getChildren(file: File, path: string) {
@@ -363,7 +376,6 @@ export default Vue.extend({
 			await analyseRepo(this.repo);
 		},
 		toggleViewStats() {
-			if (!this.canViewStats) return;
 			this.viewStats.enabled = !this.viewStats.enabled;
 		}
 	},
@@ -421,6 +433,10 @@ export default Vue.extend({
 			vm.$store.commit("setLoading", false);
 			vm.setTitle();	
 		});
+	},
+	mounted() {
+		// Remember folder stats preference.
+		if (this.$route.query["view-folder-stats"] == "1") this.viewStats.enabled = true;
 	}
 });
 </script>

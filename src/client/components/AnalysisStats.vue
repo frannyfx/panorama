@@ -1,68 +1,65 @@
 <template>
-	<div class="analysis-stats list-item">
-		<div class="panel header">
-			<div class="file-icon">
-				<img :src="iconPath">
-			</div>
-			<div class="details">
-				<h3 class="file-name">
-					<span v-if="file.type == 'file' || file.path != ''">{{file.name}}</span>
-					<span v-else>{{repo.name}}</span>
-				</h3>
-				<div class="file-info">
-					<div v-if="file.type == 'file'" class="dot-indicator" :style="{
-						'background-color': fileType ? `#${fileType.colour}` : undefined
-					}"></div>
-					<span v-if="file.type == 'file'">
-						<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
-						<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
-						<span v-else-if="fileType && file.parent.path == ''">{{$t("components.analysisStats.fileOfTypeInRoot", [fileType.name])}}</span>
-						<span v-else>{{$t("components.analysisStats.fileInRoot")}}</span>
-					</span>
-					<span v-else>
-						<span v-if="file.path != '' && file.parent.path == ''">{{$t("components.analysisStats.folderInRoot")}}</span>
-						<span v-else-if="file.path != ''">{{$t("components.analysisStats.folderInFolder", [file.parent.path])}}</span>
-						<span v-else>{{$t("components.analysisStats.gitRepo")}}</span>
-					</span>
+	<transition-group class="analysis-stats list-item" :class="{ first: !show }" tag="div" name="panel">
+		<div class="panel header" key="header" v-show="show">
+			<div class="file">
+				<div class="file-icon">
+					<img :src="iconPath">
+				</div>
+				<div class="details">
+					<h3 class="file-name">
+						<span v-if="file.type == 'file' || file.path != ''">{{file.name}}</span>
+						<span v-else>{{repo.name}}</span>
+					</h3>
+					<div class="file-info">
+						<div v-if="file.type == 'file'" class="dot-indicator" :style="{
+							'background-color': fileType ? `#${fileType.colour}` : undefined
+						}"></div>
+						<span v-if="file.type == 'file'">
+							<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
+							<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
+							<span v-else-if="fileType && file.parent.path == ''">{{$t("components.analysisStats.fileOfTypeInRoot", [fileType.name])}}</span>
+							<span v-else>{{$t("components.analysisStats.fileInRoot")}}</span>
+						</span>
+						<span v-else>
+							<span v-if="file.path != '' && file.parent.path == ''">{{$t("components.analysisStats.folderInRoot")}}</span>
+							<span v-else-if="file.path != ''">{{$t("components.analysisStats.folderInFolder", [file.parent.path])}}</span>
+							<span v-else>{{$t("components.analysisStats.gitRepo")}}</span>
+						</span>
+					</div>
 				</div>
 			</div>
-			<div class="contributors" v-if="file.analysis.available">
-				<div class="list">
-					<contributor-bubble v-for="login in file.analysis.data.contributorList.slice(0, 3)" :key="login" :login="login"/>
-				</div>
-				<div class="list">
-					<contributor-bubble v-for="login in file.analysis.data.contributorList.slice(3, 8)" :key="login" :login="login" :small="true"/>
-				</div>
+			<div class="contributors">
+				<contributor-bubbles key="contributor-bubbles" :contributor-list="file.analysis.available ? file.analysis.data.contributorList : []"/>
 			</div>
 		</div>
-		<div class="panel contributor-stats">
+		<div class="panel contributor-stats" key="contributor-stats" v-show="show && file.analysis.available">
 			<div class="stats-header">
 				<div class="details">
 					<h3>{{$t("components.analysisStats.contributors")}}</h3>
 				</div>
 				<div class="actions"></div>
 			</div>
-			<analysis-bar :items="contributorBarItems"/>
+			<analysis-bar :items="file.analysis.available ? contributorBarItems : []"/>
 		</div>
-		<div class="panel folder-stats" v-if="file.type == 'dir'">
+		<div class="panel folder-stats" key="folder-stats" v-show="show && file.analysis.available && file.type == 'dir'">
 			<div class="stats-header">
 				<div class="details">
 					<h3>{{$t("components.analysisStats.fileTypes")}}</h3>
 				</div>
 				<div class="actions"></div>
 			</div>
-			<analysis-bar :items="fileTypeBarItems"/>
+			<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []"/>
 		</div>
-		<div class="panel token-stats">
+		<div class="panel token-stats" key="token-stats" v-show="show && file.analysis.available">
 			<div class="stats-header">
 				<div class="details">
 					<h3>{{$t("components.analysisStats.codeClassification")}}</h3>
 				</div>
 				<div class="actions"></div>
 			</div>
-			<analysis-bar :items="codeClassificationBarItems"/>
+			<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []"/>
 		</div>
-	</div>
+	</transition-group>
 </template>
 <script lang="ts">
 // Imports
@@ -72,13 +69,13 @@ import { File, getIconPath } from "../modules/models/File";
 import { Repository } from "../modules/models/Repository";
 
 // Components
-import ContributorBubble from "./ContributorBubble.vue";
+import ContributorBubbles from "./ContributorBubbles.vue";
 import AnalysisBar from "./AnalysisBar.vue";
 import { BarItem } from "../modules/models/Bar";
 
 export default Vue.extend({
 	components: {
-		ContributorBubble,
+		ContributorBubbles,
 		AnalysisBar
 	},
 	props: {
@@ -88,6 +85,10 @@ export default Vue.extend({
 		},
 		path: {
 			type: String,
+			required: true
+		},
+		show: {
+			type: Boolean,
 			required: true
 		}
 	},
@@ -174,55 +175,56 @@ export default Vue.extend({
 	.header {
 		display: flex;
 		align-items: center;
+		flex-wrap: wrap;
 
-		.file-icon {
+		.file {
 			display: flex;
 			align-items: center;
+			flex-grow: 100;
 
-			img {
-				height: 60px;
-			}
-		}
-
-		.details {
-			margin-left: 20px;
-			flex-grow: 1;
-
-			.file-name {
-				font-size: 1.3em;
-				color: $grey-blue;
-				margin: 0;
-			}
-
-			.file-info {
+			.file-icon {
 				display: flex;
 				align-items: center;
 
-				.dot-indicator {
-					margin-right: 8px;
+				img {
+					height: 60px;
+				}
+			}
+
+			.details {
+				margin-left: 20px;
+				flex-grow: 1;
+
+				.file-name {
+					font-size: 1.3em;
+					color: $grey-blue;
+					margin: 0;
 				}
 
-				font-size: 0.8em;
-				font-weight: 400;
-				color: $light-grey-blue;
-				margin: 0;
+				.file-info {
+					display: flex;
+					align-items: center;
+
+					.dot-indicator {
+						margin-right: 8px;
+					}
+
+					font-size: 0.8em;
+					font-weight: 400;
+					color: $light-grey-blue;
+					margin: 0;
+				}
 			}
 		}
-		
+
 		.contributors {
+			flex-shrink: 1;
+			flex-grow: 1;
+
 			display: flex;
 			align-items: center;
+			justify-content: center;
 			flex-direction: column;
-
-			.list {
-				display: flex;
-				align-items: center;
-				flex-direction: row;
-			}
-
-			> :not(:last-child) {
-				margin-bottom: 8px;
-			}
 		}
 	}
 
@@ -239,11 +241,27 @@ export default Vue.extend({
 
 			.details {
 				flex-grow: 1;
+
 				h3 {
 					color: $grey-blue;
 				}
 			}
 		}
+	}
+}
+
+/* Transitions */
+.panel-enter-active, .panel-leave-active {
+	transition: max-height 1s, opacity 1s, padding-top 1s, padding-bottom 1s;
+	max-height: 200px;
+	overflow: hidden;
+
+	&.panel-enter, &.panel-leave-to {
+		border-top: 0px solid transparent !important;
+		max-height: 0px !important;
+		opacity: 0;
+		padding-top: 0px;
+		padding-bottom: 0px;
 	}
 }
 </style>
