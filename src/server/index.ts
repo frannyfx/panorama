@@ -17,11 +17,10 @@ import analysis from "./analysis";
 import queue from "./analysis/queue";
 import database from "./database";
 
-
 /**
- * Initialise the backend.
+ * Initialise the backend with the selected sub-modules.
  */
-async function initialise() {
+async function start() {
 	writeHeader();
 	try {
 		logger.info(`Initialising with web server ${config.web.enabled ? "enabled" : "disabled"}, analysis ${config.analysis.enabled ? "enabled" : "disabled"}.`);
@@ -44,10 +43,14 @@ async function initialise() {
 	}
 }
 
-async function destroy() {
+/**
+ * Stop Panorama's submodules.
+ */
+async function stop() {
 	await database.stop();
-	await web.stop();
-	await analysis.stop();
+	config.web.enabled && await web.stop();
+	config.analysis.enabled && await analysis.stop();
+	await queue.stop();
 }
 
 /**
@@ -59,9 +62,8 @@ function writeHeader() {
 	}) + "\n\n");
 }
 
-
 // Initialise the backend.
-initialise();
+start();
 
 // Catch SIGINT (CTRL+C).
 process.on("SIGINT", async () => {
@@ -70,7 +72,7 @@ process.on("SIGINT", async () => {
 	logger.info("Received CTRL+C. Exiting...");
 
 	// Allow modules to shut down.
-	await destroy();
+	await stop();
 
 	// Exit.
 	logger.info("Bye!");
