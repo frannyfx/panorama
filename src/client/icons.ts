@@ -27,6 +27,7 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons/faChevronRight
 import { faSignOutAlt } from "@fortawesome/free-solid-svg-icons/faSignOutAlt";
 import { faSync } from "@fortawesome/free-solid-svg-icons/faSync";
 import { faQuestion } from "@fortawesome/free-solid-svg-icons/faQuestion";
+import { faChartPie } from "@fortawesome/free-solid-svg-icons/faChartPie";
 import { faGithub } from "@fortawesome/free-brands-svg-icons/faGithub";
 
 // Add the icons to the library.
@@ -50,5 +51,6 @@ export default library.add(
 	faSignOutAlt, 
 	faSync,
 	faQuestion,
+	faChartPie,
 	faGithub
 );

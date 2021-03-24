@@ -14,7 +14,3 @@ export interface BarItem {
 		description?: string
 	}
 }
-
-export interface BarViewOptions {
-	precision: number
-};

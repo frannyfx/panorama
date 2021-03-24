@@ -37,27 +37,51 @@
 				<div class="details">
 					<h3>{{$t("components.analysisStats.contributors")}}</h3>
 				</div>
-				<div class="actions"></div>
+				<div class="actions">
+					<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
+						<button class="action" 
+							:class="{ enabled: contributorStats.toScale.enabled }"
+							@click="() => toggleToScale('contributorStats')">
+							<font-awesome-icon icon="chart-pie"/>
+						</button>
+					</div>
+				</div>
 			</div>
-			<analysis-bar :items="file.analysis.available ? contributorBarItems : []"/>
+			<analysis-bar :items="file.analysis.available ? contributorBarItems : []" :to-scale="contributorStats.toScale.enabled"/>
 		</div>
-		<div class="panel folder-stats" key="folder-stats" v-show="show && file.analysis.available && file.type == 'dir'">
+		<div class="panel file-type-stats" key="file-type-stats" v-show="show && file.analysis.available && file.type == 'dir'">
 			<div class="stats-header">
 				<div class="details">
 					<h3>{{$t("components.analysisStats.fileTypes")}}</h3>
 				</div>
-				<div class="actions"></div>
+				<div class="actions">
+					<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
+						<button class="action" 
+							:class="{ enabled: fileTypeStats.toScale.enabled }"
+							@click="() => toggleToScale('fileTypeStats')">
+							<font-awesome-icon icon="chart-pie"/>
+						</button>
+					</div>
+				</div>
 			</div>
-			<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []"/>
+			<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []" :to-scale="fileTypeStats.toScale.enabled"/>
 		</div>
 		<div class="panel token-stats" key="token-stats" v-show="show && file.analysis.available">
 			<div class="stats-header">
 				<div class="details">
 					<h3>{{$t("components.analysisStats.codeClassification")}}</h3>
 				</div>
-				<div class="actions"></div>
+				<div class="actions">
+					<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
+						<button class="action" 
+							:class="{ enabled: tokenStats.toScale.enabled }"
+							@click="() => toggleToScale('tokenStats')">
+							<font-awesome-icon icon="chart-pie"/>
+						</button>
+					</div>
+				</div>
 			</div>
-			<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []"/>
+			<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []" :to-scale="tokenStats.toScale.enabled"/>
 		</div>
 	</transition-group>
 </template>
@@ -67,14 +91,16 @@ import Vue, { PropType } from "vue";
 import { FileType } from "../../shared/models/FileType";
 import { File, getIconPath } from "../modules/models/File";
 import { Repository } from "../modules/models/Repository";
+import { BarItem } from "../modules/models/Bar";
 
 // Components
+import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import ContributorBubbles from "./ContributorBubbles.vue";
 import AnalysisBar from "./AnalysisBar.vue";
-import { BarItem } from "../modules/models/Bar";
 
 export default Vue.extend({
 	components: {
+		FontAwesomeIcon,
 		ContributorBubbles,
 		AnalysisBar
 	},
@@ -164,6 +190,30 @@ export default Vue.extend({
 				}
 			});
 		}
+	},
+	data() {
+		return {
+			contributorStats: {
+				toScale: {
+					enabled: false
+				}
+			},
+			fileTypeStats: {
+				toScale: {
+					enabled: false
+				}
+			},
+			tokenStats: {
+				toScale: {
+					enabled: false
+				}
+			}
+		};
+	},
+	methods: {
+		toggleToScale(key: "contributorStats" | "fileTypeStats" | "tokenStats") {
+			this[key].toScale.enabled = !this[key].toScale.enabled;
+		}
 	}
 });
 </script>
@@ -238,6 +288,9 @@ export default Vue.extend({
 		}
 
 		.stats-header {
+			width: 100%;
+			display: flex;
+			align-items: center;
 			margin-bottom: 20px;
 
 			.details {

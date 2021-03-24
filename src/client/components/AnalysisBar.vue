@@ -1,5 +1,5 @@
 <template>
-	<div class="analysis-bar">
+	<div class="analysis-bar" :class="{ 'to-scale': toScale }">
 		<transition-group class="bar" tag="div" name="segment" @before-enter="beforeSegmentEnter" @enter="segmentEnter">
 			<div 
 				class="segment" 
@@ -38,21 +38,26 @@
 import Vue, { PropOptions, PropType } from "vue";
 
 // Models
-import { BarItem, BarViewOptions } from "../modules/models/Bar";
+import { BarItem } from "../modules/models/Bar";
 
 export default Vue.extend({
 	props: {
 		items: <PropOptions<BarItem[]>> {
 			type: Array
 		},
-		viewOptions: {
-			type: Object as PropType<BarViewOptions>
+		precision: {
+			type: Number,
+			required: false,
+			default: 2
+		},
+		toScale: {
+			type: Boolean,
+			required: false,
+			default: false
 		}
 	},
 	computed: {
-		precision() : number {
-			return this.viewOptions?.precision ?? 2;
-		}
+
 	},
 	methods: {
 		getItemSegmentWidth(item: BarItem) : string {
@@ -80,6 +85,10 @@ export default Vue.extend({
 	flex-direction: column;
 	align-items: stretch;
 
+	&.to-scale .bar .segment {
+		min-width: 0%;
+	}
+
 	.bar, .labels {
 		width: 100%;
 		display: flex;
@@ -98,7 +107,7 @@ export default Vue.extend({
 		.segment {
 			height: 100%;
 			min-width: 2%;
-			transition: width 1s;
+			transition: width 1s, min-width 1s;
 			flex-shrink: 1;
 
 			&:last-child {

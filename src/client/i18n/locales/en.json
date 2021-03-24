@@ -157,7 +157,8 @@
 			"linesOfCode": "No lines | One line | {0} lines",
 			"contributors": "Contributors",
 			"fileTypes": "File types",
-			"codeClassification": "Code classification"
+			"codeClassification": "Code classification",
+			"viewToScale": "View to scale"
 		},
 		"contributorBubble": {
 			"anonymous": "Anonymous"
