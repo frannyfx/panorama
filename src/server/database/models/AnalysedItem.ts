@@ -3,6 +3,7 @@
  */
 
 // Imports
+import Knex from "knex";
 import { getConnection } from "../";
 import { Data } from "../../../shared/Result";
 import { ContributorMap } from "../../analysis/blame";
@@ -98,11 +99,7 @@ export interface DatabaseAnalysedItemAggregateFileType {
  * @param analysedItems The analysed items from the repository to convert.
  * @returns Whether the query was successful.
  */
-async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[]) : Promise<boolean> {
-	// Get connection.
-	let connection = await getConnection();
-	if (!connection) return false;
-
+async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], transaction: Knex.Transaction) : Promise<void> {
 	// Get all the extensions of all the files.
 	let fileExtensions = new Set(analysedItems.filter(item => item.isFile).map(item => item.path.split(".").pop() || "").filter(extension => extension != ""));
 
@@ -125,8 +122,7 @@ async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analyse
 	});
 
 	// Insert the analysis items.
-	await connection("AnalysedItem").insert(convertedAnalysedItems);
-	return true;
+	await transaction("AnalysedItem").insert(convertedAnalysedItems);
 }
 
 /**
@@ -135,11 +131,7 @@ async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analyse
  * @param analysedItems The analysed items from the repository to convert.
  * @returns Whether the query was successful.
  */
-async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[]) : Promise<boolean> {
-	// Get connection.
-	let connection = await getConnection();
-	if (!connection) return false;
-
+async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], transaction: Knex.Transaction) : Promise<void> {
 	// Create a list to hold the aggregate stats.
 	let convertedAggregateStats : DatabaseAnalysedItemAggregateStats[] = [];
 	analysedItems.map(item => {
@@ -159,8 +151,7 @@ async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analys
 	});
 
 	// Insert the converted aggregate stats.
-	await connection("AnalysedItemAggregateStats").insert(convertedAggregateStats);
-	return true;
+	await transaction("AnalysedItemAggregateStats").insert(convertedAggregateStats);
 }
 
 /**
@@ -170,11 +161,7 @@ async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analys
  * @param contributorMap Maps commit emails to contributors.
  * @returns Whether the query was successful.
  */
-async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap) : Promise<boolean> {
-	// Get connection.
-	let connection = await getConnection();
-	if (!connection) return false;
-
+async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap, transaction: Knex.Transaction) : Promise<void> {
 	// Create a list to hold the chunks.
 	let convertedChunks : DatabaseAnalysedItemChunk[] = [];
 	let convertedChunksTokens : DatabaseAnalysedItemChunkToken[] = [];
@@ -212,9 +199,8 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
 	});
 
 	// Insert the converted chunks and chunk tokens.
-	await connection("AnalysedItemChunk").insert(convertedChunks);
-	await connection("AnalysedItemChunkToken").insert(convertedChunksTokens);
-	return true;
+	await transaction("AnalysedItemChunk").insert(convertedChunks);
+	await transaction("AnalysedItemChunkToken").insert(convertedChunksTokens);
 }
 
 /**
@@ -224,11 +210,7 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
  * @param contributorMap Maps commit emails to contributors.
  * @returns Whether the query was successful.
  */
-async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap) : Promise<boolean> {
-	// Get connection.
-	let connection = await getConnection();
-	if (!connection) return false;
-
+async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap, transaction: Knex.Transaction) : Promise<void> {
 	// Create lists to hold the contributors and the aggregate stats.
 	let contributors : DatabaseAnalysedItemContributor[] = [];
 	let contributorAggregateStats : DatabaseAnalysedItemContributorAggregateStats[] = [];
@@ -269,13 +251,12 @@ async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalys
 
 	// Insert an anonymous analysis contributor.
 	if (insertAnonymous) {
-		await connection("AnalysisContributor").insert({ analysisId: analysis.analysisId!, userId: -1 });
+		await transaction("AnalysisContributor").insert({ analysisId: analysis.analysisId!, userId: -1 });
 	}
 
 	// Insert the contributors and the aggregate stats.
-	await connection("AnalysedItemContributor").insert(contributors);
-	await connection("AnalysedItemContributorAggregateStats").insert(contributorAggregateStats);
-	return true;
+	await transaction("AnalysedItemContributor").insert(contributors);
+	await transaction("AnalysedItemContributorAggregateStats").insert(contributorAggregateStats);
 }
 
 /**
@@ -284,11 +265,7 @@ async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalys
  * @param analysedItems The analysed items from the repository to convert.
  * @returns Whether the query was successful.
  */
-async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[]) : Promise<boolean> {
-	// Get connection.
-	let connection = await getConnection();
-	if (!connection) return false;
-
+async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], transaction: Knex.Transaction) : Promise<void> {
 	// Filter out items that are not directories.
 	let folders = analysedItems.filter(item => !item.isFile && item.extensions);
 
@@ -323,8 +300,7 @@ async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseA
 	});
 
 	// Insert the aggregate file types.
-	await connection("AnalysedItemAggregateFileType").insert(aggregateFileTypes);
-	return true;
+	await transaction("AnalysedItemAggregateFileType").insert(aggregateFileTypes);
 }
 
 /**
@@ -334,24 +310,21 @@ async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseA
  * @param contributorMap Maps commit emails to contributors.
  * @returns Whether the query was successful.
  */
-async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap) : Promise<boolean> {
-	// TODO: Check result of each / use transaction.
+async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap, transaction: Knex.Transaction) : Promise<void> {
 	// Convert base AnalysedItem data.
-	await convertAndInsertAnalysedItems(analysis, analysedItems);
-	
+	await convertAndInsertAnalysedItems(analysis, analysedItems, transaction);
+			
 	// Convert AnalysedItem aggregate stats.
-	await convertAndInsertAggregateStats(analysis, analysedItems);
+	await convertAndInsertAggregateStats(analysis, analysedItems, transaction);
 
 	// Convert AnalysedItemChunk and AnalysedItemChunkToken data.
-	await convertAndInsertAnalysedItemChunks(analysis, analysedItems, contributorMap);
+	await convertAndInsertAnalysedItemChunks(analysis, analysedItems, contributorMap, transaction);
 
 	// Convert contributors data.
-	await convertAndInsertAnalysedItemContributors(analysis, analysedItems, contributorMap);
+	await convertAndInsertAnalysedItemContributors(analysis, analysedItems, contributorMap, transaction);
 
 	// Convert extension data.
-	await convertAndInsertAnalysedItemAggregateFileType(analysis, analysedItems);
-	
-	return true;
+	await convertAndInsertAnalysedItemAggregateFileType(analysis, analysedItems, transaction);
 }
 
 /**

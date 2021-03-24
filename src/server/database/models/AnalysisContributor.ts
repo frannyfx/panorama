@@ -4,6 +4,7 @@
  */
 
 // Imports
+import Knex from "knex";
 import { getConnection } from "../";
 import Analysis from "./Analysis";
 
@@ -24,13 +25,13 @@ export interface DatabaseAnalysisContributor {
  * @param analysisId The parent analysis of the contributor.
  * @param user The user model.
  */
-export async function insertOrUpdate(analysisId: number, user: DatabaseUser) : Promise<boolean> {
+export async function insertOrUpdate(analysisId: number, user: DatabaseUser, transaction: Knex.Transaction | undefined = undefined) : Promise<boolean> {
 	// Get connection.
-	let connection = await getConnection();
+	let connection = transaction ?? await getConnection();
 	if (!connection) return false;
 
 	// Insert or update the user.
-	await insertOrUpdateUser(user);
+	await insertOrUpdateUser(user, transaction);
 	await connection("AnalysisContributor").insert({
 		analysisId, userId: user.userId
 	});

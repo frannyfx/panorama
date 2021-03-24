@@ -4,6 +4,7 @@
  */
 
 // Imports
+import Knex from "knex";
 import { getConnection } from "../";
 
 // Interfaces
@@ -21,9 +22,9 @@ export interface DatabaseUser {
  * Insert a user into the database.
  * @param user The user to insert.
  */
-export async function insertOrUpdate(user: DatabaseUser) : Promise<boolean> {
+export async function insertOrUpdate(user: DatabaseUser, transaction: Knex.Transaction | undefined = undefined) : Promise<boolean> {
 	// Get connection.
-	let connection = await getConnection();
+	let connection = transaction ?? await getConnection();
 	if (!connection) return false;
 
 	// Check if the user already exists.

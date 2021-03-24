@@ -21,13 +21,14 @@ import { getRepository } from "../../../../../github";
 import ticket from "../../../../../crypto/ticket";
 
 // Models
-import DatabaseAnalysis, { DatabaseAnalysisStatus } from "../../../../../database/models/Analysis";
+import DatabaseAnalysis, { DatabaseAnalysisStatus, DatabaseAnalysis as Analysis } from "../../../../../database/models/Analysis";
 import DatabaseRepository from "../../../../../database/models/Repository";
 import DatabaseUser, { DatabaseUser as User } from "../../../../../database/models/User";
 import DatabaseAnalysedItem from "../../../../../database/models/AnalysedItem";
 import DatabaseAnalysisContributor from "../../../../../database/models/AnalysisContributor";
 import { AnalysedItem } from "../../../../../analysis/Item";
 import { getRepoName, sleep } from "../../../../../../shared/utils";
+import database from "../../../../../database";
 
 /**
  * Validate a user's ticket to access an analysis.
@@ -218,38 +219,45 @@ let route : Array<Route> = [{
 
 		// Create job.
 		try {
-			// Insert data into the database and return a server error if any of those inserts fail.
-			// TODO: MySQL transaction.
-			// TODO: Just use throw for the errors since we're in a try/catch block.
-			// TODO: Look into MySQL TCP connection timeout (might just be due to connection from localhost to fran.codes)
-			// - Requesting user.
-			if (!(await DatabaseUser.insertOrUpdate({
-				userId: request.auth!.payload!.id,
-				login: request.auth!.payload!.login,
-				lastAccess: new Date()
-			}))) return send(response, Codes.ServerError);
-			
-			// - Repository owner.
-			if (!(await DatabaseUser.insertOrUpdate({
-				userId: repositoryResult.result!.owner!.id,
-				login: repositoryResult.result!.owner!.login
-			}))) return send(response, Codes.ServerError);
+			// Get the database connection.
+			let connection = await database.getConnection();
+			if (!connection) throw new Error("No database connection.");
 
-			// - Repository.
-			if (!(await DatabaseRepository.insertOrUpdate({
-				repositoryId: repositoryResult.result!.id,
-				name: repositoryResult.result!.name,
-				ownerId: repositoryResult.result!.owner!.id,
-				lastAnalysis: new Date()
-			}))) return send(response, Codes.ServerError);
+			// Create database analysis.
+			let databaseAnalysis : Analysis | undefined;
+			await connection.transaction(async transaction => {
+				// Insert user requesting.
+				await DatabaseUser.insertOrUpdate({
+					userId: request.auth!.payload!.id,
+					login: request.auth!.payload!.login,
+					lastAccess: new Date()
+				}, transaction);
 
-			// - Analysis
-			let databaseAnalysis = await DatabaseAnalysis.insert({
-				repositoryId: repositoryResult.result!.id,
-				requestedBy: request.auth!.payload!.id,
-				status: DatabaseAnalysisStatus.QUEUED,
-				queuedAt: new Date()
+				// Insert repository owner.
+				await DatabaseUser.insertOrUpdate({
+					userId: repositoryResult.result!.owner!.id,
+					login: repositoryResult.result!.owner!.login
+				}, transaction);
+
+				// Insert repository.
+				await DatabaseRepository.insertOrUpdate({
+					repositoryId: repositoryResult.result!.id,
+					name: repositoryResult.result!.name,
+					ownerId: repositoryResult.result!.owner!.id,
+					lastAnalysis: new Date()
+				}, transaction);
+
+				// Insert analysis.
+				databaseAnalysis = await DatabaseAnalysis.insert({
+					repositoryId: repositoryResult.result!.id,
+					requestedBy: request.auth!.payload!.id,
+					status: DatabaseAnalysisStatus.QUEUED,
+					queuedAt: new Date()
+				}, transaction);
 			});
+
+			// Must have database analysis.
+			if (!databaseAnalysis) throw new Error("Transaction failed.");
 
 			// If analysis insertion failed return server error.
 			if (!databaseAnalysis.analysisId) return send(response, Codes.ServerError);

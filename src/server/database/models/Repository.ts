@@ -4,6 +4,7 @@
  */
 
 // Imports
+import Knex from "knex";
 import { getConnection } from "../";
 
 // Interfaces
@@ -22,9 +23,9 @@ export interface DatabaseRepository {
  * @param repository The repository data.
  * @returns Whether the function executed successfully.
  */
-async function insertOrUpdate(repository: DatabaseRepository) : Promise<boolean> {
+async function insertOrUpdate(repository: DatabaseRepository, transaction: Knex.Transaction | undefined = undefined) : Promise<boolean> {
 	// Get connection.
-	let connection = await getConnection();
+	let connection = transaction ?? await getConnection();
 	if (!connection) return false;
 
 	// Check if the repository already exists.

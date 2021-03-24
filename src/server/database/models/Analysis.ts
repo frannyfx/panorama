@@ -4,6 +4,7 @@
  */
 
 // Imports
+import Knex from "knex";
 import { getConnection } from "../";
 import { Data } from "../../../shared/Result";
 
@@ -38,9 +39,9 @@ export interface DatabaseAnalysis {
  * @param analysis The analysis data to insert.
  * @returns The database analysis with the new analysisId set.
  */
-async function insert(analysis: DatabaseAnalysis) : Promise<DatabaseAnalysis> {
+async function insert(analysis: DatabaseAnalysis, transaction: Knex.Transaction | undefined = undefined) : Promise<DatabaseAnalysis> {
 	// Get connection.
-	let connection = await getConnection();
+	let connection = transaction ?? await getConnection();
 	if (!connection) return analysis;
 
 	// Insert the analysis and update the ID in the object.

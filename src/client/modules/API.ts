@@ -213,8 +213,11 @@ export async function analyseRepo(repository: Repository) {
 	let ticketResponse = await send(Method.PUT, "analysis/queue", { name: repository.fullName });
 
 	// If the request failed, show an error.
-	if (!ticketResponse.status.ok || !ticketResponse.result?.ticket)
+	if (!ticketResponse.status.ok || !ticketResponse.result?.ticket) {
+		Store.commit("Repositories/setAnalysisInProgress", { repository, inProgress: false });
 		return createI18NAlert("WARNING", "analysisQueueFailed", [repository.fullName]);
+	}
+		
 	
 	// Use the ticket to subscribe to the events.
 	subscribeToJobProgress(repository.fullName, ticketResponse.result!.jobId, ticketResponse.result!.ticket, Store.state.auth.accessToken, (result: Data) => {
