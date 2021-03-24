@@ -7,8 +7,8 @@
 import knex from "knex";
 
 // Config
-import loadConfig, { Config } from "../Config";
 import { humanTimeIntervalToMillis } from "../utils";
+import loadConfig, { Config } from "../Config";
 const config : Config = loadConfig();
 
 // Modules
@@ -141,7 +141,7 @@ async function performPurge() {
 
 		// If anything was evicted, log the results.
 		if (analysisDeletionCount + repositoryDeletionCount + userDeletionCount > 0)
-			logger.info(`Purged ${analysisDeletionCount} analyses, ${repositoryDeletionCount} repositories and ${userDeletionCount} users.`);
+			logger.info(`Purged ${analysisDeletionCount} analyses, ${repositoryDeletionCount}/${repositoriesToDelete.length} repositories and ${userDeletionCount}/${usersToDelete.length} users.`);
 	} catch (e) {
 		logger.warn(`Error during purge. ${e}`);
 	}

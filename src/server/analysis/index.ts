@@ -39,20 +39,20 @@ import { getConnection } from "../database";
  * Start the analysis system.
  */
 export async function start() {
+	// Ensure queue has started.
+	await queue.start();
+
 	// Initialise caching system.
 	await cache.start();
 
-	// Initialise queue system.
-	await queue.start();
-
-	// Load lexers.
+	// Register lexers.
 	await lexing.registerLexers();
-	
+
 	// Get queue.
 	let repoQueue = queue.getRepoQueue();
 	if (!repoQueue) throw new Error("Unable to get queue.");
 
-	// Set queue handlers.
+	// Enable/disable queue handler depending on config.
 	repoQueue.process(handleRepoJob);
 }
 

@@ -4,12 +4,20 @@
  */
 
 // Imports
-import { promises as fs } from "fs";
+import { ArgumentParser } from "argparse";
 import path from "path";
 
 // Modules
 import getRoot from "./utils/root";
 
+// Argument parser
+const parser = new ArgumentParser();
+parser.add_argument("-c", "--config");
+const configPath = parser.parse_args()["config"];
+
+/**
+ * The interface specifying the format of the config file.
+ */
 export interface Config {
 	general: {
 		assetsDir: string,				// Static private assets folder.
@@ -34,6 +42,7 @@ export interface Config {
 		clientSecret: string			// GitHub App secret.
 	},
 	web: {
+		enabled: boolean,				// Whether to enable the web-server.
 		router: {
 			routeDirs: Array<string>	// Directories to scan to find routes.
 		},
@@ -45,6 +54,7 @@ export interface Config {
 		url: string						// URL to connect to Redis server.
 	},
 	analysis: {
+		enabled: boolean,				// Whether to consume analysis jobs.
 		cache: {
 			dir: string,				// Caching directory.
 			manifestFilename: string,	// SQLite manifest file name.
@@ -61,6 +71,9 @@ export interface Config {
 };
 
 export default () : Config => {
+	// If the user has specified a config file, return it.
+	if (configPath) return require(path.isAbsolute(configPath) ? configPath : path.join(process.cwd(), configPath));
+
 	// Check if config.json exists before loading the default.
 	try {
 		return require(path.join(getRoot(), "config.json"));

@@ -1,15 +1,19 @@
-## Project
+## Panorama
+# Compiled assets
 dist
-config.json
-panorama_data
-panorama_data/*
-src/assets/crypto/*
-!.keep
 build
 
-native/target
-native/index.node
-native/artifacts.json
+# Private config files
+config.json
+config.test.*.json
+
+# Server cache
+panorama_data
+panorama_data/*
+
+# Private keys
+src/assets/crypto/*
+!.keep
 
 # Redis
 *.rdb

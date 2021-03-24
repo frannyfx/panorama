@@ -58,7 +58,6 @@ export function start() : Promise<void> {
 			reject();
 		});
 	});
-	
 }
 
 /**

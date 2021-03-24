@@ -6,11 +6,17 @@
 // Imports
 import figlet from "figlet";
 
-// Modules
+// Logger and config
 const logger = require("./utils/logger")("main");
+import loadConfig, { Config } from "./Config";
+const config : Config = loadConfig();
+
+// Modules
 import web from "./web";
 import analysis from "./analysis";
+import queue from "./analysis/queue";
 import database from "./database";
+
 
 /**
  * Initialise the backend.
@@ -18,10 +24,17 @@ import database from "./database";
 async function initialise() {
 	writeHeader();
 	try {
-		logger.info("Initialising...");
+		logger.info(`Initialising with web ${config.web.enabled ? "enabled" : "disabled"} and analysis ${config.analysis.enabled ? "enabled" : "disabled"}.`);
+
+		// Initialise required modules.
 		await database.start();
-		await web.start();
-		await analysis.start();
+		await queue.start();
+
+		// Enable/disable web-server according to the config file.
+		config.web.enabled && await web.start();
+
+		// Enable/disable analysis according to the config file.
+		config.analysis.enabled && await analysis.start();
 		logger.success("Initialisation complete.");
 	} catch (e) {
 		logger.error("Unable to initialise Panorama.");
