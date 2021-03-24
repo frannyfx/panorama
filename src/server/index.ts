@@ -24,7 +24,7 @@ import database from "./database";
 async function initialise() {
 	writeHeader();
 	try {
-		logger.info(`Initialising with web ${config.web.enabled ? "enabled" : "disabled"} and analysis ${config.analysis.enabled ? "enabled" : "disabled"}.`);
+		logger.info(`Initialising with web server ${config.web.enabled ? "enabled" : "disabled"}, analysis ${config.analysis.enabled ? "enabled" : "disabled"}.`);
 
 		// Initialise required modules.
 		await database.start();
@@ -55,8 +55,8 @@ async function destroy() {
  */
 function writeHeader() {
 	console.log(figlet.textSync("panorama", {
-		font: "Small"
-	}).trimEnd() + " version 1.0\n\n");
+		font: "Standard"
+	}) + "\n\n");
 }
 
 
