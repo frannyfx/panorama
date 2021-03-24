@@ -15,7 +15,7 @@ export interface DatabaseRepository {
 	repositoryId: number,
 	name: string,
 	ownerId: number,
-	lastAnalysis?: Date
+	lastAnalysed?: Date
 };
 
 /**
@@ -37,7 +37,7 @@ async function insertOrUpdate(repository: DatabaseRepository, transaction: Knex.
 		await connection("Repository").where({ repositoryId: repository.repositoryId }).update({
 			name: repository.name,
 			ownerId: repository.ownerId,
-			lastAnalysis: repository.lastAnalysis
+			lastAnalysed: repository.lastAnalysed
 		});
 	}
 

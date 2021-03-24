@@ -15,6 +15,7 @@ export interface DatabaseUser {
 	userId: number,
 	login: string,
 	lastAccess?: Date,
+	lastUpdated?: Date,
 	colour?: string
 };
 
@@ -30,12 +31,13 @@ export async function insertOrUpdate(user: DatabaseUser, transaction: Knex.Trans
 	// Check if the user already exists.
 	let userResult = await connection("User").select("userId").where({userId: user.userId}).limit(1);
 	if (userResult.length == 0)
-		await connection("User").insert(user);
+		await connection("User").insert({...user, lastUpdated: new Date()});
 	else {
 		// Update the existing user.
 		await connection("User").where({ userId: user.userId }).update({
 			login: user.login,
 			lastAccess: user.lastAccess ? user.lastAccess : undefined,
+			lastUpdated: new Date(),
 			colour: user.colour
 		});
 	}

@@ -244,7 +244,7 @@ let route : Array<Route> = [{
 					repositoryId: repositoryResult.result!.id,
 					name: repositoryResult.result!.name,
 					ownerId: repositoryResult.result!.owner!.id,
-					lastAnalysis: new Date()
+					lastAnalysed: new Date()
 				}, transaction);
 
 				// Insert analysis.

@@ -3,11 +3,19 @@
 		"assetsDir": "../assets/"
 	},
 	"database": {
-		"host": "localhost",
-		"user": "panorama",
-		"password": "",
-		"database": "panorama",
-		"charset": "utf8mb4"
+		"connection": {
+			"host": "localhost",
+			"user": "panorama",
+			"password": "",
+			"database": "panorama",
+			"charset": "utf8mb4"
+		},
+		"purge": {
+			"analysisThreshold": "7d",
+			"repositoryThreshold": "7d",
+			"userThreshold": "7d",
+			"periodLength": "3h"
+		}
 	},
 	"web": {
 		"router": {

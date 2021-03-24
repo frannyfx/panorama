@@ -11,17 +11,23 @@ import path from "path";
 import getRoot from "./utils/root";
 
 export interface Config {
-	// Main database config
 	general: {
 		assetsDir: string,				// Static private assets folder.
-		version: number					// Panorama version number.
 	},
 	database: {
-		host: string,					// Host to connect to.
-		user: string,					// MySQL username.
-		password: string,				// MySQL password.
-		name: string,					// Database name.
-		charset: string					// Database charset.
+		connection: {
+			host: string,				// Host to connect to.
+			user: string,				// MySQL username.
+			password: string,			// MySQL password.
+			name: string,				// Database name.
+			charset: string				// Database charset.
+		},
+		purge: {
+			analysisThreshold: string,	// The time interval that must pass since its completion date for an analysis to be evicted from the DB.
+			repositoryThreshold: string,// The time interval that must pass since its last analysis for a repository to be evicted from the DB.
+			userThreshold: string,		// The time interval a user must remain untouched for it to be evicted from the DB.
+			periodLength: string		// The time interval between each DB purge.
+		}
 	},
 	github?: {
 		clientId: string,				// GitHub App client ID.
@@ -42,8 +48,8 @@ export interface Config {
 		cache: {
 			dir: string,				// Caching directory.
 			manifestFilename: string,	// SQLite manifest file name.
-			purgeThreshold: string,		// The time interval a repository remain untouched for it to be evicted from the cache.
-			purgePeriodLength: string	// The number of hours between each cache purge.
+			purgeThreshold: string,		// The time interval a repository must remain untouched for it to be evicted from the cache.
+			purgePeriodLength: string	// The time interval between each cache purge.
 		},
 		lexing: {
 			langDirs: Array<string>			// Directories to scan to find languages.

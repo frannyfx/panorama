@@ -71,7 +71,7 @@ export async function stop() {
  * Purge old repositories that were last analysed beyond the threshold.
  */
 async function performPurge() {
-	// Run cache purge.
+	// Get manifest connection.
 	let connection = await manifest.getConnection();
 
 	// If retrieving connection failed, schedule a purge and hopefully by then the cache manifest will be valid.
@@ -79,19 +79,23 @@ async function performPurge() {
 
 	// Convert config file human period to milliseconds.
 	// If this fails, do not schedule a new purge since the config will be invalid until restart.
-	let purgeThreshold = humanTimeIntervalToMillis(config.analysis.cache.purgeThreshold);
+	const purgeThreshold = humanTimeIntervalToMillis(config.analysis.cache.purgeThreshold);
 	if (purgeThreshold == -1) return;
 
-	// Select all cache jobs that have not been analysed in longer than the purge threshold.
-	let cacheRepositories : CacheRepository[] = await connection("Repository").select("*")
-		.where("lastAnalysedAt", "<", new Date().getTime() - purgeThreshold);
+	try {
+		// Select all cache jobs that have not been analysed in longer than the purge threshold.
+		let cacheRepositories : CacheRepository[] = await connection("Repository").select("id")
+			.where("lastAnalysedAt", "<", new Date().getTime() - purgeThreshold);
 
-	// Log and remove the repositories.
-	if (cacheRepositories.length > 0) {
-		logger.info(`Purged ${cacheRepositories.length} repositories from cache.`);
-		await Promise.all(cacheRepositories.map(cacheRepository => removeRepository(cacheRepository.id, false)));
+		// Log and remove the repositories.
+		if (cacheRepositories.length > 0) {
+			logger.info(`Purged ${cacheRepositories.length} repositories from cache.`);
+			await Promise.all(cacheRepositories.map(cacheRepository => removeRepository(cacheRepository.id, false)));
+		}
+	} catch (e) {
+		logger.warn(`Error during purge. ${e}`);
 	}
-	
+
 	// Schedule a purge.
 	schedulePurge();
 }
