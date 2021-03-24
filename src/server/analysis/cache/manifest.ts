@@ -113,8 +113,8 @@ async function initialiseCache() {
 		table.integer("id");
 		table.string("name");
 		table.string("path");
-		table.dateTime("updated_at");
-		table.dateTime("analysed_at");
+		table.dateTime("updatedAt");
+		table.dateTime("lastAnalysedAt");
 		table.integer("size");
 
 		// Add keys and indexes.

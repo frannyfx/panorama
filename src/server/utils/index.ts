@@ -66,3 +66,25 @@ export function areSetsEqual<T>(a: Set<T>, b: Set<T>) : boolean {
 	for (var i of a) if (!b.has(i)) return false;
 	return true;
 }
+
+/**
+ * Convert human time interval string to milliseconds.
+ * @param input The time interval string.
+ * @returns The equivalent time interval in milliseconds or -1 if something went wrong.
+ */
+export function humanTimeIntervalToMillis(input: string) : number {
+	// Array of conversions from unit to milliseconds.
+	const unitConversions : {[key: string]: number} = { "d": 24 * 60 * 60 * 1000, "h": 60 * 60 * 1000, "m": 60 * 1000, "s": 1000 };
+
+	// Match a series of numbers at the start.
+	let match = input.match(/^[0-9]*(\.[0-9]*)?/);
+	if (!match) return -1;
+
+	// Get the value.
+	let unit = input.substr(match[0].length);
+	let value = parseFloat(match[0]);
+	if (!unit || isNaN(value)) return -1;
+
+	// Return the converted value.
+	return value * unitConversions[unit];
+}

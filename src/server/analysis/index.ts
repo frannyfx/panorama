@@ -17,7 +17,7 @@ const config : Config = loadConfig();
 
 // Modules
 const logger = require("../utils/logger")("analysis");
-import cache, { getCacheDir, getRepository, insertRepository, removeRepository } from "./cache";
+import cache, { getCacheDir, getRepository, insertRepository, removeRepository, updateRepository } from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
 import { buildResult, Data, Result } from "../../shared/Result";
@@ -113,12 +113,11 @@ async function cloneRepository(job : BeeQueue.Job<RepoJob>) : Promise<Result> {
 		let repositoryPath = path.join(getCacheDir(), job.data.repository.full_name);
 
 		// Check whether the path is empty and clear it if it isn't.
+		// If the path does not exist, ignore the error.
 		try {
 			await fs.readdir(repositoryPath);
 			await fs.rmdir(repositoryPath, { recursive: true });
-		} catch (e) {
-			// Path does not exist, ignore the error.
-		}
+		} catch (e) { }
 		
 		// Create path to store the repository.
 		await fs.mkdir(repositoryPath, { recursive: true});
@@ -169,6 +168,12 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 				}
 			});
 
+			// Update the repository in the manifest.
+			cachedRepository.updatedAt = new Date(job.data.repository.pushed_at);
+			cachedRepository.lastAnalysedAt = new Date();
+			cachedRepository.size = job.data.repository.size;
+			await updateRepository(cachedRepository);
+
 			// Merge branches.
 			await repository.mergeBranches(branchName, `refs/remotes/origin/${branchName}`);
 			return repository;
@@ -181,9 +186,6 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 				logger.warn(`Failed to remove repository ${job.data.repository.id} from cache.`);
 				return null;
 			}
-
-			// Remove from filesystem.
-			await fs.rmdir(cachedRepository.path, { recursive: true });
 		}
 	}
 
@@ -202,8 +204,8 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 		id: job.data.repository.id,
 		name: job.data.repository.full_name,
 		path: cloneResult.result!.path,
-		updated_at: new Date(job.data.repository.updated_at),
-		analysed_at: new Date(),
+		updatedAt: new Date(job.data.repository.pushed_at),
+		lastAnalysedAt: new Date(),
 		size: job.data.repository.size
 	});
 

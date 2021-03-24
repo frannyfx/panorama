@@ -42,7 +42,8 @@ export interface Config {
 		cache: {
 			dir: string,				// Caching directory.
 			manifestFilename: string,	// SQLite manifest file name.
-			sizeLimit: number			// Max cache size in MiB.
+			purgeThreshold: string,		// The time interval a repository remain untouched for it to be evicted from the cache.
+			purgePeriodLength: string	// The number of hours between each cache purge.
 		},
 		lexing: {
 			langDirs: Array<string>			// Directories to scan to find languages.

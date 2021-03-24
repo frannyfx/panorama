@@ -27,7 +27,8 @@
 		"cache": {
 			"dir": "panorama_data/caches/repos",
 			"manifestFilename": "manifest.db",
-			"sizeLimit": 100000
+			"purgeThreshold": "1d",
+			"purgePeriodLength": "3h"
 		},
 		"lexing": {
 			"langDirs": [
