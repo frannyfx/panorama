@@ -28,7 +28,7 @@ const lexer : Lexer = {
 		expression: /^(\r|\n)\s*/
 	}, {
 		type: TokenType.Code,
-		expression: /^.+?(?=(<!--)|\n|$)/
+		expression: /^[^\r\n]+?(?=(<!--)|\r|\n|$)/
 	}]
 };
 

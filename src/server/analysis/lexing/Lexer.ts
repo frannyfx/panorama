@@ -68,7 +68,7 @@ export interface TokenGroup {
  * @param lexer The object to validate as a lexer.
  */
 export function isLexer(lexer: any): lexer is Lexer {
-	return true; // TODO: Do proper type checking.
+	return Array.isArray(lexer.extensions) && Array.isArray(lexer.definitions);
 }
 
 

@@ -45,7 +45,7 @@ export async function generateBlameGroups(owner: string, repo: string, accessTok
 		let end = start + lineCount - 1;
 
 		// Get contributor data.
-		let contributorEmail = hunk.finalSignature().email();
+		let contributorEmail = hunk.finalSignature()?.email() ?? "Anonymous";
 		var contributorId : string | null = null;
 
 		// Look-up the email in the contributor map.

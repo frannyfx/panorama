@@ -19,7 +19,8 @@ export interface Config {
 		host: string,					// Host to connect to
 		user: string,					// MySQL username
 		password: string,				// MySQL password
-		name: string					// Database name
+		name: string,					// Database name
+		charset: string					// Database charset
 	},
 	github?: {
 		clientId: string,				// GitHub App client ID

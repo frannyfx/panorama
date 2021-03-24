@@ -33,7 +33,6 @@ let routes : Array<Route> = [{
 	method: Method.GET,
 	url: "/",
 	handler: async (request, response) => {
-		// TODO: Read Accept-Language header.
 		response.redirect("/en");
 	}
 }, {

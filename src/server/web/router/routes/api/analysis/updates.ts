@@ -89,7 +89,6 @@ let route : Route = {
 				return send(connection, buildResponse(Codes.NotFound));
 
 			// Subscribe to job events and immediately send the current progress.
-			// TODO: Prevent instant success from bugging out the progress reporting (sends zero instead of RepoJobProgress object).
 			sendJobProgress(connection, jobId, job!.status, job!.progress);
 			job.on("progress", progress => sendJobProgress(connection, jobId, job!.status, progress));
 			job.on("succeeded", (result : RepoJobResult) => sendJobProgress(connection, jobId, "succeeded", { value: 1, stage: AnalysisStage.Done }, result));

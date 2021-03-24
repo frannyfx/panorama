@@ -40,7 +40,7 @@ export interface ModalData {
 };
 
 export interface ModalAction {
-	type: "PRIMARY" | "NORMAL", // TODO: Maybe create an enum?
+	type: "PRIMARY" | "NORMAL",
 	id: string,
 	icon?: string[],
 	content: ModalActionContentFunction,

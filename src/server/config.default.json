@@ -6,7 +6,8 @@
 		"host": "localhost",
 		"user": "panorama",
 		"password": "",
-		"database": "panorama"
+		"database": "panorama",
+		"charset": "utf8mb4"
 	},
 	"web": {
 		"router": {

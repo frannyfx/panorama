@@ -306,7 +306,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	let analysisResults : AnalysedItem[] = [];
 
 	// Create cache which maps contributor emails to their profiles.
-	let contributorMap : ContributorMap = {};
+	let contributorMap : ContributorMap = { "Anonymous": { id: null }};
 	let unknownExtensions : Set<string> = new Set();
 	let failedFiles = 0;
 

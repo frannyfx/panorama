@@ -81,8 +81,7 @@ async function verifyIntegrity() : Promise<boolean> {
 	} catch (e) {
 		return false;
 	}
-
-	// TODO: Verify validity of the manifest.
+	
 	return true;
 }
 

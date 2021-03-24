@@ -221,7 +221,6 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 
 	// Add to store.
 	Store.commit("Repositories/addFileChildren", { repository, path, files, analysis });
-	console.log("Added!");
 	return true;
 }
 

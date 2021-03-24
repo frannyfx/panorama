@@ -38,6 +38,8 @@ const registeredLexers : LexerMap = {};
  * Register the lexers in the given folders.
  */
 export async function registerLexers() {
+	logger.info("Registering lexers...");
+
 	// Scan lexer directories.
 	let root = getRoot();
 	let lexerPaths = (await Promise.all(config.analysis.lexing.langDirs.map(dir => walkDir(path.join(root, dir), jsRegex)))).flat();
@@ -47,6 +49,7 @@ export async function registerLexers() {
 
 	// Register the lexers.
 	lexers.map(lexer => {
+		logger.info(`Lexer for extensions ${lexer.extensions.join(", ")} registered.`);
 		lexer.extensions.map(extension => registeredLexers[extension] = lexer);
 	});
 }
