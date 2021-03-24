@@ -6,12 +6,12 @@
 				<div class="title">
 					<span class="owner">{{repo.owner.login}}</span>
 					<span class="slash">/</span>
-					<span class="name">{{repo.name}}</span>
+					<span class="name ellipsis">{{repo.name}}</span>
 					<span class="analysed" v-show="repo.analysis.id != -1" v-tooltip="{ theme: 'panorama', content: $t('components.repositoryListItem.analysed') }">
 						<font-awesome-icon icon="check"/>
 					</span>
 				</div>
-				<div class="subtitle" v-html="$t('components.repositoryListItem.lastUpdated', [`<span class='strong'>${updatedAt}</span>`])">
+				<div class="subtitle ellipsis" v-html="$t('components.repositoryListItem.lastUpdated', [`<span class='strong'>${updatedAt}</span>`])">
 				</div>
 			</div>
 			<div class="contributors hide-small">
@@ -87,8 +87,6 @@ export default Vue.extend({
 		flex-grow: 1;
 		flex-shrink: 1;
 		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
 
 		.title {
 			font-size: 1em;
@@ -109,9 +107,6 @@ export default Vue.extend({
 
 			.name {
 				font-weight: 700;
-				overflow: hidden;
-				white-space: nowrap;
-				text-overflow: ellipsis;
 			}
 
 			.analysed {
@@ -125,9 +120,6 @@ export default Vue.extend({
 	.subtitle {
 		font-size: 0.7em;
 		color: $light-grey-blue;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
 	}
 
 	.contributors {

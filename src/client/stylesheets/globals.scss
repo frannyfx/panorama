@@ -68,7 +68,7 @@ body {
 
 /* Tooltips */
 .v-popper--theme-panorama {
-	z-index: 300;
+	z-index: 99;
 	
 	&.v-popper__popper--shown {
 		backdrop-filter: blur(5px) saturate(150%);
@@ -142,6 +142,12 @@ a {
 
 .strong {
 	font-weight: 600;
+}
+
+.ellipsis {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 /* Transitions */

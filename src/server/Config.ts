@@ -14,17 +14,18 @@ export interface Config {
 	// Main database config
 	general: {
 		assetsDir: string,				// Static private assets folder.
+		version: number					// Panorama version number.
 	},
 	database: {
-		host: string,					// Host to connect to
-		user: string,					// MySQL username
-		password: string,				// MySQL password
-		name: string,					// Database name
-		charset: string					// Database charset
+		host: string,					// Host to connect to.
+		user: string,					// MySQL username.
+		password: string,				// MySQL password.
+		name: string,					// Database name.
+		charset: string					// Database charset.
 	},
 	github?: {
-		clientId: string,				// GitHub App client ID
-		clientSecret: string			// GitHub App secret
+		clientId: string,				// GitHub App client ID.
+		clientSecret: string			// GitHub App secret.
 	},
 	web: {
 		router: {
@@ -41,7 +42,7 @@ export interface Config {
 		cache: {
 			dir: string,				// Caching directory.
 			manifestFilename: string,	// SQLite manifest file name.
-			sizeLimit: number			// Max cache size in MiB
+			sizeLimit: number			// Max cache size in MiB.
 		},
 		lexing: {
 			langDirs: Array<string>			// Directories to scan to find languages.

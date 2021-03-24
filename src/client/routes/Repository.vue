@@ -5,9 +5,9 @@
 				<div class="title">
 					<h3>
 						<font-awesome-icon v-tooltip="{ theme: 'panorama', content: repo.private ? $t('routes.repo.private') : $t('routes.repo.public') }" class="repo-icon" :icon="repo.private ? 'lock' : 'book'"/>
-						<span class="minor">{{$route.params.owner}}</span>
+						<span class="minor ellipsis">{{$route.params.owner}}</span>
 						<span class="separator">/</span>
-						<span class="major">{{$route.params.repo}}</span>
+						<span class="major ellipsis">{{$route.params.repo}}</span>
 					</h3>
 					<p class="description">{{repo.description && repo.description.trim().length != 0 ? repo.description : $t("routes.repo.noDescription")}}</p>
 				</div>
@@ -449,10 +449,13 @@ export default Vue.extend({
 .header {
 	display: flex;
 	align-items: center;
+	width: 100%;
 
 	> .title {
 		flex-grow: 1;
 		flex-shrink: 1;
+		overflow: hidden;
+		margin-right: 20px;
 
 		h3 {
 			display: flex;
