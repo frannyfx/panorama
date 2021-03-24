@@ -37,7 +37,7 @@ export async function getConnection() : Promise<knex | null> {
 
 		// Test the connection.
 		await databaseConnection.raw("SELECT 1");
-		logger.success("Opened database connection successfully.");
+		logger.success("Opened database connection.");
 		return databaseConnection;
 	} catch (e) {
 		return null;

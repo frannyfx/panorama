@@ -377,7 +377,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		Analysis.update(analysis);
 
 		// Call the job completion callback returning the analysis ID.
-		logger.success(`Successfully completed analysis ${analysis.analysisId!} of '${job.data.repository.full_name}'.`);
+		logger.success(`Completed analysis ${analysis.analysisId!} of '${job.data.repository.full_name}'.`);
 
 		// Fetch final analysis data with joins and return it.
 		return {

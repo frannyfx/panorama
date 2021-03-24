@@ -43,7 +43,7 @@ export async function getConnection() : Promise<knex | null> {
 
 		// Test the connection.
 		await manifestConnection.raw("SELECT 1");
-		logger.success("Opened cache manifest successfully.");
+		logger.success("Opened cache manifest.");
 		return manifestConnection;
 	} catch (e) {
 		return null;

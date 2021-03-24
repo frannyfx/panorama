@@ -1,6 +1,6 @@
 <template>
 	<div class="analysis-stats list-item">
-		<div class="header">
+		<div class="panel header">
 			<div class="file-icon">
 				<img :src="iconPath">
 			</div>
@@ -9,7 +9,10 @@
 					<span v-if="file.type == 'file' || file.path != ''">{{file.name}}</span>
 					<span v-else>{{repo.name}}</span>
 				</h3>
-				<p class="file-info">
+				<div class="file-info">
+					<div v-if="file.type == 'file'" class="dot-indicator" :style="{
+						'background-color': fileType ? `#${fileType.colour}` : undefined
+					}"></div>
 					<span v-if="file.type == 'file'">
 						<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
 						<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
@@ -21,7 +24,7 @@
 						<span v-else-if="file.path != ''">{{$t("components.analysisStats.folderInFolder", [file.parent.path])}}</span>
 						<span v-else>{{$t("components.analysisStats.gitRepo")}}</span>
 					</span>
-				</p>
+				</div>
 			</div>
 			<div class="contributors" v-if="file.analysis.available">
 				<div class="list">
@@ -130,7 +133,7 @@ export default Vue.extend({
 				// Convert the available data to a bar item.
 				return {
 					data: {
-						id: fileType.id,
+						id: fileType.typeId,
 						percentage: fileTypeStats.percentage * 100
 					},
 					view: {
@@ -171,7 +174,6 @@ export default Vue.extend({
 	.header {
 		display: flex;
 		align-items: center;
-		padding: 30px 40px;
 
 		.file-icon {
 			display: flex;
@@ -193,6 +195,13 @@ export default Vue.extend({
 			}
 
 			.file-info {
+				display: flex;
+				align-items: center;
+
+				.dot-indicator {
+					margin-right: 8px;
+				}
+
 				font-size: 0.8em;
 				font-weight: 400;
 				color: $light-grey-blue;
@@ -218,9 +227,12 @@ export default Vue.extend({
 	}
 
 	.panel {
-		border-top: 1px solid $grey-tinted;
 		box-sizing: border-box;
 		padding: 30px 40px;
+
+		&:not(:first-child) {
+			border-top: 1px solid $grey-tinted;
+		}
 
 		.stats-header {
 			margin-bottom: 20px;

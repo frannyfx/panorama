@@ -1,17 +1,18 @@
 <template>
 	<div class="analysis-bar">
-		<div class="bar">
+		<transition-group class="bar" tag="div" name="segment" @before-enter="beforeSegmentEnter" @enter="segmentEnter">
 			<div 
 				class="segment" 
-				v-for="item in items" :key="item.data.id" 
+				v-for="(item, index) in items" :key="item.data.id"
 				v-tooltip="{ theme: 'panorama', content: item.view.label }"
+				:data-index="index"
 				:style="{ 
-					'width': `${Math.round(item.data.percentage * 10**precision) / 10**precision}%`,
+					'width': getItemSegmentWidth(item),
 					'background-color': `#${item.view.colour}`
 				}">
 			</div>
-		</div>
-		<div class="labels">
+		</transition-group>
+		<transition-group class="labels" tag="div" name="label" @before-leave="beforeLabelLeave">
 			<div
 				class="label"
 				v-for="item in items" :key="item.data.id"
@@ -19,17 +20,17 @@
 					'flex-grow': `${Math.floor(item.data.percentage)}`
 				}">
 				<div
-					class="icon"
+					class="dot-indicator"
 					:style="{
 						'background-color': `#${item.view.colour}`		
 					}">
 				</div>
 				<div class="details">
-					<div class="label">{{item.view.label}}</div>
+					<div class="title">{{item.view.label}}</div>
 					<div class="description">{{item.view.description}}</div>
 				</div>
 			</div>
-		</div>
+		</transition-group>
 	</div>	
 </template>
 <script lang="ts">
@@ -54,7 +55,21 @@ export default Vue.extend({
 		}
 	},
 	methods: {
-		
+		getItemSegmentWidth(item: BarItem) : string {
+			return `${Math.round(item.data.percentage * 10**this.precision) / 10**this.precision}%`;
+		},
+		beforeSegmentEnter(el: any) {
+			el.style.width = "0%";
+		},
+		segmentEnter(el: HTMLElement) {
+			// @ts-ignore
+			let itemData = this.items[el.dataset.index];
+			setTimeout(() => el.style.width = this.getItemSegmentWidth(itemData), 16);
+		},
+		beforeLabelLeave(el: HTMLElement) {
+			let rect = el.getBoundingClientRect();
+			el.style.maxWidth = `${rect.width}px`;
+		}
 	}
 });
 </script>
@@ -78,33 +93,31 @@ export default Vue.extend({
 		border-radius: 20px;
 		background-color: $light-grey-blue;
 		overflow: hidden;
+		position: relative;
 
 		.segment {
 			height: 100%;
 			min-width: 2%;
 			transition: width 1s;
 			flex-shrink: 1;
+
+			&:last-child {
+				flex-grow: 1;
+			}
 		}
 	}
 
 	.labels {
 		margin-top: 10px;
-		/*justify-content: space-between;*/
+		height: 35px;
 		
 		.label {
 			display: flex;
 			align-items: center;
-			/*min-width: 90px;*/
-			transition: width 1s;
+			transition: flex-grow 1s;
 
-			.icon {
-				width: 6px;
-				height: 6px;
-				border-radius: 50%;
-				background-color: $grey-blue;
-				margin-left: 15px;
-				margin-right: 15px;
-				flex-shrink: 0;
+			.dot-indicator {
+				margin: 0px 15px;
 			}
 
 			.details {
@@ -112,7 +125,7 @@ export default Vue.extend({
 				flex-direction: column;
 				align-items: flex-start;
 
-				.label {
+				.title {
 					font-size: 0.8em;
 					font-weight: 600;
 					color: $grey-blue;
@@ -127,9 +140,38 @@ export default Vue.extend({
 
 			flex-shrink: 1;
 			overflow: hidden;
+			height: 100%;
 		}
+	}	
+}
+
+/* Transitions */
+.segment-enter-active, .segment-leave-active {
+	transition: width 1s, min-width 1s !important;
+	&.segment-enter, &.segment-leave-to {
+		min-width: 0% !important;
 	}
 
-	
+	&.segment-leave-to {
+		width: 0% !important;
+	}
+}
+
+.segment-move {
+	transition: width 1s, min-width 1s, transform 1s !important
+}
+
+/* --- */
+.label-enter-active, .label-leave-active {
+	transition: flex-grow 1s, opacity 1s, max-width 1s !important;
+	&.label-enter, &.label-leave-to {
+		flex-grow: 0 !important;
+		max-width: 0px !important;
+		opacity: 0 !important;
+	}
+}
+
+.label-move {
+	transition: flex-grow 1s, opacity 1s, max-width 1s, transform 1s !important;
 }
 </style>

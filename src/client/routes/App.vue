@@ -70,6 +70,10 @@ export default Vue.extend({
 	},
 	watch: {
 		$route(to, from) {
+			// Do not overwrite specific route titles.
+			if (to.name == from.name) return;
+
+			// Change title depending on the route.
 			document.title = to.meta?.title ? this.$i18n.t(to.meta.title).toString() : "Panorama";
 		}
 	},

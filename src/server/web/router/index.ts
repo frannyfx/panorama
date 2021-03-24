@@ -109,7 +109,7 @@ function registerRoute(fastify: any, route: Route, options: Options) {
 	if (!register) return;
 
 	// Register the route.
-	logger.info(`Route ${Method[route.method]} ${route.url} registered.`);
+	logger.info(`${Method[route.method]} ${route.url}`);
 	register(route.url, wrapRoute(route, options));
 }
 
@@ -236,6 +236,7 @@ export default async function (fastify: any, options: Options, done: Function) {
 	let routes = (await Promise.all(options.directories.map(directory => loadRoutes(directory)))).flat();
 
 	// Register the routes.
+	logger.info("Registering routes...");
 	routes.map(route => registerRoute(fastify, route, options));
 	done();
 }

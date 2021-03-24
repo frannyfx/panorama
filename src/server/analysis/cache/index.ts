@@ -45,7 +45,7 @@ export async function start() {
 		
 	// Start manifest.
 	await manifest.start();
-	logger.success("Cache initialised successfully.");
+	logger.success("Cache initialised.");
 }
 
 /**

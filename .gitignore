@@ -5,6 +5,7 @@ panorama_data
 panorama_data/*
 src/assets/crypto/*
 !.keep
+build
 
 native/target
 native/index.node

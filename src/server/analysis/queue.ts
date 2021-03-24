@@ -88,7 +88,7 @@ function createQueue() {
 	});
 
 	// Log status.
-	logger.success("Queue initialised successfully.");
+	logger.success("Queue initialised.");
 }
 
 /**

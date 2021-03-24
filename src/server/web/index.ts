@@ -45,7 +45,7 @@ async function start() {
 	});
 
 	let address = await webServer.listen(config.web.port, config.web.address);
-	logger.success(`Successfully started web server at ${address}.`);
+	logger.success(`Started web server at ${address}.`);
 }
 
 /**
