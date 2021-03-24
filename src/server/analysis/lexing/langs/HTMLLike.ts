@@ -3,6 +3,7 @@
  * - HTML
  * - XML
  * - Handlebars
+ * - Vue
  */
 
 // Modules
@@ -18,11 +19,14 @@ const lexer : Lexer = {
 		"xml",
 
 		// Handlebars
-		"hbs"
+		"hbs",
+
+		// Vue.js
+		"vue"
 	],
 	definitions: [{
 		type: TokenType.Documentation,
-		expression: /^<!--.+-->/
+		expression: /^(<!--.*-->)/
 	}, {
 		type: TokenType.Whitespace,
 		expression: /^(\r|\n)\s*/

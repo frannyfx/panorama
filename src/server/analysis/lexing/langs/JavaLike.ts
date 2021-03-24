@@ -8,6 +8,7 @@
  * - C++
  * - C#
  * - Dart
+ * - Swift
  */
 
 // Modules
@@ -39,11 +40,14 @@ const lexer : Lexer = {
 		"cs",
 
 		// Dart
-		"dart"
+		"dart",
+
+		// Swift
+		"swift"
 	],
 	definitions: [{
 		type: TokenType.Documentation,
-		expression: /^((\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/)|(\/\/[^\n]*?(?=$|\n)))/
+		expression: /^((\/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/)|(\/\/[^\r\n]*?(?=$|\r|\n)))/
 	}, {
 		type: TokenType.Whitespace,
 		expression: /^(\r|\n)\s*/

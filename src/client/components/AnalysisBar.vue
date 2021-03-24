@@ -3,7 +3,7 @@
 		<transition-group class="bar" tag="div" name="segment" @before-enter="beforeSegmentEnter" @enter="segmentEnter">
 			<div 
 				class="segment" 
-				v-for="(item, index) in items" :key="item.data.id"
+				v-for="(item, index) in processedItems" :key="item.data.id"
 				v-tooltip="{ theme: 'panorama', content: item.view.label }"
 				:data-index="index"
 				:style="{ 
@@ -15,7 +15,7 @@
 		<transition-group class="labels" tag="div" name="label" @before-leave="beforeLabelLeave">
 			<div
 				class="label"
-				v-for="item in items" :key="item.data.id"
+				v-for="item in processedItems" :key="item.data.id"
 				:style="{
 					'flex-grow': `${Math.floor(item.data.percentage)}`
 				}">
@@ -57,7 +57,10 @@ export default Vue.extend({
 		}
 	},
 	computed: {
-
+		processedItems() : BarItem[] {
+			// TODO: Otherify the items.
+			return this.items;
+		}
 	},
 	methods: {
 		getItemSegmentWidth(item: BarItem) : string {
