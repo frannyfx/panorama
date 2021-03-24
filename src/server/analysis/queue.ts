@@ -74,7 +74,6 @@ function createQueue() {
 	repoQueue.on("job failed", async (jobId, err) => {
 		// Log error.
 		logger.error(`Job ${jobId} failed. ${err}`);
-		console.log(err);
 
 		// Get the analysis with the specified job ID.
 		let analysis = await Analysis.getRawWithJobId(jobId);
