@@ -4,10 +4,10 @@
 			<div class="content container">
 				<div class="title">
 					<div class="eye"><font-awesome-icon icon="eye"/></div>
-					<button @click="switchTheme">
+					<!--<button @click="switchTheme">
 						<font-awesome-icon icon="eye"/>
 						<span>Switch theme</span>
-					</button>
+					</button>-->
 				</div>
 				<h1>Privacy Policy</h1>
 				<i>Last updated March 25<sup>th</sup> 2021.</i>
@@ -113,7 +113,7 @@ export default Vue.extend({
 	},
 	data() {
 		return {
-			theme: "dark"
+			theme: "light"
 		};
 	},
 	methods: {
@@ -127,11 +127,11 @@ export default Vue.extend({
 
 		// Listen for changes
 		mql.addEventListener("change", (e) => {
-			this.theme = e.matches ? "dark" : "light";
+			//this.theme = e.matches ? "dark" : "light";
 		});
 
 		// Set initial value.
-		this.theme = mql.matches ? "dark" : "light";
+		//this.theme = mql.matches ? "dark" : "light";
 	}
 });
 </script>
