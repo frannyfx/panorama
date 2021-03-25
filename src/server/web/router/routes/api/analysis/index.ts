@@ -183,6 +183,28 @@ let route : Array<Route> = [{
 		send(response, Codes.OK, fileChunks);
 	}
 }, {
+	method: Method.GET,
+	url: "/api/analysis/:id/tokens",
+	auth: true,
+	schemas: {
+		params: Joi.object({
+			id: Joi.number()
+		}),
+		query: Joi.object({
+			path: Joi.string().required(),
+			ticket: Joi.string().required()
+		})
+	},
+	handler: async (request: Request, response: any) => {
+		// Verify the ticket provided.
+		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
+
+		// Get the file's chunk tokens.
+		let fileTokens = await DatabaseAnalysedItem.getTokens(request.params!.id, request.query!.path);
+		if (!fileTokens) return send(response, Codes.BadRequest);
+		send(response, Codes.OK, fileTokens);
+	}
+}, {
 	method: Method.PUT,
 	url: "/api/analysis/queue",
 	auth: true,

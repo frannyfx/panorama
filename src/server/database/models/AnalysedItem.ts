@@ -482,9 +482,47 @@ async function getChunks(analysisId: number, path: string) : Promise<Data[] | nu
 	return chunks;
 }
 
+/**
+ * Get token groups.
+ * @param analysisId The ID of the analysis where to fetch the file from.
+ * @param path The path of the file.
+ * @returns The token groups.
+ */
+async function getTokens(analysisId: number, path: string) : Promise<Data[] | null> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return null;
+
+	// Get the item's chunks in order.
+	let token : DatabaseAnalysedItemChunkToken[] = await connection("AnalysedItemChunkToken")
+		.where({ analysisId, path })
+		.orderBy("start", "asc")
+		.select(
+			"AnalysedItemChunkToken.start",
+			"AnalysedItemChunkToken.end",
+			"AnalysedItemChunkToken.tokenType"
+		);
+
+	// Group tokens together when they start on the same line.
+	let groupedTokens : {[key: string]: Data} = {};
+	token.map(token => {
+		// If there's already a token that starts on that line, push the token type.
+		if (groupedTokens[token.start]) groupedTokens[token.start].tokens.push(token.tokenType);
+		else groupedTokens[token.start] = {
+			start: token.start,
+			end: token.end,
+			tokens: [token.tokenType]
+		};
+	});
+
+	// Return the chunks.
+	return Object.keys(groupedTokens).map(start => groupedTokens[start]);
+}
+
 export default {
 	convertAndInsert,
 	getPathsInFolder,
 	getItemsInFolder,
-	getChunks
+	getChunks,
+	getTokens
 };

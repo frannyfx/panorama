@@ -10,7 +10,7 @@ import { MutationTree } from "vuex";
 import { Repository, RepositoryObject } from "../../modules/models/Repository";
 import config from "../../config";
 import { File } from "../../modules/models/File";
-import { Analysis, AnalysisChunk, AnalysisMap } from "../../modules/models/Analysis";
+import { Analysis, AnalysisChunk, AnalysisMap, AnalysisToken } from "../../modules/models/Analysis";
 import { User } from "../../modules/models/User";
 import Vue from "vue";
 import { Data } from "../../../shared/Result";
@@ -131,20 +131,36 @@ const mutations : MutationTree<RepositoriesState> = {
 		data.file.content.data = data.content;
 	},
 	setFileChunks(state: RepositoriesState, data: { file: File, chunks: AnalysisChunk[] }) {
+		// Set the loaded flag to true.
 		data.file.analysis.data!.chunks.loaded = true;
+
+		// The analysis chunks need to have an index so the table can display them properly.
 		let chunkList : AnalysisChunk[] = [];
 		for (var i = 0; i < data.chunks.length; i++) {
-			let currentChunk = data.chunks[i];
-			chunkList.push({
-				login: currentChunk.login,
-				start: currentChunk.start,
-				end: currentChunk.end,
-				index: i
-			});
+			chunkList.push({ ...data.chunks[i], index: i });
 		}
 
+		// Set the list.
 		data.file.analysis.data!.chunks.list = chunkList;
+
+		// Map the start of each chunk to the chunk itself as it allows for easier rendering.
 		chunkList.map(chunk => data.file.analysis.data!.chunks.object[chunk.start] = chunk);
+	},
+	setFileTokens(state: RepositoriesState, data: { file: File, tokens: AnalysisToken[] }) {
+		// Set the loaded flag to true.
+		data.file.analysis.data!.tokens.loaded = true;
+
+		// The analysis tokens need to have an index so the table can display them properly.
+		let tokenList : AnalysisToken[] = [];
+		for (var i = 0; i < data.tokens.length; i++) {
+			tokenList.push({ ...data.tokens[i], index: i});
+		}
+
+		// Set the list.
+		data.file.analysis.data!.tokens.list = tokenList;
+
+		// Map the start of each token to the token itself as it allows for easier rendering.
+		tokenList.map(token => data.file.analysis.data!.tokens.object[token.start] = token);
 	},
 	clear(state: RepositoriesState) {
 		// Dynamically delete keys (Vue components will react accordingly).

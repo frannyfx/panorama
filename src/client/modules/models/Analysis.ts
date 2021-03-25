@@ -21,11 +21,25 @@ export interface Analysis {
 		object: {
 			[key: string]: AnalysisChunk
 		}
+	},
+	tokens: {
+		loaded: boolean,
+		list: AnalysisToken[],
+		object: {
+			[key: string]: AnalysisToken
+		}
 	}
 };
 
 export interface AnalysisChunk {
 	login?: string,
+	start: number,
+	end: number,
+	index?: number
+}
+
+export interface AnalysisToken {
+	tokens: number[],
 	start: number,
 	end: number,
 	index?: number
@@ -76,6 +90,11 @@ export function toAnalysis(input: Data) : Analysis {
 			loaded: false,
 			list: [],
 			object: {}
-		}		
+		},
+		tokens: {
+			loaded: false,
+			list: [],
+			object: {}
+		}
 	};
 }

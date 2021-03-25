@@ -46,7 +46,21 @@
 							class="analysis-chunk"
 							:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
 							:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
-							<div class="details">{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</div>
+							<div class="details" :style="{
+								'background-color': `#${$store.state.Users.object[file.analysis.data.chunks.object[index + 1].login].enrichedData.colour}`
+							}">{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</div>
+						</td>
+						<td 
+							v-if="file.analysis.available && file.analysis.data.tokens.loaded && file.analysis.data.tokens.object[index + 1]"
+							class="token"
+							:class="{ list: file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 }"
+							v-tooltip="{ theme: 'panorama', content: file.analysis.data.tokens.object[index + 1].tokens.map(token => $t(`tokens.${$store.state.Tokens.map[token].name}`)).join(', ') }"
+							:rowspan="file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.tokens.object[index + 1].end - file.analysis.data.tokens.object[index + 1].start) + 1">
+							<div class="dots">
+								<div class="dot-indicator" v-for="token in file.analysis.data.tokens.object[index + 1].tokens" :key="token" :style="{
+									'background-color': `#${$store.state.Tokens.map[token].colour}`
+								}"></div>
+							</div>
 						</td>
 						<td class="code"><pre v-html="line"></pre></td>
 					</tr>
@@ -208,7 +222,7 @@ export default Vue.extend({
 				this.$store.commit("Repositories/setFileContent", { file: this.file, content });
 			}
 
-			// Fetch analysis content for the file if possible & necessary.
+			// Fetch chunk content for the file if possible & necessary.
 			if (this.repo.analysis.id != -1 && this.file.analysis.available && !this.file.analysis.data!.chunks.loaded && this.repo.analysis.ticket) {
 				// Set loading animation.
 				if (!this.file.content.loading) this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: true });
@@ -219,6 +233,19 @@ export default Vue.extend({
 
 				// Set the chunks.
 				this.$store.commit("Repositories/setFileChunks", { file: this.file, chunks: chunks.result! });
+			}
+
+			// Fetch token content for the file if possible & necessary.
+			if (this.repo.analysis.id != -1 && this.file.analysis.available && !this.file.analysis.data!.tokens.loaded && this.repo.analysis.ticket) {
+				// Set loading animation
+				if (!this.file.content.loading) this.$store.commit("Repositories/setFileContentLoading", { file: this.file, loading: true });
+
+				// Fetch the file tokens.
+				let tokens = await send(Method.GET, `analysis/${this.repo.analysis.id}/tokens?path=${this.file.path}&ticket=${this.repo.analysis.ticket!}`);
+				if (!tokens.status.ok) console.log(`Tokens for file ${this.file.path} from ${this.repo.fullName} failed to load.`);
+
+				// Set the tokens.
+				this.$store.commit("Repositories/setFileTokens", { file: this.file, tokens: tokens.result! });
 			}
 
 			// Stop loading animation.
@@ -403,10 +430,28 @@ export default Vue.extend({
 				text-align: center;
 				font-size: 0.8em;
 				font-weight: 600;
-				padding: 0px 10px;
-				color: $grey-blue;
+				color: white;
 				z-index: 100;
+
+				> .details {
+					padding: 3px 8px;
+					border-radius: 20px;
+				}
+			}
+
+			.token > .dots {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+
+				> :not(:last-child) {
+					margin-right: 3px;
+				}
+			}
+
+			.analysis-chunk, .token {
 				border-right: 1px solid $grey-tinted;
+				padding: 0px 10px;
 
 				&:not(.last) {
 					border-bottom: 1px solid $grey-tinted;
