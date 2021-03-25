@@ -10,7 +10,7 @@
 					</button>-->
 				</div>
 				<h1>Privacy Policy</h1>
-				<i>Last updated March 25<sup>th</sup> 2021.</i>
+				<p><i>Last updated March 25<sup>th</sup> 2021.</i></p>
 				<p>
 					<b>Panorama</b> ("Panorama", "we", or "us") is committed to protecting your privacy.
 					This Privacy Policy explains the methods and reasons we collect, use, disclose, transfer and store your information.
