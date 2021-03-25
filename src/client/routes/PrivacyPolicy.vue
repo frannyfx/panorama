@@ -13,9 +13,10 @@
 				<i>Last updated March 25<sup>th</sup> 2021.</i>
 				<p>
 					<b>Panorama</b> ("Panorama", "we", or "us") is committed to protecting your privacy.
-					This Privacy policy explains the methods and reasons we collect, use, disclose, transfer and store your information.
-					If you have any questions about the contents of this policy, please contact us.
+					This Privacy Policy explains the methods and reasons we collect, use, disclose, transfer and store your information.
+					If you have any questions about the contents of this policy, please contact us.<br>
 				</p>
+				<p>This policy may be subject to changes as the requirements, features and capabilities of our service evolve.</p>
 				<h2>Information collected</h2>
 				<h3>Personal information</h3>
 				<p>
@@ -54,7 +55,7 @@
 				</p>
 				<h3>Data retention</h3>
 				<p>
-					We have a rigorous data eviction policy, which means that personal information and other data stored will be permanently and irreversibly deleted
+					Our systems have a rigorous data eviction policy, which means that personal information and other data stored will be permanently and irreversibly deleted
 					from our systems once it has been deemed unnecessary.<br><br>
 					If a repository has not been analysed for a certain period of time (at most 30 days), its analysis data and all the personal information related to it
 					is permanently and irreversibly deleted.<br><br>
