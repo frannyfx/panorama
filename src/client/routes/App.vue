@@ -25,7 +25,7 @@
 				<p>
 					<span>frannyfx &copy; 2021</span>
 					<span>&bull;</span>
-					<a href="https://github.com/frannyfx" target="_blank"><font-awesome-icon :icon="['fab', 'github']"/></a>
+					<a href="https://github.com/frannyfx" rel="noreferrer" target="_blank"><font-awesome-icon :icon="['fab', 'github']"/></a>
 					<span>&bull;</span>
 					<a href="/privacy-policy" target="_blank">{{ $t("general.privacyPolicy") }}</a>
 				</p>
