@@ -53,7 +53,7 @@
 						<td 
 							v-if="file.analysis.available && file.analysis.data.tokens.loaded && file.analysis.data.tokens.object[index + 1]"
 							class="token"
-							:class="{ list: file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 }"
+							:class="{ last: file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 }"
 							v-tooltip="{ theme: 'panorama', content: file.analysis.data.tokens.object[index + 1].tokens.map(token => $t(`tokens.${$store.state.Tokens.map[token].name}`)).join(', ') }"
 							:rowspan="file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.tokens.object[index + 1].end - file.analysis.data.tokens.object[index + 1].start) + 1">
 							<div class="dots">
