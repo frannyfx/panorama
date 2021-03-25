@@ -160,6 +160,9 @@
 			"codeClassification": "Code classification",
 			"viewToScale": "View to scale"
 		},
+		"analysisBar": {
+			"others": "No others | One other | {0} others"
+		},
 		"contributorBubble": {
 			"anonymous": "Anonymous"
 		},

@@ -47,7 +47,7 @@
 					</div>
 				</div>
 			</div>
-			<analysis-bar :items="file.analysis.available ? contributorBarItems : []" :to-scale="contributorStats.toScale.enabled"/>
+			<analysis-bar :items="file.analysis.available ? contributorBarItems : []" :to-scale="contributorStats.toScale.enabled" description-key="components.analysisStats.linesOfCode" :max-items="5"/>
 		</div>
 		<div class="panel file-type-stats" key="file-type-stats" v-show="show && file.analysis.available && file.type == 'dir'">
 			<div class="stats-header">
@@ -64,7 +64,7 @@
 					</div>
 				</div>
 			</div>
-			<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []" :to-scale="fileTypeStats.toScale.enabled"/>
+			<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []" :to-scale="fileTypeStats.toScale.enabled" description-key="components.analysisStats.linesOfCode"/>
 		</div>
 		<div class="panel token-stats" key="token-stats" v-show="show && file.analysis.available">
 			<div class="stats-header">
@@ -81,7 +81,7 @@
 					</div>
 				</div>
 			</div>
-			<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []" :to-scale="tokenStats.toScale.enabled"/>
+			<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []" :to-scale="tokenStats.toScale.enabled" description-key="components.analysisStats.linesOfCode"/>
 		</div>
 	</transition-group>
 </template>
@@ -141,12 +141,12 @@ export default Vue.extend({
 				return {
 					data: {
 						id: contributorStats.contributorId,
-						percentage: contributorStats.percentage * 100
+						percentage: contributorStats.percentage * 100,
+						value: contributorStats.numLines
 					},
 					view: {
 						label: contributor.id == -1 ? this.$i18n.t("components.analysisStats.anonymous").toString() : contributor.login,
-						colour: contributor.enrichedData.colour,
-						description: this.$i18n.tc("components.analysisStats.linesOfCode", contributorStats.numLines, [contributorStats.numLines]).toString()
+						colour: contributor.enrichedData.colour
 					}
 				}
 			});
@@ -161,12 +161,12 @@ export default Vue.extend({
 				return {
 					data: {
 						id: fileType.typeId,
-						percentage: fileTypeStats.percentage * 100
+						percentage: fileTypeStats.percentage * 100,
+						value: fileTypeStats.numLines
 					},
 					view: {
 						label: fileType.name,
-						colour: fileType.colour,
-						description: this.$i18n.tc("components.analysisStats.linesOfCode", fileTypeStats.numLines, [fileTypeStats.numLines]).toString()
+						colour: fileType.colour
 					}
 				};
 			});
@@ -180,12 +180,12 @@ export default Vue.extend({
 				return {
 					data: {
 						id: token,
-						percentage: tokenStats.percentage * 100
+						percentage: tokenStats.percentage * 100,
+						value: tokenStats.numLines
 					},
 					view: {
 						colour: tokenData.colour,
-						label: this.$i18n.t(`tokens.${tokenData.name}`).toString(),
-						description: this.$i18n.tc("components.analysisStats.linesOfCode", tokenStats.numLines, [tokenStats.numLines]).toString()
+						label: this.$i18n.t(`tokens.${tokenData.name}`).toString()
 					}
 				}
 			});

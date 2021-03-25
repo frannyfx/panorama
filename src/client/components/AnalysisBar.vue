@@ -27,7 +27,7 @@
 				</div>
 				<div class="details">
 					<div class="title">{{item.view.label}}</div>
-					<div class="description">{{item.view.description}}</div>
+					<div class="description">{{descriptionKey ? $tc(descriptionKey, item.data.value, [item.data.value]) : item.description}}</div>
 				</div>
 			</div>
 		</transition-group>
@@ -54,12 +54,50 @@ export default Vue.extend({
 			type: Boolean,
 			required: false,
 			default: false
+		},
+		descriptionKey: {
+			type: String,
+			required: false,
+			default: false
+		},
+		othersKey: {
+			type: String,
+			required: false
+		},
+		maxItems: {
+			type: Number,
+			required: false,
+			default: -1
 		}
 	},
 	computed: {
 		processedItems() : BarItem[] {
-			// TODO: Otherify the items.
-			return this.items;
+			// No limit, display all the items. Add 1 to the number of max items since we don't want "1 other".
+			if (this.maxItems == -1 || this.items.length <= this.maxItems + 1) return this.items;
+
+			// Get all the items that will remain untouched.
+			let items = this.items.slice(0, this.maxItems);
+
+			// Create "other" bar item.
+			let others = this.items.slice(this.maxItems).reduce((previous: BarItem, current: BarItem) => {
+				previous.data.value += current.data.value;
+				previous.data.percentage += current.data.percentage;
+				return previous;
+			}, {
+				data: {
+					id: "Others",
+					percentage: 0,
+					value: 0
+				},
+				view: {
+					label: this.$i18n.tc(this.othersKey ?? "components.analysisBar.others", this.items.length - this.maxItems, [this.items.length - this.maxItems])
+				}
+			});
+
+			console.log(others);
+
+			// Return the limited list of items.
+			return [...items, others];
 		}
 	},
 	methods: {
