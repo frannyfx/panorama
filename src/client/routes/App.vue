@@ -23,7 +23,7 @@
 		<transition name="credits">
 			<div class="credits no-select" v-show="$route.name == 'sign-in'">
 				<p>
-					<span>frannyfx &copy; 2021</span>
+					<span>frannyfx &copy; {{currentYear}}</span>
 					<span>&bull;</span>
 					<a href="https://github.com/frannyfx" rel="noreferrer" target="_blank"><font-awesome-icon :icon="['fab', 'github']"/></a>
 					<span>&bull;</span>
@@ -76,6 +76,11 @@ export default Vue.extend({
 			// Change title depending on the route.
 			document.title = to.meta?.title ? this.$i18n.t(to.meta.title).toString() : "Panorama";
 		}
+	},
+	data() {
+		return {
+			currentYear: new Date().getFullYear()
+		};
 	},
 	methods: {
 		showGenericError() {
