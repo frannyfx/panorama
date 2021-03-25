@@ -29,7 +29,7 @@
 				</div>
 			</div>
 			<div class="contributors">
-				<contributor-bubbles key="contributor-bubbles" :contributor-list="file.analysis.available ? file.analysis.data.contributorList : []"/>
+				<contributor-bubbles key="contributor-bubbles" :contributor-list="file.analysis.available ? file.analysis.data.contributorList : []" :max-items="5"/>
 			</div>
 		</div>
 		<div class="panel contributor-stats" key="contributor-stats" v-show="show && file.analysis.available">

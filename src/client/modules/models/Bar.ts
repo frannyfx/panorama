@@ -13,5 +13,6 @@ export interface BarItem {
 		colour?: string,
 		image?: string,
 		label: string
+		other?: boolean
 	}
 }

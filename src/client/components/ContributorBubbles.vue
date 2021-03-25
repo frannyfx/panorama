@@ -1,7 +1,8 @@
 <template>
 	<div class="bubbles-wrapper">
 		<transition-group class="list" tag="div" name="contributor-bubble">
-			<contributor-bubble v-for="login in contributorList" :key="login" :login="login"/>
+			<contributor-bubble v-for="login in processedList" :key="login" :login="login"/>
+			<contributor-bubble v-show="numOthers != 0" key="_limited" login="" :num-others="numOthers"/> 
 		</transition-group>
 	</div>
 </template>
@@ -21,6 +22,21 @@ export default Vue.extend({
 			type: Array,
 			required: true
 		},
+		maxItems: {
+			type: Number,
+			required: false,
+			default: -1
+		}
+	},
+	computed: {
+		processedList() : string[] {
+			// No limit, display all contributors. Add 1 to the number of max items since we don't want "1 other".
+			if (this.maxItems == -1 || this.contributorList.length <= this.maxItems + 1) return this.contributorList;
+			return this.contributorList.slice(0, this.maxItems);
+		},
+		numOthers() : number {
+			return this.maxItems == -1 || this.contributorList.length <= this.maxItems + 1 ? 0 : this.contributorList.length - this.maxItems;
+		}
 	}
 });
 </script>

@@ -3,6 +3,7 @@
 		<transition-group class="bar" tag="div" name="segment" @before-enter="beforeSegmentEnter" @enter="segmentEnter">
 			<div 
 				class="segment" 
+				:class="{ other: item.view.other }"
 				v-for="(item, index) in processedItems" :key="item.data.id"
 				v-tooltip="{ theme: 'panorama', content: item.view.label }"
 				:data-index="index"
@@ -90,11 +91,10 @@ export default Vue.extend({
 					value: 0
 				},
 				view: {
-					label: this.$i18n.tc(this.othersKey ?? "components.analysisBar.others", this.items.length - this.maxItems, [this.items.length - this.maxItems])
+					label: this.$i18n.tc(this.othersKey ?? "components.analysisBar.others", this.items.length - this.maxItems, [this.items.length - this.maxItems]),
+					other: true
 				}
 			});
-
-			console.log(others);
 
 			// Return the limited list of items.
 			return [...items, others];
@@ -150,6 +150,10 @@ export default Vue.extend({
 			min-width: 2%;
 			transition: width 1s, min-width 1s;
 			flex-shrink: 1;
+
+			&.other {
+				background-color: $grey-blue;
+			}
 
 			&:last-child {
 				flex-grow: 1;

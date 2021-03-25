@@ -164,7 +164,8 @@
 			"others": "No others | One other | {0} others"
 		},
 		"contributorBubble": {
-			"anonymous": "Anonymous"
+			"anonymous": "Anonymous",
+			"others": "No others | One other | {0} others"
 		},
 		"footer": {
 			"madeWithLove": "Made with ❤️ in London"

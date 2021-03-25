@@ -1,10 +1,11 @@
 <template>
 	<div 
 		class="contributor"
-		:class="{ anonymous: isAnonymous }" 
-		v-tooltip="{ theme: 'panorama', content: isAnonymous ? $t('components.contributorBubble.anonymous') : login }">
-		<div class="contributor-image" :style="{ 'background-image': !isAnonymous ? `url('${$store.state.Users.object[login].avatarUrl}')` : undefined }">
+		:class="{ anonymous: isAnonymous, others: numOthers > 0 }" 
+		v-tooltip="{ theme: 'panorama', content: numOthers != 0 ? $tc('components.contributorBubble.others', numOthers, [numOthers]) : isAnonymous ? $t('components.contributorBubble.anonymous') : login }">
+		<div class="contributor-image" :style="{ 'background-image': !isAnonymous && numOthers == 0 && login != '' ? `url('${$store.state.Users.object[login].avatarUrl}')` : undefined }">
 			<font-awesome-icon v-if="isAnonymous" icon="question"/>
+			<div class="others" v-if="numOthers > 0">+{{numOthers}}</div>
 		</div>
 	</div>
 </template>
@@ -27,6 +28,11 @@ export default Vue.extend({
 		login: {
 			type: String,
 			required: true
+		},
+		numOthers: {
+			type: Number,
+			required: false,
+			default: 0
 		}
 	}	
 });
@@ -54,14 +60,22 @@ export default Vue.extend({
 		background-position: center;
 	}
 
-	&.anonymous {
+	&.anonymous, &.others {
 		.contributor-image {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			background-color: $blue;
-			color: white;
 		}
+	}
+
+	&.anonymous {
+		background-color: $blue;
+		color: white;
+	}
+
+	&.others {
+		background-color: $grey-blue;
+		color: white;
 	}
 }
 </style>

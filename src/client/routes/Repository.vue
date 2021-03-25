@@ -344,7 +344,10 @@ export default Vue.extend({
 				return;
 			}
 			
-			// Get children.
+			// Prevent duplicate loading.
+			if (file.children.loading) return;
+
+			// Get the path's children.
 			await this.getChildren(file, path);			
 
 			// Remove current file being viewed from the path.
