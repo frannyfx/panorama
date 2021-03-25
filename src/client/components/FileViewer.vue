@@ -47,9 +47,6 @@
 							:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
 							:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
 							<div class="details">
-								<div class="dot-indicator" :style="{
-									'background-color': `#${$store.state.Users.object[file.analysis.data.chunks.object[index + 1].login].enrichedData.colour}`
-								}"></div>
 								<span>{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</span>
 							</div>
 						</td>
@@ -440,14 +437,6 @@ export default Vue.extend({
 					display: flex;
 					align-items: center;
 					justify-content: center;
-
-					> :not(:last-child) {
-						margin-right: 5px;
-					}
-
-					> span {
-						flex-grow: 1;
-					}
 				}
 			}
 
