@@ -91,7 +91,7 @@
 				</ul>
 				<p>You are not required to pay any charge for exercising your rights. If you make a request, please allow for a reasonable amount of time for us to respond.</p>
 				<h2>Contact us</h2>
-				<p>To make an inquiry, please contact us at <b>francesco.compagnoni@kcl.ac.uk</b>.</p>
+				<p>To make an inquiry, please contact us at <a href="mailto:francesco.compagnoni@kcl.ac.uk"><b>francesco.compagnoni@kcl.ac.uk</b></a>.</p>
 				<br>
 				<content-footer/>
 			</div>
@@ -187,6 +187,11 @@ export default Vue.extend({
 
 	p, ul {
 		font-size: 0.9em;
+	}
+
+	a {
+		color: $blue;
+		text-decoration: underline;
 	}
 
 	.content {
