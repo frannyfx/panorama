@@ -13,6 +13,7 @@ import { DatabaseAnalysis } from "./Analysis";
 
 // Models
 import FileType from "./FileType";
+import { ExtensionMap as LookupExtensionMap } from "../../../shared/models/FileType";
 
 // Interfaces
 /**
@@ -56,7 +57,7 @@ export interface DatabaseAnalysedItemChunkToken {
 	path: string,
 	start: number,
 	tokenType: number,
-	numLines: number
+	end: number
 };
 
 /**
@@ -179,6 +180,7 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
 			});
 
 			// Push the tokens inside the chunk.
+			/*
 			Object.keys(chunk.lineStats).map(tokenType => {
 				// Convert string token to number token.
 				let token = parseInt(tokenType);
@@ -193,6 +195,19 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
 					start: chunk.start,
 					tokenType: token,
 					numLines: chunk.lineStats[token]
+				});
+			});*/
+		}
+
+		// Add raw token groups.
+		for (let tokenGroup of item.tokens || []) {
+			tokenGroup.lineData.forEach(tokenType => {
+				convertedChunksTokens.push({
+					analysisId: analysis.analysisId!,
+					path: item.path,
+					start: tokenGroup.start,
+					tokenType,
+					end: tokenGroup.end
 				});
 			});
 		}

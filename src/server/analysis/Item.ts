@@ -63,6 +63,7 @@ export interface ContributorStats {
 	contributorId: string,
 	numLines: number,
 	percentage: number,
+	extensions?: ExtensionMap,
 	aggregateLineStats: AdvancedLineStats
 };
 
@@ -204,6 +205,15 @@ function computeItemPercentages(numLines: number, aggregateLineStats: AdvancedLi
 			contributorStatsMap[contributorId].aggregateLineStats[type].percentage = contributorStatsMap[contributorId].aggregateLineStats[type].numLines / aggregateLineStats[type].numLines;
 			if (isNaN(contributorStatsMap[contributorId].aggregateLineStats[type].percentage)) contributorStatsMap[contributorId].aggregateLineStats[type].percentage = 0;
 		});
+
+		// Extension percentages.
+		if (contributorStatsMap[contributorId].extensions && extensionMap) {
+			let extensions = Object.keys(contributorStatsMap[contributorId].extensions!);
+			extensions.map(extension => {
+				contributorStatsMap[contributorId].extensions![extension].percentage = contributorStatsMap[contributorId].extensions![extension].numLines / extensionMap[extension].numLines;
+				if (isNaN(contributorStatsMap[contributorId].extensions![extension].percentage)) contributorStatsMap[contributorId].extensions![extension].percentage = 0;
+			});
+		}
 	}
 
 	// Compute extension map percentages.
@@ -325,6 +335,9 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 		for (let file of files) {
 			// Add lines.
 			numLines += file.numLines;
+
+			// Get file extension.
+			let fileExtension = file.path.split(".").pop() ?? "";
 			
 			// Loop through file contributors.
 			Object.keys(file.contributors).map(contributorId => {
@@ -336,6 +349,7 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 					contributorId: contributorId,
 					numLines: 0,
 					percentage: 0,
+					extensions: {},
 					aggregateLineStats: {}
 				};
 
@@ -350,6 +364,22 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 						percentage: 0
 					};
 				});
+
+				// Increment the extension aggregates.
+				// TODO: Think about contributor extension aggregates.
+				if (fileExtension != "" && aggregateContributor.extensions) {
+					// Get existing object or create new line stats for the extension.
+					let extensionLineCount : AdvancedLineCount = aggregateContributor.extensions[fileExtension] || {
+						numLines: 0,
+						percentage: 0
+					};
+
+					// Add lines for this file extension.
+					extensionLineCount.numLines += contributor.numLines;
+
+					// Set the line count to the new line count.
+					aggregateContributor.extensions[fileExtension] = extensionLineCount;
+				}
 
 				// Increment aggregate contributor line count.
 				aggregateContributor.numLines += contributor.numLines;
@@ -370,8 +400,7 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 				};
 			});
 
-			// Get file extension and aggregate it.
-			let fileExtension = file.path.split(".").pop() || "";
+			// Aggregate file extensions.
 			if (fileExtension != "") {
 				// Get existing object or create new line stats for the extension.
 				let extensionLineCount : AdvancedLineCount = extensionMap[fileExtension] || {
