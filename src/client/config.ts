@@ -10,5 +10,8 @@ export default {
 	},
 	store: {
 		lazyDataPurgeDelay: 5000
+	},
+	files: {
+		maxSize: 131072
 	}
 };

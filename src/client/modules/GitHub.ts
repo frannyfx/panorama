@@ -221,7 +221,7 @@ export async function getEnrichedRepositoryContributors(repository: Repository) 
  */
 export async function getFileContent(repository: Repository, file: File) : Promise<string | null> {
 	// Prevent retrieving content if it's not a file or if it's too large.
-	if (file.type != "file" || file.size > 2**17) return null;
+	if (file.type != "file" || file.size > config.files.maxSize) return null;
 
 	// Get file content.
 	let content = await getOctokit().repos.getContent({
@@ -239,6 +239,5 @@ export async function getFileContent(repository: Repository, file: File) : Promi
 		return decodeURIComponent(escape(atob((content.data as ContentFile).content)));	
 	} catch (e) {
 		return null;
-	}
-	
+	}	
 }

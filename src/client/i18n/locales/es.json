@@ -11,7 +11,7 @@
 		},
 		"dashboard": {
 			"title": "Panel de control • Panorama",
-			"activity": "Actividades",
+			"recentActivity": "Actividades recientes",
 			"repositories": "Repositorios",
 			"test": "Test",
 			"viewMore": "Ver más"

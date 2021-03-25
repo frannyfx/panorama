@@ -11,7 +11,7 @@
 		},
 		"dashboard": {
 			"title": "Dashboard • Panorama",
-			"activity": "Activity",
+			"recentActivity": "Recent activity",
 			"repositories": "Repositories",
 			"test": "Test",
 			"viewMore": "View more"

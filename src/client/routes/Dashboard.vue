@@ -1,12 +1,14 @@
 <template>
 	<div class="page nav no-select">
 		<div class="content container">
-			<h2>{{ $t("routes.dashboard.activity") }}</h2>
-			<div class="activities">
-				<div class="activity"></div>
-				<div class="activity"></div>
-				<div class="activity"></div>
-			</div>
+			<h2>{{ $t("routes.dashboard.recentActivity") }}</h2>
+			<scroller>
+				<div class="activities">
+					<div class="activity"></div>
+					<div class="activity"></div>
+					<div class="activity"></div>
+				</div>
+			</scroller>
 			<h2>{{ $t("routes.dashboard.repositories") }}</h2>
 			<div class="repos">
 				<transition-group name="list">
@@ -36,21 +38,20 @@ import Repositories from "../store/modules/Repositories";
 // Modules
 import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
-import { clearAuthenticationData, send, waitForAuth } from "../modules/API";
-import { addNotification, createI18NAlert } from "../modules/Notifications";
+import { clearAuthenticationData, waitForAuth } from "../modules/API";
+import { createI18NAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
-import { Method } from "../../shared/Method";
-import { subscribeToJobProgress } from "../modules/Queue";
-import { createCustomModal, createModal, Modal, OK, OK_CANCEL, OK_CANCEL_DESTRUCTIVE } from "../modules/Modal";
 
 // Components
-import RepositoryListItem from "../components/RepositoryListItem.vue";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
+import Scroller from "../components/Scroller.vue";
+import RepositoryListItem from "../components/RepositoryListItem.vue";
 import ContentFooter from "../components/Footer.vue";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
+		Scroller,
 		RepositoryListItem,
 		ContentFooter
 	},
@@ -131,19 +132,17 @@ h2 {
 }
 
 .activities {
-	width: 100%;
-	margin: 20px 0px;
-
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	justify-content: space-between;
 
 	.activity {
-		width: 300px;
+		width: 290px;
 		height: 180px;
 		border-radius: 16px;
 		background-color: $grey-tinted;
+		flex-shrink: 0;
 
 		&:not(:last-child) {
 			margin-right: 20px;

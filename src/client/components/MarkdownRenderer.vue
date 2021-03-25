@@ -42,7 +42,7 @@ export default Vue.extend({
 			html: true,
 		})	.use(require("markdown-it-replace-link"))
 			.use(require("markdown-it-highlightjs"), { auto: false })
-			.use(require("markdown-it-link-attributes"), { attrs: { target: "_blank" }});
+			.use(require("markdown-it-link-attributes"), { attrs: { target: "_blank", rel: "noreferrer" }});
 	},
 	props: {
 		source: {
