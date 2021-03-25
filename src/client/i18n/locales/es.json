@@ -40,8 +40,8 @@
 	},
 	"alerts": {
 		"generalError": {
-			"title": "Something went wrong.",
-			"description": "Please try again later."
+			"title": "Algo salió mal.",
+			"description": "Por favor vuelva a intentarlo."
 		},
 		"signInFailed": {
 			"title": "No has efectuado el acceso.",
@@ -73,7 +73,7 @@
 			}
 		},
 		"ticketFetchFailed": {
-			"title": "Unable to fetch analysis data for the {0}.",
+			"title": "No ha sido posible encontrar los datos del análisis para {0}.",
 			"description": "Something went wrong. Please try again later."
 		},
 		"analysisQueueFailed": {
@@ -154,13 +154,18 @@
 			"folderInRoot": "Carpeta en el directorio raíz",
 			"gitRepo": "Repositorio",
 			"anonymous": "Anonimo",
-			"linesOfCode": "Ninguna linea | Una line | {0} lineas",
+			"linesOfCode": "Ninguna linea | Una linea | {0} lineas",
 			"contributors": "Collaboradores",
 			"fileTypes": "Tipos de archivo",
-			"codeClassification": "Tipología de código"
+			"codeClassification": "Tipología de código",
+			"viewToScale": "Visualizar tamaño original"
+		},
+		"analysisBar": {
+			"others": "No más personas | Una otra persona | {0} más personas"
 		},
 		"contributorBubble": {
-			"anonymous": "Anonimo"
+			"anonymous": "Anonimo",
+			"others": "No más personas | Una otra persona | {0} más personas"
 		},
 		"footer": {
 			"madeWithLove": "Hecho con ❤️ en Londres"

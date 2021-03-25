@@ -157,10 +157,15 @@
 			"linesOfCode": "Nessuna riga | Una riga | {0} righe",
 			"contributors": "Collaboratori",
 			"fileTypes": "Tipi di file",
-			"codeClassification": "Tipologia del codice"
+			"codeClassification": "Tipologia del codice",
+			"viewToScale": "Mostra scala corretta"
+		},
+		"analysisBar": {
+			"others": "Nessun altro | Un'altra persona | {0} altre persone"
 		},
 		"contributorBubble": {
-			"anonymous": "Anonimo"
+			"anonymous": "Anonimo",
+			"others": "Nessun altro | Un'altra persona | {0} altre persone"
 		},
 		"footer": {
 			"madeWithLove": "Fatto con ❤️ a Londra"
