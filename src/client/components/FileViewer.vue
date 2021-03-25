@@ -46,9 +46,12 @@
 							class="analysis-chunk"
 							:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
 							:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
-							<div class="details" :style="{
-								'background-color': `#${$store.state.Users.object[file.analysis.data.chunks.object[index + 1].login].enrichedData.colour}`
-							}">{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</div>
+							<div class="details">
+								<div class="dot-indicator" :style="{
+									'background-color': `#${$store.state.Users.object[file.analysis.data.chunks.object[index + 1].login].enrichedData.colour}`
+								}"></div>
+								<span>{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</span>
+							</div>
 						</td>
 						<td 
 							v-if="file.analysis.available && file.analysis.data.tokens.loaded && file.analysis.data.tokens.object[index + 1]"
@@ -430,12 +433,21 @@ export default Vue.extend({
 				text-align: center;
 				font-size: 0.8em;
 				font-weight: 600;
-				color: white;
+				color: $grey-blue;
 				z-index: 100;
 
 				> .details {
-					padding: 3px 8px;
-					border-radius: 20px;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+
+					> :not(:last-child) {
+						margin-right: 5px;
+					}
+
+					> span {
+						flex-grow: 1;
+					}
 				}
 			}
 
@@ -445,7 +457,7 @@ export default Vue.extend({
 				justify-content: center;
 
 				> :not(:last-child) {
-					margin-right: 3px;
+					margin-right: 5px;
 				}
 			}
 
@@ -459,7 +471,7 @@ export default Vue.extend({
 			}
 
 			.code {
-				padding: 0px 20px;
+				padding: 5px 20px;
 
 				pre {
 					margin: 0;
