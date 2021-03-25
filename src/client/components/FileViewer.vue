@@ -40,10 +40,10 @@
 			<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != '' && canViewSource">
 				<table class="line-table">
 					<tr v-for="(line, index) in highlightedLines" :key="index">
-						<td class="line-number">{{ index + 1}}</td>
+						<td class="line-number no-select">{{ index + 1}}</td>
 						<td
 							v-if="file.analysis.available && file.analysis.data.chunks.loaded && file.analysis.data.chunks.object[index + 1]"
-							class="analysis-chunk"
+							class="analysis-chunk no-select"
 							:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
 							:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
 							<div class="details">
@@ -52,7 +52,7 @@
 						</td>
 						<td 
 							v-if="file.analysis.available && file.analysis.data.tokens.loaded && file.analysis.data.tokens.object[index + 1]"
-							class="token"
+							class="token no-select"
 							:class="{ last: file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 }"
 							v-tooltip="{ theme: 'panorama', content: file.analysis.data.tokens.object[index + 1].tokens.map(token => $t(`tokens.${$store.state.Tokens.map[token].name}`)).join(', ') }"
 							:rowspan="file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.tokens.object[index + 1].end - file.analysis.data.tokens.object[index + 1].start) + 1">

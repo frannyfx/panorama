@@ -6,7 +6,8 @@
 	</div>
 </template>
 <script lang="ts">
-import Vue from 'vue'
+// Imports
+import Vue from "vue";
 export default Vue.extend({
 	computed: {
 		scrollLeft() : boolean {
@@ -45,7 +46,7 @@ export default Vue.extend({
 		// On resize update values.
 		window.addEventListener("resize", () => this.updateValues());
 	}
-})
+});
 </script>
 <style lang="scss" scoped>
 .scroller-wrapper {

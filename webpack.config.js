@@ -7,7 +7,8 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 module.exports = {
 	entry: {
 		"main": "./src/client/entries/index.ts",
-		"callback": "./src/client/entries/callback.ts"
+		"callback": "./src/client/entries/callback.ts",
+		"privacy-policy": "./src/client/entries/privacy-policy.ts"
 	},
 	output: {
 		path: path.resolve(__dirname, "dist/public/js"),
