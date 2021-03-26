@@ -276,7 +276,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		startedAt: new Date()
 	};
 
-	Analysis.update(analysis);
+	await Analysis.update(analysis);
 
 	// Report to the user that the job is starting.
 	reportJobProgress(job, AnalysisStage.Starting);
@@ -288,7 +288,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 	// Set the repository commit ID being analysed.
 	let analysisCommit = await getLatestCommit(repository);
 	analysis.commitId = analysisCommit.id().tostrS();
-	Analysis.update(analysis);
+	await Analysis.update(analysis);
 
 	// Set stage to lexing.
 	reportJobProgress(job, AnalysisStage.Lexing);
@@ -383,7 +383,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 		// Set the job completion date.
 		analysis.completedAt = new Date();
 		analysis.status = DatabaseAnalysisStatus.COMPLETED;
-		Analysis.update(analysis);
+		await Analysis.update(analysis);
 
 		// Call the job completion callback returning the analysis ID.
 		logger.success(`Completed analysis ${analysis.analysisId!} of '${job.data.repository.full_name}'.`);

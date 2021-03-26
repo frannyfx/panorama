@@ -289,7 +289,7 @@ let route : Array<Route> = [{
 
 			// Update analysis with job ID.
 			databaseAnalysis.jobId = job.id;
-			DatabaseAnalysis.update(databaseAnalysis);
+			await DatabaseAnalysis.update(databaseAnalysis);
 
 			// Generate ticket to listen to job events.
 			let jobTicket = await ticket.sign({ jobId: job.id, accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex") });
