@@ -7,6 +7,9 @@ import { stop } from "../../../../src/server/database";
 import Analysis, { DatabaseAnalysisStatus } from "../../../../src/server/database/models/Analysis";
 import Repository from "../../../../src/server/database/models/Repository";
 
+/**
+ * Global set-up.
+ */
 beforeAll(async done => {
 	// Insert the repository necessary for the foreign key constraints to be valid.
 	let repositoryResult = await Repository.insertOrUpdate({
@@ -19,6 +22,9 @@ beforeAll(async done => {
 	done();
 });
 
+/**
+ * Global clean-up.
+ */
 afterAll(async done => {
 	await Repository.delete(-1);
 	await stop();
@@ -51,7 +57,7 @@ describe("insert", () => {
 
 	it("throws when an analysis with an invalid repository is given", async () => {
 		await expect(Analysis.insert({
-			repositoryId: -2,
+			repositoryId: -100,
 			requestedBy: -1,
 			status: DatabaseAnalysisStatus.QUEUED,
 			queuedAt: new Date()
@@ -61,7 +67,7 @@ describe("insert", () => {
 	it("throws when an analysis with an invalid requester is given", async () => {
 		await expect(Analysis.insert({
 			repositoryId: -1,
-			requestedBy: -2,
+			requestedBy: -100,
 			status: DatabaseAnalysisStatus.QUEUED,
 			queuedAt: new Date()
 		})).rejects.toThrowError();
@@ -107,7 +113,7 @@ describe("update", () => {
 		});
 
 		// Update the analysis.
-		analysisResult.requestedBy = -2;
+		analysisResult.requestedBy = -100;
 		await expect(Analysis.update(analysisResult)).rejects.toThrowError();
 
 		// Clean-up.

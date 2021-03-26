@@ -10,7 +10,9 @@ const invalidDatabase = {
 	purge
 };
 
-// Test set-up
+/**
+ * Test set-up.
+ */
 beforeEach(() => {
 	jest.resetModules();
 });

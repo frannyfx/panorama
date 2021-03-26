@@ -30,11 +30,20 @@ export async function insertOrUpdate(analysisId: number, user: DatabaseUser, tra
 	let connection = transaction ?? await getConnection();
 	if (!connection) return false;
 
+	// Check analysis exists.
+	let analysis = await Analysis.get(analysisId);
+	if (!analysis) return false;
+
 	// Insert or update the user.
 	await insertOrUpdateUser(user, transaction);
-	await connection("AnalysisContributor").insert({
-		analysisId, userId: user.userId
-	});
+	
+	// Check if analysis contributor already exists.
+	let contributor = await connection("AnalysisContributor").where({ analysisId, userId: user.userId }).first();
+	if (!contributor) {
+		await connection("AnalysisContributor").insert({
+			analysisId, userId: user.userId
+		});
+	}
 
 	return true;
 }
