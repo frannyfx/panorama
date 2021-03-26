@@ -23,12 +23,19 @@ export function dedupe<T>(list: T[], comparator: (a: T, b: T) => boolean) : T[] 
 
 /**
  * Linear interpolation function.
- * @param a 
- * @param b 
- * @param amount 
- * @returns 
+ * @param a The minimum value.
+ * @param b The maximum value.
+ * @param amount The proportion between the two values.
+ * @returns The lerped value.
  */
 export function lerp(a: number, b: number, amount: number) {
+	// Swap the values if b is less than a.
+	if (b < a) {
+		let c = b;
+		b = a;
+		a = c;
+	}
+
 	amount = amount < 0 ? 0 : amount;
 	amount = amount > 1 ? 1 : amount;
 	return a + (b - a) * amount;

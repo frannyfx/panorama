@@ -13,7 +13,6 @@ import { DatabaseAnalysis } from "./Analysis";
 
 // Models
 import FileType from "./FileType";
-import { ExtensionMap as LookupExtensionMap } from "../../../shared/models/FileType";
 
 // Interfaces
 /**
@@ -178,25 +177,6 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
 				end: chunk.end,
 				contributorId: contributorMap[chunk.contributorId].id
 			});
-
-			// Push the tokens inside the chunk.
-			/*
-			Object.keys(chunk.lineStats).map(tokenType => {
-				// Convert string token to number token.
-				let token = parseInt(tokenType);
-				
-				// Don't insert the token if there are no lines related to it.
-				if (chunk.lineStats[token] == 0) return;
-
-				// Push the token information.
-				convertedChunksTokens.push({
-					analysisId: analysis.analysisId!,
-					path: item.path,
-					start: chunk.start,
-					tokenType: token,
-					numLines: chunk.lineStats[token]
-				});
-			});*/
 		}
 
 		// Add raw token groups.
