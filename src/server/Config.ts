@@ -6,6 +6,7 @@
 // Imports
 import { ArgumentParser } from "argparse";
 import path from "path";
+import { Data } from "shared/Result";
 
 // Modules
 import getRoot from "./utils/root";
@@ -73,7 +74,11 @@ export interface Config {
 	}
 };
 
-export function loadConfig() : Config {
+export function loadConfig(testConfig: Data | undefined = undefined) : Config {
+	// Allow for tests to override the config loaded.
+	if (testConfig) config = <Config>testConfig;
+
+	// Return config if it has already been loaded.
 	if (config) return config;
 
 	// If the user has specified a config file, return it.
