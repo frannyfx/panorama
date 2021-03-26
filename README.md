@@ -83,11 +83,13 @@ node dist/server/index.js
 ```
 
 ## 🧪 Testing
-The full test suite can be executed by running:
+All test suites can be executed by running:
 
 ```bash
 npm test
 ```
+
+It is highly recommended to create a `panorama.test.json` config file which points to a test database to prevent tests from conflicting with your production environment.
 
 ## 👨‍💻 Credits
 ### Project

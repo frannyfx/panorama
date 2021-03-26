@@ -74,15 +74,25 @@ export interface Config {
 	}
 };
 
-export function loadConfig(testConfig: Data | undefined = undefined) : Config {
+export function loadConfig(configOverride: Data | undefined = undefined, loadTestConfig : boolean = false) : Config {
 	// Allow for tests to override the config loaded.
-	if (testConfig) config = <Config>testConfig;
+	if (configOverride) config = <Config>configOverride;
 
 	// Return config if it has already been loaded.
 	if (config) return config;
 
 	// If the user has specified a config file, return it.
 	if (configPath) config = require(path.isAbsolute(configPath) ? configPath : path.join(process.cwd(), configPath));
+
+	// Load test config if flag is true.
+	if (loadTestConfig) {
+		try {
+			config = require(path.join(getRoot(), "panorama.test.json"));
+			return config!;
+		} catch { 
+			console.log("Unable to find panorama.test.json file in the server root directory. Your tests may fail.");
+		}
+	}
 
 	// Check if config.json exists before loading the default.
 	try {

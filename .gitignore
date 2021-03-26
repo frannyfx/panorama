@@ -5,6 +5,7 @@ build
 
 # Private config files
 panorama.json
+panorama.test.json
 
 # Server cache
 panorama_data

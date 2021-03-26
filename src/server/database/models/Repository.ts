@@ -44,6 +44,24 @@ async function insertOrUpdate(repository: DatabaseRepository, transaction: Knex.
 	return true;
 }
 
+/**
+ * Delete a repository.
+ * @param repositoryId The ID of the repository to delete.
+ * @returns Whether the repository was deleted successfully.
+ */
+async function deleteRepository(repositoryId: number) : Promise<boolean> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return false;
+
+	try {
+		await connection("Repository").where({ repositoryId }).del();
+		return true;
+	} catch (e) {
+		return false;
+	}
+}
+
 export default {
-	insertOrUpdate
+	insertOrUpdate, delete: deleteRepository
 };

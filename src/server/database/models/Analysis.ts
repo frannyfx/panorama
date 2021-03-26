@@ -71,6 +71,7 @@ async function update(analysis: DatabaseAnalysis) : Promise<boolean> {
 		startedAt: analysis.startedAt!,
 		completedAt: analysis.completedAt!
 	});
+
 	return true;
 }
 
@@ -86,7 +87,7 @@ async function getRawWithJobId(jobId: string) : Promise<DatabaseAnalysis | null>
 
 	// Get ID
 	let analysis : DatabaseAnalysis = await connection("Analysis").where({ jobId }).first();
-	return analysis;
+	return analysis ?? null;
 }
 
 /**
@@ -159,6 +160,24 @@ async function get(analysisId: number) : Promise<Data | null> {
 	return analysisRow;
 }
 
+/**
+ * Delete an analysis.
+ * @param analysisId The ID of the analysis to delete.
+ * @returns Whether the analysis was deleted successfully.
+ */
+async function deleteAnalysis(analysisId: number) : Promise<boolean> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return false;
+
+	try {
+		await connection("Analysis").where({ analysisId }).del();
+		return true;
+	} catch (e) {
+		return false;
+	}
+}
+
 export default {
-	insert, update, getLatest, get, getRawWithJobId
+	insert, update, getLatest, get, getRawWithJobId, delete: deleteAnalysis
 };
