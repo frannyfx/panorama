@@ -80,7 +80,7 @@ describe("insertOrUpdate", () => {
 		}
 	});
 
-	it("returns false if analysis id is invalid", async () => {
+	it("returns false for a non-existent analysis", async () => {
 		let result = await AnalysisContributor.insertOrUpdate(-100, { userId: -3, login: "test-user" });
 		expect(result).toEqual(false);
 	});
@@ -115,5 +115,11 @@ describe("getFromAnalysis", () => {
 				await connection("User").where({userId: -3}).del();
 			}
 		}
+	});
+
+	it("returns empty array for a non-existent analysis", async () => {
+		let analysisContributors = await AnalysisContributor.getFromAnalysis(analysisId);
+		expect(analysisContributors).not.toBeNull();
+		if (analysisContributors) expect(analysisContributors.length).toEqual(0);
 	});
 });
