@@ -55,7 +55,7 @@ describe("insertOrUpdate", () => {
 		// Insert the contributor.
 		let insertionResult = await AnalysisContributor.insertOrUpdate(analysisId, {
 			userId: -2,
-			login: "test-user"
+			login: "test-user-2"
 		});
 
 		// Check insertion successful.
@@ -94,7 +94,7 @@ describe("getFromAnalysis", () => {
 		// Set-up.
 		let insertionResult = await AnalysisContributor.insertOrUpdate(analysisId, {
 			userId: -3,
-			login: "test-user"
+			login: "test-user-3"
 		});
 
 		expect(insertionResult).toBe(true);
