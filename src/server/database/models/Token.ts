@@ -20,7 +20,7 @@ async function lookupTokens(tokens: number[]) : Promise<TokenMap> {
 	if (!connection) return {};
 
 	// Get tokens.
-	let matchingTokens : TokenType[] = await connection.select("*").from("TokenType").whereIn("tokenId", tokens);
+	let matchingTokens : TokenType[] = await connection.select("*").from("TokenType").whereIn("tokenId", tokens.filter(token => !isNaN(token)));
 
 	// Map token ID to token.
 	let tokenMap : TokenMap = {};
