@@ -15,6 +15,9 @@ const parser = new ArgumentParser();
 parser.add_argument("-c", "--config");
 const configPath = parser.parse_args()["config"];
 
+// Loaded config
+let config : Config | null = null;
+
 /**
  * The interface specifying the format of the config file.
  */
@@ -70,14 +73,18 @@ export interface Config {
 	}
 };
 
-export default () : Config => {
+export function loadConfig() : Config {
+	if (config) return config;
+
 	// If the user has specified a config file, return it.
-	if (configPath) return require(path.isAbsolute(configPath) ? configPath : path.join(process.cwd(), configPath));
+	if (configPath) config = require(path.isAbsolute(configPath) ? configPath : path.join(process.cwd(), configPath));
 
 	// Check if config.json exists before loading the default.
 	try {
-		return require(path.join(getRoot(), "config.json"));
+		config = require(path.join(getRoot(), "panorama.json"));
 	} catch (e) {
-		return require(path.join(getRoot(), "config.default.json"));
+		config = require(path.join(getRoot(), "panorama.default.json"));
 	}
+
+	return config!;
 };

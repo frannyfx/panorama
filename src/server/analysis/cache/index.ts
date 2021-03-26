@@ -7,13 +7,16 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+// Logger
+import createLogger from "../../utils/logger";
+const logger = createLogger("cache");
+
 // Config
-import loadConfig, { Config } from "../../Config";
-import { humanTimeIntervalToMillis } from "../../utils";
-const config : Config = loadConfig();
+import { loadConfig } from "../../Config";
+const config = loadConfig();
 
 // Modules
-const logger = require("../../utils/logger")("cache");
+import { humanTimeIntervalToMillis } from "../../utils";
 import getRoot from "../../utils/root";
 import manifest from "./manifest";
 

@@ -7,10 +7,6 @@
 import Joi from "joi";
 import crypto from "crypto";
 
-// Config
-import loadConfig, { Config } from "../../../../../Config";
-const config : Config = loadConfig();
-
 // Modules
 import { Method } from "../../../../../../shared/Method";
 import { Request, Route } from "../../../Route";

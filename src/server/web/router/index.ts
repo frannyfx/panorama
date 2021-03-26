@@ -9,8 +9,11 @@ import { ObjectSchema } from "joi";
 import path from "path";
 import websocket from "fastify-websocket";
 
+// Logger
+import createLogger from "../../utils/logger";
+const logger = createLogger("router");
+
 // Modules
-const logger = require("../../utils/logger")("router");
 import { Method } from "../../../shared/Method";
 import { buildResult, Data, Result } from "../../../shared/Result";
 import { Auth, Handler, Request, Route } from "./Route";

@@ -6,13 +6,16 @@
 // Imports
 import knex from "knex";
 
+// Logger
+import createLogger from "../utils/logger";
+const logger = createLogger("db");
+
 // Config
-import { humanTimeIntervalToMillis } from "../utils";
-import loadConfig, { Config } from "../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../Config";
+const config = loadConfig();
 
 // Modules
-const logger = require("../utils/logger")("db");
+import { humanTimeIntervalToMillis } from "../utils";
 
 // Variables
 var databaseConnection : knex | null = null;

@@ -7,15 +7,18 @@
 import path from "path";
 import fastify, { FastifyInstance } from "fastify";
 
+// Logger
+import createLogger from "../utils/logger";
+const logger = createLogger("web");
+
 // Config
-import loadConfig, { Config } from "../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../Config";
+const config = loadConfig();
 
 // Modules
 import getRoot from "../utils/root";
 import { Auth, Request } from "./router/Route";
 import { checkAuth } from "../github";
-const logger = require("../utils/logger")("web");
 
 // Web-server
 var webServer : FastifyInstance;

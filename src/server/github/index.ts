@@ -9,8 +9,8 @@ import { createOAuthAppAuth } from "@octokit/auth-oauth-app";
 import { GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
 
 // Config
-import loadConfig, { Config } from "../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../Config";
+const config = loadConfig();
 
 // Modules
 import { Result, buildResult, Data } from "../../shared/Result";
@@ -45,12 +45,15 @@ async function getOctokit() : Promise<Octokit> {
  * @returns A result containing the user's information.
  */
 export async function checkAuth(accessToken: string) : Promise<Result<User>> {
-	let octokit = new Octokit({
-		auth: accessToken
-	});
-
-	let result = await octokit.users.getAuthenticated();
-	return buildResult(result.status == 200, result.data);
+	// Build new Octokit with the provided access token.
+	let octokit = new Octokit({ auth: accessToken });
+	try {
+		// Get user details.
+		let result = await octokit.users.getAuthenticated();
+		return buildResult(result.status == 200, result.data);
+	} catch (e) {
+		return buildResult(false);
+	}
 }
 
 /**
@@ -60,11 +63,8 @@ export async function checkAuth(accessToken: string) : Promise<Result<User>> {
  */
 export async function getAccessToken(code: string) : Promise<Result<string>> {
 	try {
-		let authentication = await octokitAuth({
-			type: "token",
-			code
-		});
-
+		// Authenticate user and get bearer token.
+		let authentication = await octokitAuth({ type: "token", code });
 		return buildResult(true, (<Data>authentication).token);
 	} catch (e) {
 		return buildResult(false);
@@ -79,57 +79,59 @@ export async function getAccessToken(code: string) : Promise<Result<string>> {
  */
 export async function getRepository(name: string, accessToken: string) : Promise<Result<Repository>> {
 	// Build new Octokit with the provided access token.
-	let octokit = new Octokit({
-		auth: accessToken
-	});
+	let octokit = new Octokit({ auth: accessToken });
 
 	// Get owner and repo name.
 	let split = getRepoName(name);
 	if (!split) return buildResult(false);
 
-	// Get repository.
 	try {
-		let result = await octokit.repos.get({
-			owner: split.owner,
-			repo: split.repo
-		});
-		
+		// Get repository.
+		let result = await octokit.repos.get({ owner: split.owner, repo: split.repo });
 		return buildResult(result.status == 200, result.data);
 	} catch (e) {
 		return buildResult(false);
 	}
 }
 
+/**
+ * Get a repository's contributors.
+ * @param name The full name of the repository.
+ * @param accessToken The user's access token.
+ * @returns A result containing the repository's contributors.
+ */
 export async function getRepositoryContributors(name: string, accessToken: string) : Promise<Result<Contributors>> {
 	// Build new Octokit with the provided access token.
-	let octokit = new Octokit({
-		auth: accessToken
-	});
+	let octokit = new Octokit({ auth: accessToken });
 
 	// Get owner and repo name.
 	let split = getRepoName(name);
 	if (!split) return buildResult(false);
 
-	let result = await octokit.repos.listContributors({
-		owner: split.owner,
-		repo: split.repo
-	});
-
-	return buildResult(result.status == 200, result.data);
+	try {
+		// Get contributors.
+		let result = await octokit.repos.listContributors({ owner: split.owner, repo: split.repo });
+		return buildResult(result.status == 200, result.data);
+	} catch (e) {
+		return buildResult(false);
+	}
 }
 
+/**
+ * Get the details about a commit's author.
+ * @param owner The owner of the repository.
+ * @param repo The name of the repository.
+ * @param ref The reference of the commit.
+ * @param accessToken The user's access token.
+ * @returns The commit's author.
+ */
 export async function getCommitAuthor(owner: string, repo: string, ref: string, accessToken: string) : Promise<Result> {
 	// Build new Octokit with the provided access token.
-	let octokit = new Octokit({
-		auth: accessToken
-	});
+	let octokit = new Octokit({ auth: accessToken });
 
-	// Get commit
 	try {
-		let result = await octokit.repos.getCommit({
-			owner, repo, ref
-		});
-	
+		// Get commit.
+		let result = await octokit.repos.getCommit({ owner, repo, ref });
 		return buildResult(result.status == 200, result.status == 200 && result.data.author ? result.data.author : undefined);
 	} catch (e) {
 		return buildResult(false);

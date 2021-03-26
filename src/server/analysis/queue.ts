@@ -7,18 +7,20 @@
 import Queue, { Job } from "bee-queue";
 import redis, { RedisClient } from "redis";
 
+// Logger
+import createLogger from "../utils/logger";
+const logger = createLogger("queue");
 
 // Config
-import loadConfig, { Config } from "../Config";
-import Analysis, { DatabaseAnalysis, DatabaseAnalysisStatus } from "../database/models/Analysis";
-import { Repository } from "../github";
-const config : Config = loadConfig();
+import { loadConfig } from "../Config";
+const config = loadConfig();
 
 // Modules
-const logger = require("../utils/logger")("queue");
 import { Data } from "../../shared/Result";
 
 // Models
+import Analysis, { DatabaseAnalysis, DatabaseAnalysisStatus } from "../database/models/Analysis";
+import { Repository } from "../github";
 
 // Interfaces
 export interface RepoJob {

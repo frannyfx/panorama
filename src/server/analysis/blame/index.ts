@@ -8,8 +8,9 @@ import Git from "nodegit";
 import { Data } from "../../../shared/Result";
 import { getCommitAuthor } from "../../github";
 
-// Modules
-const logger = require("../../utils/logger")("blame");
+// Logger
+import createLogger from "../../utils/logger";
+const logger = createLogger("blame");
 
 // Interfaces
 /**

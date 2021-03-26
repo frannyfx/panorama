@@ -5,10 +5,8 @@ The **Panorama** project aims to shine light on the amount of work that contribu
 
 ## ☕️ Requirements
 Panorama has the following requirements:
-- Node.js ≥ 13.9.0;
-- NPM ≥ 6.14.8;
-- A Redis server for its distributed job queue system;
-- `typescript` and `webpack-cli` installed as global Node modules.
+- Node ≥ 15.12.0 and NPM ≥ 7.6.3;
+- Redis;
 
 ## ⚙️ Compiling
 You should build the frontend component first, as the script will also transfer the necessary files to the compilation directory.
@@ -18,62 +16,74 @@ It's worth noting that these instructions assume a  macOS or 🐧 Linux envir
 ### Frontend
 To compile the frontend using Webpack, which will also take care of compiling the TypeScript code, simply run:
 
-```
+```bash
 npm run build-client
 ```
 
 Running Webpack in production mode will drastically reduce file size, but may take a long time to complete. To do so, run the following command:
-```
+
+```bash
 npm run build-client-prod
 ```
 
 ### Backend
 #### Configuration
-Create a new `config.json` file by running:
-```
-cp src/server/config.default.json src/server/config.json
+Create a new `panorama.json` file by running:
+
+```bash
+cp src/server/panorama.default.json src/server/panorama.json
 ```
 
-Edit the new config file in your preferred editor to include the client ID and secret for your app.
+Edit the new config file in your preferred editor to include the client ID and secret for your app, and modify the parameters as you need.
 
-```
-nano src/server/config.json
+```bash
+nano src/server/panorama.json
 ```
 
 You will also need a valid RSA private key used in Panorama's cryptographic modules. To generate one, run:
 
-```
+```bash
 openssl genrsa -out assets/crypto/key.pem
 ```
 
 #### Prerequisites
 Firstly, install the NPM packages by running:
-```
+
+```bash
 npm install
 ```
 
 Additionally, if you haven't already, install the required modules globally:
-```
+
+```bash
 npm install -g typescript webpack-cli
 ```
 
 #### Compiling
 Then, compile the TypeScript code using the compiler:
 
-```
+```bash
 npm run build-server
 ```
 
 Make sure you let `node-gyp` compile `sqlite3` to a native module. If you get an error about this, just run:
-```
+
+```bash
 npm rebuild
 ```
 
 ## 🏃‍♂️ Running
 The server can be executed by running:
 
+```bash
+node dist/server/index.js
 ```
-node dist/index.js
+
+## 🧪 Testing
+The full test suite can be executed by running:
+
+```bash
+npm test
 ```
 
 ## 👨‍💻 Credits

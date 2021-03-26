@@ -78,9 +78,9 @@ function log(tag : string, logConfig: LogConfig, logParameters : LogParameters, 
 	else console.log(...components, ...content);
 }
 
-export = (tag : string, config : LogConfig | null) : Logger => {
+export default (tag : string = "", config : LogConfig | null = null) : Logger => {
 	// Set defaults.
-	if (tag == null) tag = "main";
+	if (tag == "") tag = "main";
 	if (config == null) config = Object.assign(defaultConfig, config);
 
 	return {

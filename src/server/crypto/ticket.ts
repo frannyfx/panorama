@@ -9,12 +9,15 @@ import { promises as fs } from "fs";
 import path from "path";
 import crypto from "crypto";
 
+// Logger
+import createLogger from "../utils/logger";
+const logger = createLogger("cryp_tk");
+
 // Config
-import loadConfig, { Config } from "../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../Config";
+const config = loadConfig();
 
 // Modules
-const logger = require("../utils/logger")("cryp_tk");
 import getRoot from "../utils/root";
 import { Data } from "../../shared/Result";
 

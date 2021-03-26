@@ -6,12 +6,11 @@
 // Imports
 import crypto from "crypto";
 
-// Config
-import loadConfig, { Config } from "../../../../../Config";
-const config : Config = loadConfig();
+// Logger
+import createLogger from "../../../../../utils/logger";
+const logger = createLogger("q_sock");
 
 // Modules
-const logger = require("../../../../../utils/logger")("q_sock");
 import { Method } from "../../../../../../shared/Method";
 import { Request, Route } from "../../../Route";
 import { SocketStream } from "fastify-websocket";

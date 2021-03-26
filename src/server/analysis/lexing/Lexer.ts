@@ -3,8 +3,9 @@
  * @author Francesco Compagnoni
  */
 
-// Modules
-const logger = require("../../utils/logger")("lexer");
+// Logger
+import createLogger from "../../utils/logger";
+const logger = createLogger("lexer");
 
 // Enums
 /**

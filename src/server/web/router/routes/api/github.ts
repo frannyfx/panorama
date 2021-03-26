@@ -9,8 +9,8 @@ import fs from "fs";
 import path from "path";
 
 // Config
-import loadConfig, { Config } from "../../../../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../../../../Config";
+const config = loadConfig();
 
 // Modules
 import getRoot from "../../../../utils/root";
@@ -18,7 +18,6 @@ import { Method } from "../../../../../shared/Method";
 import { Request, Route } from "../../Route";
 import { Codes, send } from "../../API";
 import { getAccessToken } from "../../../../github";
-import { getValidLocales } from "../../..";
 
 let route : Array<Route> = [{
 	method: Method.GET,

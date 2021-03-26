@@ -8,12 +8,15 @@ import { promises as fs } from "fs";
 import path from "path";
 import knex from "knex";
 
+// Logger
+import createLogger from "../../utils/logger";
+const logger = createLogger("cache_db");
+
 // Config
-import loadConfig, { Config } from "../../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../../Config";
+const config = loadConfig();
 
 // Modules
-const logger = require("../../utils/logger")("cache_db");
 import getRoot from "../../utils/root";
 
 // Constants

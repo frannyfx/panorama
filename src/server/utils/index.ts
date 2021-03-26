@@ -83,7 +83,7 @@ export function humanTimeIntervalToMillis(input: string) : number {
 	// Get the value.
 	let unit = input.substr(match[0].length);
 	let value = parseFloat(match[0]);
-	if (!unit || isNaN(value)) return -1;
+	if (!unit || !unitConversions[unit] || isNaN(value)) return -1;
 
 	// Return the converted value.
 	return value * unitConversions[unit];

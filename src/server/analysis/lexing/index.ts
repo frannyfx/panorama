@@ -7,15 +7,18 @@
 import { promises as fs } from "fs";
 import path from "path";
 
+// Logger
+import createLogger from "../../utils/logger";
+const logger = createLogger("lexing");
+
+// Config
+import { loadConfig } from "../../Config";
+const config = loadConfig();
+
 // Modules
-const logger = require("../../utils/logger")("lexing");
 import { Lexer, Token, lex, isLexer } from "./Lexer";
 import { walkDir } from "../../utils";
 import getRoot from "../../utils/root";
-
-// Config
-import loadConfig, { Config } from "../../Config";
-const config : Config = loadConfig();
 
 // Interfaces
 interface LexerMap {

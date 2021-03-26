@@ -9,8 +9,8 @@ import path from "path";
 import Joi from "joi";
 
 // Config
-import loadConfig, { Config } from "../../../Config";
-const config : Config = loadConfig();
+import { loadConfig } from "../../../Config";
+const config = loadConfig();
 
 // Modules
 import getRoot from "../../../utils/root";

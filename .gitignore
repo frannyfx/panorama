@@ -4,8 +4,7 @@ dist
 build
 
 # Private config files
-config.json
-config.test.*.json
+panorama.json
 
 # Server cache
 panorama_data

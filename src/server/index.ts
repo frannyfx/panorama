@@ -6,10 +6,13 @@
 // Imports
 import figlet from "figlet";
 
-// Logger and config
-const logger = require("./utils/logger")("main");
-import loadConfig, { Config } from "./Config";
-const config : Config = loadConfig();
+// Logger
+import createLogger from "./utils/logger";
+const logger = createLogger("main");
+
+// Config
+import { loadConfig } from "./Config";
+const config = loadConfig();
 
 // Modules
 import web from "./web";

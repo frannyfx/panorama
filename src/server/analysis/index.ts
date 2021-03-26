@@ -11,12 +11,11 @@ import Git, { Branch } from "nodegit";
 import util from "util";
 import GitIgnoreParser from "gitignore-parser";
 
-// Config
-import loadConfig, { Config } from "../Config";
-const config : Config = loadConfig();
+// Logger
+import createLogger from "../utils/logger";
+const logger = createLogger("analysis");
 
 // Modules
-const logger = require("../utils/logger")("analysis");
 import cache, { getCacheDir, getRepository, insertRepository, removeRepository, updateRepository } from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
