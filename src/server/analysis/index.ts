@@ -19,18 +19,17 @@ const logger = createLogger("analysis");
 import cache, { getCacheDir, getRepository, insertRepository, removeRepository, updateRepository } from "./cache";
 import queue, { RepoJob, RepoJobResult } from "./queue";
 import { AnalysisStage, RepoJobProgress } from "../../shared/Queue";
-import { buildResult, Data, Result } from "../../shared/Result";
+import { buildResult, Result } from "../../shared/Result";
 import { ContributorMap, generateBlameGroups } from "./blame";
-import lexing, { getRegisteredLexers, lexFile } from "./lexing";
+import lexing, { lexFile } from "./lexing";
 import { generateTokenGroups } from "./lexing/Lexer";
 import { AnalysedItem, generateFolderEntries, processFileAnalysis } from "./Item";
 
 // Models
 import Analysis, { DatabaseAnalysis, DatabaseAnalysisStatus } from "../database/models/Analysis";
 import DatabaseAnalysedItem from "../database/models/AnalysedItem";
-import { getRepositoryContributors } from "../github";
 import { insertOrUpdate as insertOrUpdateContributor } from "../database/models/AnalysisContributor";
-import { dedupe, lerp, sleep } from "../../shared/utils";
+import { dedupe, lerp } from "../../shared/utils";
 import { extractVibrant } from "./colours";
 import { getConnection } from "../database";
 

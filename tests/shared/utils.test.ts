@@ -55,7 +55,7 @@ describe("getRepoName", () => {
 
 	it("handles valid names", () => {
 		let result = getRepoName("frannyfx/panorama");
-		expect(result.owner).toEqual("frannyfx");
-		expect(result.repo).toEqual("panorama");
+		expect(result!.owner).toEqual("frannyfx");
+		expect(result!.repo).toEqual("panorama");
 	});
 });

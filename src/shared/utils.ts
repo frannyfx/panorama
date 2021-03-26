@@ -81,6 +81,6 @@ export interface RepoName {
  */
 export function getRepoName(name: string) : RepoName | null {
 	let split = name.split("/");
-	if (split.length != 2) null;
+	if (split.length != 2) return null;
 	return { owner: split[0], repo: split[1] };
 }
