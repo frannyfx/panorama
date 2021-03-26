@@ -7,7 +7,6 @@ import { getConnection, stop } from "../../../../src/server/database";
 import Analysis, { DatabaseAnalysisStatus } from "../../../../src/server/database/models/Analysis";
 import Repository from "../../../../src/server/database/models/Repository";
 import AnalysisContributor from "../../../../src/server/database/models/AnalysisContributor";
-import User from "../../../../src/server/database/models/User";
 
 // Variables
 let analysisId = -1;
@@ -82,13 +81,39 @@ describe("insertOrUpdate", () => {
 	});
 
 	it("returns false if analysis id is invalid", async () => {
-		let result = await AnalysisContributor.insertOrUpdate(-1, { userId: -3, login: "test-user" });
+		let result = await AnalysisContributor.insertOrUpdate(-100, { userId: -3, login: "test-user" });
 		expect(result).toEqual(false);
 	});
 });
 
 describe("getFromAnalysis", () => {
 	it("gets contributors for an analysis", async () => {
+		// Need an analysis ID.
+		if (analysisId == -1) return fail();
 
+		// Set-up.
+		let insertionResult = await AnalysisContributor.insertOrUpdate(analysisId, {
+			userId: -3,
+			login: "test-user"
+		});
+
+		expect(insertionResult).toBe(true);
+
+		// Test.
+		if (insertionResult) {
+			let analysisContributors = await AnalysisContributor.getFromAnalysis(analysisId);
+			expect(analysisContributors).not.toBe(null);
+			if (analysisContributors) {
+				expect(analysisContributors.length).toEqual(1);
+				expect(analysisContributors[0].userId).toEqual(-3);
+			}
+			
+			// Clean-up.
+			let connection = await getConnection();
+			if (connection) {
+				await connection("AnalysisContributor").where({userId: -3}).del();
+				await connection("User").where({userId: -3}).del();
+			}
+		}
 	});
 });
