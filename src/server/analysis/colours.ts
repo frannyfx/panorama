@@ -24,6 +24,5 @@ export async function extractVibrant(imageUrl: string) : Promise<string | null> 
 		return palette.Vibrant?.hex.slice(1) || null;
 	} catch (e) {
 		return null;
-	}
-	
+	}	
 }

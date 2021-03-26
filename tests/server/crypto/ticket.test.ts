@@ -81,7 +81,7 @@ describe("ticket", () => {
 		expect(signedResult).not.toBeNull();
 
 		// Test verification.
-		let verifyResult = await ticket.verify(signedResult);
+		let verifyResult = await ticket.verify(signedResult!);
 		expect(verifyResult.ok).toEqual(true);
 		expect(verifyResult.decoded!.hello).toEqual("world");
 	});

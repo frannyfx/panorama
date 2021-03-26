@@ -10,15 +10,6 @@ const invalidDatabase = {
 	purge
 };
 
-const validDatabase = {
-	connection: {
-		host: "ensembldb.ensembl.org",
-		user: "anonymous",
-		password: ""
-	},
-	purge
-};
-
 // Test set-up
 beforeEach(() => {
 	jest.resetModules();
@@ -41,7 +32,7 @@ describe("getConnection", () => {
 	it("returns not null when valid connection details are provided", async () => {
 		// Mock config file.
 		let config = await import("../../../src/server/Config");
-		config.loadConfig({ database: validDatabase });
+		config.loadConfig();
 
 		// Import database.
 		let database = await import("../../../src/server/database");
@@ -71,7 +62,7 @@ describe("start", () => {
 	it("does not throw when valid connection details are provided", async () => {
 		// Mock config file.
 		let config = await import("../../../src/server/Config");
-		config.loadConfig({ database: validDatabase });
+		config.loadConfig();
 
 		// Import database.
 		let database = await import("../../../src/server/database");
@@ -96,7 +87,7 @@ describe("stop", () => {
 	it("resolves when there is a valid connection", async () => {
 		// Mock config file.
 		let config = await import("../../../src/server/Config");
-		config.loadConfig({ database: validDatabase });
+		config.loadConfig();
 
 		// Import database and connect.
 		let database = await import("../../../src/server/database");

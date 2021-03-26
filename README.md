@@ -8,7 +8,7 @@ Panorama has the following requirements:
 - Node ≥ 15.12.0 and NPM ≥ 7.6.3;
 - Redis;
 
-## ⚙️ Compiling
+## ⚙️ Set-up
 You should build the frontend component first, as the script will also transfer the necessary files to the compilation directory.
 
 It's worth noting that these instructions assume a  macOS or 🐧 Linux environment, so your mileage may vary.
@@ -71,6 +71,9 @@ Make sure you let `node-gyp` compile `sqlite3` to a native module. If you get an
 ```bash
 npm rebuild
 ```
+
+#### Database
+Import the Panorama MySQL schema located in `deployment/panorama-db.sql` into your MySQL database and make sure to update the `panorama.json` configuration file with the correct connection details.
 
 ## 🏃‍♂️ Running
 The server can be executed by running:
