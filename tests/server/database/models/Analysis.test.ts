@@ -1,3 +1,7 @@
+// Override config.
+import { loadConfig } from "../../../../src/server/Config";
+loadConfig(undefined, true);
+
 // File imports
 import { stop } from "../../../../src/server/database";
 import Analysis, { DatabaseAnalysisStatus } from "../../../../src/server/database/models/Analysis";

@@ -89,7 +89,7 @@ All test suites can be executed by running:
 npm test
 ```
 
-It is highly recommended to create a `panorama.test.json` config file which points to a test database to prevent tests from conflicting with your production environment.
+It is highly recommended to create a `panorama.test.json` config file which points to a test database to prevent tests from conflicting with your production environment. If the test suite does not find this file, it will fall back to `panorama.json` and `panorama.default.json`.
 
 ## 👨‍💻 Credits
 ### Project
