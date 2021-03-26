@@ -1,6 +1,3 @@
-// Test imports
-import mockKnex from "mock-knex";
-
 // Constants
 const purge = {
 	analysisThreshold: "",
@@ -22,11 +19,12 @@ const validDatabase = {
 	purge
 };
 
-describe("getConnection", () => {
-	beforeEach(() => {
-		jest.resetModules();
-	});
+// Test set-up
+beforeEach(() => {
+	jest.resetModules();
+});
 
+describe("getConnection", () => {
 	it("returns null when invalid connection details are provided", async () => {
 		// Mock config file.
 		let config = await import("../../../src/server/Config");
@@ -58,10 +56,6 @@ describe("getConnection", () => {
 });
 
 describe("start", () => {
-	beforeEach(() => {
-		jest.resetModules();
-	});
-
 	it("throws when invalid connection details are provided", async () => {
 		// Mock config file.
 		let config = await import("../../../src/server/Config");
@@ -91,10 +85,6 @@ describe("start", () => {
 });
 
 describe("stop", () => {
-	beforeEach(() => {
-		jest.resetModules();
-	});
-
 	it("resolves when there is no connection", async () => {
 		// Import database.
 		let database = await import("../../../src/server/database");

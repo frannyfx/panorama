@@ -11,7 +11,7 @@ import crypto from "crypto";
 
 // Logger
 import createLogger from "../utils/logger";
-const logger = createLogger("cryp_tk");
+const logger = createLogger("ticket");
 
 // Config
 import { loadConfig } from "../Config";
@@ -39,9 +39,12 @@ async function getPrivateKey() : Promise<string | null> {
 	// Load cached private key.
 	if (privateKey != "") return privateKey;
 
+	// Check if it's possible to load private key.
+	if (!config?.crypto?.keyDir) return null;
+
 	// Otherwise, load it from assets directory.
 	try {
-		privateKey = (await fs.readFile(path.join(getRoot(), config.crypto.keyDir))).toString("utf-8");
+		privateKey = (await fs.readFile(path.isAbsolute(config.crypto.keyDir) ? config.crypto.keyDir : path.join(getRoot(), config.crypto.keyDir))).toString("utf-8");
 		return privateKey;
 	} catch (e) {
 		logger.error(`Failed to load private key - ${e}`);
@@ -81,7 +84,7 @@ export function sign(data: Data) : Promise<string | null> {
 	return new Promise(async resolve => {
 		// Get the private key.
 		let key = await getPrivateKey();
-		if (!key || key == "") return null;
+		if (!key || key == "") return resolve(null);
 
 		// Sign the content.
 		jwt.sign(data, key, { algorithm: "RS256" }, (err, token) => {
@@ -105,7 +108,7 @@ export function verify(data: string) : Promise<TicketVerificationResult> {
 	return new Promise(async resolve => {
 		// Get the public key.
 		let key = await getPublicKey();
-		if (!key || key == "") return null;
+		if (!key || key == "") return resolve({ ok: false });
 
 		// Verify the token.
 		jwt.verify(data, key, (err, decoded) => {
