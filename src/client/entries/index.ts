@@ -29,6 +29,7 @@ const Error = () => import(/* webpackChunkName: "error" */ /* webpackMode: "lazy
 // Set up plugins.
 Vue.use(VueRouter);
 Vue.use(VTooltip, {
+	defaultHtml: false,
 	themes: {
 		panorama: {
 			"$extend": "tooltip",
@@ -38,7 +39,7 @@ Vue.use(VTooltip, {
 				hide: 0
 			}
 		},
-	},
+	}
 });
 
 // Set up routes.

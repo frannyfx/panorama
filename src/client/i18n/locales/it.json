@@ -136,7 +136,8 @@
 		"repositoryFileListItem": {
 			"fileOfType": "File {0}",
 			"file": "File",
-			"directory": "Cartella"
+			"directory": "Cartella",
+			"analysed": "Analizzato"
 		},
 		"fileViewer": {
 			"viewSource": "Mostra sorgente",

@@ -136,7 +136,8 @@
 		"repositoryFileListItem": {
 			"fileOfType": "{0} file",
 			"file": "File",
-			"directory": "Directory"
+			"directory": "Directory",
+			"analysed": "Analysed"
 		},
 		"fileViewer": {
 			"viewSource": "View source",

@@ -12,13 +12,7 @@
 import Vue from "vue";
 import smoothReflow from "vue-smooth-reflow";
 
-// Components
-import SmoothHeight from "./SmoothHeight.vue";
-
 export default Vue.extend({
-	components: {
-		SmoothHeight
-	},
 	mixins: [smoothReflow],
 	props: {
 		tag: {

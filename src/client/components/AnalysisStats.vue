@@ -105,7 +105,6 @@ import { BarItem } from "../modules/models/Bar";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import ContributorBubbles from "./ContributorBubbles.vue";
 import AnalysisBar from "./AnalysisBar.vue";
-import SmoothHeight from "./SmoothHeight.vue";
 import Panel from "./Panel.vue";
 
 export default Vue.extend({
@@ -113,7 +112,6 @@ export default Vue.extend({
 		FontAwesomeIcon,
 		ContributorBubbles,
 		AnalysisBar,
-		SmoothHeight,
 		Panel
 	},
 	props: {

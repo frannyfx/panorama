@@ -85,9 +85,8 @@ import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
 import Extensions from "../store/modules/Extensions";
 import { File } from "../modules/models/File";
-import { dedupe, sleep } from "../../shared/utils";
-import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
-import { Error, showError } from "../modules/Error";
+import { dedupe } from "../../shared/utils";
+import { AnalysisMap, toAnalysis } from "../modules/models/Analysis";
 import { createI18NAlert } from "../modules/Notifications";
 import { Data } from "../../shared/Result";
 import Tokens from "../store/modules/Tokens";
@@ -98,7 +97,6 @@ import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
 import AnalysisStats from "../components/AnalysisStats.vue";
-import SmoothHeight from "../components/SmoothHeight.vue";
 
 /**
  * Get analysis data for a path.
@@ -231,8 +229,7 @@ export default Vue.extend({
 		RepositoryFileListItem,
 		FileViewer,
 		ContentFooter,
-		AnalysisStats,
-		SmoothHeight
+		AnalysisStats
 	},
 	watch: {
 		"repo.analysis.id": async function (to: number, from: number) {

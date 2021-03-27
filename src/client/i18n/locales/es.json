@@ -136,7 +136,8 @@
 		"repositoryFileListItem": {
 			"fileOfType": "Archivo {0}",
 			"file": "Archivo",
-			"directory": "Carpeta"
+			"directory": "Carpeta",
+			"analysed": "Analizado"
 		},
 		"fileViewer": {
 			"viewSource": "View source",

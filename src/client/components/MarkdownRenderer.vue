@@ -3,7 +3,7 @@
 </template>
 <script lang="ts">
 // Imports
-import Vue, { PropType } from "vue";
+import Vue from "vue";
 import MarkdownIt from "markdown-it";
 
 export default Vue.extend({
@@ -59,6 +59,8 @@ export default Vue.extend({
 <style lang="scss">
 @import "~github-markdown-css";
 .markdown-body {
+	padding: 30px 40px 40px 40px;
+	
 	img {
 		border-radius: 5px;
 	}

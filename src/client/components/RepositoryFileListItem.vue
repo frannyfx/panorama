@@ -11,7 +11,7 @@
 				<span>{{ overrideName ? overrideName : file.name }}</span>
 			</div>
 			<div class="analysis">
-				<font-awesome-icon v-if="file.analysis.available" icon="check"/>
+				<font-awesome-icon v-if="file.analysis.available" v-tooltip="{ theme: 'panorama', content: $t('components.repositoryFileListItem.analysed') }" icon="check"/>
 			</div>
 		</div>
 	</div>

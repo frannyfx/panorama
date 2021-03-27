@@ -30,50 +30,48 @@
 			</div>
 		</div>
 		<analysis-stats :show="viewStats.enabled" :repo="repo" :path="path"/>
-		<smooth-height>
-			<div class="file-viewer list-item">
-				<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled && canNotViewSource" :source="file.content.data" :relativeLinkRoot="rawLink"/>
-				<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
-					<a :href="fileLink" target="_blank"><img :src="`${rawLink}/${file.path}`"></a>
-					<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
-					<a :href="fileLink" target="_blank" class="subtitle">{{ $t('components.fileViewer.fileOfType', [fileType.name]) }} &bull; {{humanFileSize}}</a>
-				</div>			
-				<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != '' && canViewSource">
-					<table class="line-table">
-						<tr v-for="(line, index) in highlightedLines" :key="index">
-							<td class="line-number no-select">{{ index + 1}}</td>
-							<td
-								v-if="file.analysis.available && file.analysis.data.chunks.loaded && file.analysis.data.chunks.object[index + 1]"
-								class="analysis-chunk no-select"
-								:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
-								:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
-								<div class="details">
-									<span>{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</span>
-								</div>
-							</td>
-							<td 
-								v-if="file.analysis.available && file.analysis.data.tokens.loaded && file.analysis.data.tokens.object[index + 1]"
-								class="token no-select"
-								:class="{ last: file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 }"
-								v-tooltip="{ theme: 'panorama', content: file.analysis.data.tokens.object[index + 1].tokens.map(token => $t(`tokens.${$store.state.Tokens.map[token].name}`)).join(', ') }"
-								:rowspan="file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.tokens.object[index + 1].end - file.analysis.data.tokens.object[index + 1].start) + 1">
-								<div class="dots">
-									<div class="dot-indicator" v-for="token in file.analysis.data.tokens.object[index + 1].tokens" :key="token" :style="{
-										'background-color': `#${$store.state.Tokens.map[token].colour}`
-									}"></div>
-								</div>
-							</td>
-							<td class="code"><pre v-html="line"></pre></td>
-						</tr>
-					</table>
-				</div>
-				<div class="icon-preview" v-else-if="file.content.loaded">
-					<a :href="fileLink" target="_blank"><img :src="iconPath"></a>
-					<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
-					<a :href="fileLink" target="_blank" class="subtitle">{{ fileType ? $t('components.fileViewer.fileOfType', [fileType.name]) : $t('components.fileViewer.file') }} &bull; {{humanFileSize}}</a>
-				</div>
+		<div class="file-viewer list-item">
+			<markdown-renderer class="markdown-renderer" v-if="fileType && fileType.name == 'Markdown' && !viewSource.enabled && canNotViewSource" :source="file.content.data" :relativeLinkRoot="rawLink"/>
+			<div class="image-viewer" v-else-if="fileType && fileType.name == 'Image'">
+				<a :href="fileLink" target="_blank"><img :src="`${rawLink}/${file.path}`"></a>
+				<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
+				<a :href="fileLink" target="_blank" class="subtitle">{{ $t('components.fileViewer.fileOfType', [fileType.name]) }} &bull; {{humanFileSize}}</a>
+			</div>			
+			<div class="code-viewer" v-else-if="fileType && file.content.data && file.content.data != '' && canViewSource">
+				<table class="line-table">
+					<tr v-for="(line, index) in highlightedLines" :key="index">
+						<td class="line-number no-select">{{ index + 1}}</td>
+						<td
+							v-if="file.analysis.available && file.analysis.data.chunks.loaded && file.analysis.data.chunks.object[index + 1]"
+							class="analysis-chunk no-select"
+							:class="{ last: file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 }"
+							:rowspan="file.analysis.data.chunks.object[index + 1].index == file.analysis.data.chunks.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.chunks.object[index + 1].end - file.analysis.data.chunks.object[index + 1].start) + 1">
+							<div class="details">
+								<span>{{ file.analysis.data.chunks.object[index + 1].login || $t("components.fileViewer.anonymous") }}</span>
+							</div>
+						</td>
+						<td 
+							v-if="file.analysis.available && file.analysis.data.tokens.loaded && file.analysis.data.tokens.object[index + 1]"
+							class="token no-select"
+							:class="{ last: file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 }"
+							v-tooltip="{ theme: 'panorama', content: file.analysis.data.tokens.object[index + 1].tokens.map(token => $t(`tokens.${$store.state.Tokens.map[token].name}`)).join(', ') }"
+							:rowspan="file.analysis.data.tokens.object[index + 1].index == file.analysis.data.tokens.list.length - 1 ? highlightedLines.length - index + 1 : (file.analysis.data.tokens.object[index + 1].end - file.analysis.data.tokens.object[index + 1].start) + 1">
+							<div class="dots">
+								<div class="dot-indicator" v-for="token in file.analysis.data.tokens.object[index + 1].tokens" :key="token" :style="{
+									'background-color': `#${$store.state.Tokens.map[token].colour}`
+								}"></div>
+							</div>
+						</td>
+						<td class="code"><pre v-html="line"></pre></td>
+					</tr>
+				</table>
 			</div>
-		</smooth-height>
+			<div class="icon-preview" v-else-if="file.content.loaded">
+				<a :href="fileLink" target="_blank"><img :src="iconPath"></a>
+				<a :href="fileLink" target="_blank" class="title">{{ file.name }}</a>
+				<a :href="fileLink" target="_blank" class="subtitle">{{ fileType ? $t('components.fileViewer.fileOfType', [fileType.name]) : $t('components.fileViewer.file') }} &bull; {{humanFileSize}}</a>
+			</div>
+		</div>
 	</div>
 </template>
 <script lang="ts">
@@ -94,16 +92,14 @@ import { Method } from "../../shared/Method";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
-import MarkdownRenderer from "../components/MarkdownRenderer.vue";
+import MarkdownRenderer from "./MarkdownRenderer.vue";
 import AnalysisStats from "./AnalysisStats.vue";
-import SmoothHeight from "./SmoothHeight.vue";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
 		MarkdownRenderer,
 		AnalysisStats,
-		SmoothHeight
 	},
 	watch: {
 		path(to, from) {
@@ -346,10 +342,6 @@ export default Vue.extend({
 	.file-viewer {
 		margin: 0 !important;
 	}
-}
-
-.markdown-renderer {
-	padding: 30px 40px 40px 40px;
 }
 
 .image-viewer, .icon-preview {
