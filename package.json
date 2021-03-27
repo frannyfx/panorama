@@ -99,6 +99,7 @@
     "sqlite3": "^5.0.1",
     "v-tooltip": "^3.0.0-alpha.17",
     "vue-router": "^3.5.1",
-    "vue-simple-markdown": "^1.1.4"
+    "vue-simple-markdown": "^1.1.4",
+    "vue-smooth-reflow": "^0.1.12"
   }
 }

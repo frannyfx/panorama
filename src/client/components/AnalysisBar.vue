@@ -162,13 +162,29 @@ export default Vue.extend({
 	}
 
 	.labels {
-		margin-top: 10px;
-		height: 35px;
+		margin-top: 15px;
+		align-items: center;
+
+		@include sm {
+			height: auto !important;
+			justify-content: space-evenly;
+			flex-wrap: wrap;
+
+			> .label {
+				flex-grow: 0 !important;
+				margin: 5px;
+
+				.dot-indicator {
+					margin-left: 0px !important;
+				}
+			}
+		}
 		
 		.label {
 			display: flex;
 			align-items: center;
 			transition: flex-grow 1s;
+			max-height: 33px;
 
 			.dot-indicator {
 				margin: 0px 15px;
@@ -217,11 +233,12 @@ export default Vue.extend({
 
 /* --- */
 .label-enter-active, .label-leave-active {
-	transition: flex-grow 1s, opacity 1s, max-width 1s !important;
+	transition: flex-grow 1s, opacity 1s, max-width 1s, transform 1s !important;
 	&.label-enter, &.label-leave-to {
 		flex-grow: 0 !important;
 		max-width: 0px !important;
 		opacity: 0 !important;
+		transform: scale(0);
 	}
 }
 

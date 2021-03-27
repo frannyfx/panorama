@@ -1,89 +1,97 @@
 <template>
-	<transition-group class="analysis-stats list-item" :class="{ first: !show }" tag="div" name="panel">
-		<div class="panel header" key="header" v-show="show">
-			<div class="file">
-				<div class="file-icon">
-					<img :src="iconPath">
-				</div>
-				<div class="details">
-					<h3 class="file-name">
-						<span v-if="file.type == 'file' || file.path != ''">{{file.name}}</span>
-						<span v-else>{{repo.name}}</span>
-					</h3>
-					<div class="file-info">
-						<div v-if="file.type == 'file'" class="dot-indicator" :style="{
-							'background-color': fileType ? `#${fileType.colour}` : undefined
-						}"></div>
-						<span v-if="file.type == 'file'">
-							<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
-							<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
-							<span v-else-if="fileType && file.parent.path == ''">{{$t("components.analysisStats.fileOfTypeInRoot", [fileType.name])}}</span>
-							<span v-else>{{$t("components.analysisStats.fileInRoot")}}</span>
-						</span>
-						<span v-else>
-							<span v-if="file.path != '' && file.parent.path == ''">{{$t("components.analysisStats.folderInRoot")}}</span>
-							<span v-else-if="file.path != ''">{{$t("components.analysisStats.folderInFolder", [file.parent.path])}}</span>
-							<span v-else>{{$t("components.analysisStats.gitRepo")}}</span>
-						</span>
+	<div class="analysis-stats" :class="{ first: !show }">
+		<panel key="header" :show="show">
+			<div class="panel-content header">
+				<div class="file">
+					<div class="file-icon">
+						<img :src="iconPath">
+					</div>
+					<div class="details">
+						<h3 class="file-name">
+							<span v-if="file.type == 'file' || file.path != ''">{{file.name}}</span>
+							<span v-else>{{repo.name}}</span>
+						</h3>
+						<div class="file-info">
+							<div v-if="file.type == 'file'" class="dot-indicator" :style="{
+								'background-color': fileType ? `#${fileType.colour}` : undefined
+							}"></div>
+							<span v-if="file.type == 'file'">
+								<span v-if="fileType && file.parent.path != ''">{{$t("components.analysisStats.fileOfTypeInFolder", [fileType.name, file.parent.path])}}</span>
+								<span v-else-if="!fileType && file.parent.path != ''">{{$t("components.analysisStats.fileInFolder", [file.parent.path])}}</span>
+								<span v-else-if="fileType && file.parent.path == ''">{{$t("components.analysisStats.fileOfTypeInRoot", [fileType.name])}}</span>
+								<span v-else>{{$t("components.analysisStats.fileInRoot")}}</span>
+							</span>
+							<span v-else>
+								<span v-if="file.path != '' && file.parent.path == ''">{{$t("components.analysisStats.folderInRoot")}}</span>
+								<span v-else-if="file.path != ''">{{$t("components.analysisStats.folderInFolder", [file.parent.path])}}</span>
+								<span v-else>{{$t("components.analysisStats.gitRepo")}}</span>
+							</span>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="contributors">
-				<contributor-bubbles key="contributor-bubbles" :contributor-list="file.analysis.available ? file.analysis.data.contributorList : []" :max-items="5"/>
-			</div>
-		</div>
-		<div class="panel contributor-stats" key="contributor-stats" v-show="show && file.analysis.available">
-			<div class="stats-header">
-				<div class="details">
-					<h3>{{$t("components.analysisStats.contributors")}}</h3>
+				<div class="contributors">
+					<contributor-bubbles key="contributor-bubbles" :contributor-list="file.analysis.available ? file.analysis.data.contributorList : []" :max-items="5"/>
 				</div>
-				<div class="actions">
-					<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
-						<button class="action" 
-							:class="{ enabled: contributorStats.toScale.enabled }"
-							@click="() => toggleToScale('contributorStats')">
-							<font-awesome-icon icon="chart-pie"/>
-						</button>
+			</div>
+		</panel>
+		<panel key="contributor-stats" :show="show && file.analysis.available">
+			<div class="panel-content contributor-stats">
+				<div class="stats-header">
+					<div class="details">
+						<h3>{{$t("components.analysisStats.contributors")}}</h3>
+					</div>
+					<div class="actions">
+						<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
+							<button class="action" 
+								:class="{ enabled: contributorStats.toScale.enabled }"
+								@click="() => toggleToScale('contributorStats')">
+								<font-awesome-icon icon="chart-pie"/>
+							</button>
+						</div>
 					</div>
 				</div>
+				<analysis-bar :items="file.analysis.available ? contributorBarItems : []" :to-scale="contributorStats.toScale.enabled" description-key="components.analysisStats.linesOfCode" :max-items="5"/>
 			</div>
-			<analysis-bar :items="file.analysis.available ? contributorBarItems : []" :to-scale="contributorStats.toScale.enabled" description-key="components.analysisStats.linesOfCode" :max-items="5"/>
-		</div>
-		<div class="panel file-type-stats" key="file-type-stats" v-show="show && file.analysis.available && file.type == 'dir'">
-			<div class="stats-header">
-				<div class="details">
-					<h3>{{$t("components.analysisStats.fileTypes")}}</h3>
-				</div>
-				<div class="actions">
-					<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
-						<button class="action" 
-							:class="{ enabled: fileTypeStats.toScale.enabled }"
-							@click="() => toggleToScale('fileTypeStats')">
-							<font-awesome-icon icon="chart-pie"/>
-						</button>
+		</panel>
+		<panel key="file-type-stats" :show="show && file.analysis.available && file.type == 'dir'">
+			<div class="panel-content file-type-stats">
+				<div class="stats-header">
+					<div class="details">
+						<h3>{{$t("components.analysisStats.fileTypes")}}</h3>
+					</div>
+					<div class="actions">
+						<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
+							<button class="action" 
+								:class="{ enabled: fileTypeStats.toScale.enabled }"
+								@click="() => toggleToScale('fileTypeStats')">
+								<font-awesome-icon icon="chart-pie"/>
+							</button>
+						</div>
 					</div>
 				</div>
+				<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []" :to-scale="fileTypeStats.toScale.enabled" description-key="components.analysisStats.linesOfCode"/>
 			</div>
-			<analysis-bar :items="file.analysis.available && file.type == 'dir' ? fileTypeBarItems : []" :to-scale="fileTypeStats.toScale.enabled" description-key="components.analysisStats.linesOfCode"/>
-		</div>
-		<div class="panel token-stats" key="token-stats" v-show="show && file.analysis.available">
-			<div class="stats-header">
-				<div class="details">
-					<h3>{{$t("components.analysisStats.codeClassification")}}</h3>
-				</div>
-				<div class="actions">
-					<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
-						<button class="action" 
-							:class="{ enabled: tokenStats.toScale.enabled }"
-							@click="() => toggleToScale('tokenStats')">
-							<font-awesome-icon icon="chart-pie"/>
-						</button>
+		</panel>
+		<panel key="token-stats" :show="show && file.analysis.available">
+			<div class="panel-content token-stats">
+				<div class="stats-header">
+					<div class="details">
+						<h3>{{$t("components.analysisStats.codeClassification")}}</h3>
+					</div>
+					<div class="actions">
+						<div v-tooltip="{ theme: 'panorama', content: $t('components.analysisStats.viewToScale') }">
+							<button class="action" 
+								:class="{ enabled: tokenStats.toScale.enabled }"
+								@click="() => toggleToScale('tokenStats')">
+								<font-awesome-icon icon="chart-pie"/>
+							</button>
+						</div>
 					</div>
 				</div>
+				<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []" :to-scale="tokenStats.toScale.enabled" description-key="components.analysisStats.linesOfCode"/>
 			</div>
-			<analysis-bar :items="file.analysis.available ? codeClassificationBarItems : []" :to-scale="tokenStats.toScale.enabled" description-key="components.analysisStats.linesOfCode"/>
-		</div>
-	</transition-group>
+		</panel>
+	</div>
 </template>
 <script lang="ts">
 // Imports
@@ -97,12 +105,16 @@ import { BarItem } from "../modules/models/Bar";
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
 import ContributorBubbles from "./ContributorBubbles.vue";
 import AnalysisBar from "./AnalysisBar.vue";
+import SmoothHeight from "./SmoothHeight.vue";
+import Panel from "./Panel.vue";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
 		ContributorBubbles,
-		AnalysisBar
+		AnalysisBar,
+		SmoothHeight,
+		Panel
 	},
 	props: {
 		repo: {
@@ -225,12 +237,21 @@ export default Vue.extend({
 	.header {
 		display: flex;
 		align-items: center;
+		justify-content: center;
 		flex-wrap: wrap;
 
 		.file {
 			display: flex;
 			align-items: center;
 			flex-grow: 100;
+
+			@include sm {
+				flex-grow: 0;
+
+				.details {
+					flex-grow: 0;
+				}
+			}
 
 			.file-icon {
 				display: flex;
@@ -279,43 +300,19 @@ export default Vue.extend({
 		}
 	}
 
-	.panel {
-		box-sizing: border-box;
-		padding: 30px 40px;
+	.stats-header {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		margin-bottom: 20px;
 
-		&:not(:first-child) {
-			border-top: 1px solid $grey-tinted;
-		}
+		.details {
+			flex-grow: 1;
 
-		.stats-header {
-			width: 100%;
-			display: flex;
-			align-items: center;
-			margin-bottom: 20px;
-
-			.details {
-				flex-grow: 1;
-
-				h3 {
-					color: $grey-blue;
-				}
+			h3 {
+				color: $grey-blue;
 			}
 		}
-	}
-}
-
-/* Transitions */
-.panel-enter-active, .panel-leave-active {
-	transition: max-height 1s, opacity 1s, padding-top 1s, padding-bottom 1s;
-	max-height: 200px;
-	overflow: hidden;
-
-	&.panel-enter, &.panel-leave-to {
-		border-top: 0px solid transparent !important;
-		max-height: 0px !important;
-		opacity: 0;
-		padding-top: 0px;
-		padding-bottom: 0px;
 	}
 }
 </style>

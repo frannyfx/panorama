@@ -90,6 +90,7 @@ import { Analysis, AnalysisMap, toAnalysis } from "../modules/models/Analysis";
 import { Error, showError } from "../modules/Error";
 import { createI18NAlert } from "../modules/Notifications";
 import { Data } from "../../shared/Result";
+import Tokens from "../store/modules/Tokens";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
@@ -97,7 +98,7 @@ import RepositoryFileListItem from "../components/RepositoryFileListItem.vue";
 import FileViewer from "../components/FileViewer.vue";
 import ContentFooter from "../components/Footer.vue";
 import AnalysisStats from "../components/AnalysisStats.vue";
-import Tokens from "../store/modules/Tokens";
+import SmoothHeight from "../components/SmoothHeight.vue";
 
 /**
  * Get analysis data for a path.
@@ -230,7 +231,8 @@ export default Vue.extend({
 		RepositoryFileListItem,
 		FileViewer,
 		ContentFooter,
-		AnalysisStats
+		AnalysisStats,
+		SmoothHeight
 	},
 	watch: {
 		"repo.analysis.id": async function (to: number, from: number) {

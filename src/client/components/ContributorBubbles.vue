@@ -2,7 +2,7 @@
 	<div class="bubbles-wrapper">
 		<transition-group class="list" tag="div" name="contributor-bubble">
 			<contributor-bubble v-for="login in processedList" :key="login" :login="login"/>
-			<contributor-bubble v-show="numOthers != 0" key="_limited" login="" :num-others="numOthers"/> 
+			<contributor-bubble v-if="numOthers != 0" key="_limited" login="" :num-others="numOthers"/> 
 		</transition-group>
 	</div>
 </template>
