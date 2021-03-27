@@ -27,7 +27,7 @@ import { FastifyReply } from "fastify";
 async function getIndex(request: Request, reply: FastifyReply, code: number = 200) {
 	// Check locale only if we're not currently loading the error page.
 	if (getSupportedLocales().indexOf(request.params?.locale) == -1) {
-		return reply.redirect(`/${request.locale!}/error/NotFound`);
+		return reply.redirect(`/${request.locale!}/error/notFound`);
 	}
 
 	// Create read stream for index.html.
