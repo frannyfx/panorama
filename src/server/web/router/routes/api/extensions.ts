@@ -22,13 +22,13 @@ let route : Array<Route> = [{
 			list: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Split extensions by commas.
 		let extensions = request.query!.list.split(",");
 
 		// Lookup extensions.
 		let extensionsMap = await DatabaseFileType.lookupExtensions(extensions);
-		send(response, Codes.OK, extensionsMap);
+		send(reply, Codes.OK, extensionsMap);
 	}
 }, {
 	method: Method.GET,
@@ -38,13 +38,13 @@ let route : Array<Route> = [{
 			list: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request: Request, reply) => {
 		// Split types by commas.
 		let types = request.query!.list.split(",");
 
 		// Lookup types.
 		let typeMap = await DatabaseFileType.lookupTypes(types);
-		send(response, Codes.OK, typeMap);
+		send(reply, Codes.OK, typeMap);
 	}
 }];
 

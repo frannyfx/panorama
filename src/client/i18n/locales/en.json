@@ -174,8 +174,12 @@
 	},
 	"errors": {
 		"general": {
-			"title": "An error occurred.",
+			"title": "An error occurred",
 			"description": "Something went wrong. Please try again later."
+		},
+		"notFound": {
+			"title": "Not found",
+			"description": "Could not find what you were looking for."
 		}
 	},
 	"tokens": {

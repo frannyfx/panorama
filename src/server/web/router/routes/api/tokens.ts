@@ -22,13 +22,13 @@ let route : Array<Route> = [{
 			list: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Split extensions by commas.
 		let tokens : number[] = request.query!.list.split(",").map((token : string) => parseInt(token)).filter((token : number) => !isNaN(token));
 
 		// Lookup extensions.
 		let tokenMap = await DatabaseToken.lookupTokens(tokens);
-		send(response, Codes.OK, tokenMap);
+		send(reply, Codes.OK, tokenMap);
 	}
 }];
 

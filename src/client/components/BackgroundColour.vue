@@ -1,6 +1,6 @@
 <template>
 	<transition name="colour">
-		<div class="background" v-show="$route.name != 'sign-in' && $route.name != 'error'"></div>
+		<div class="background" v-show="$route.name != 'sign-in' && $route.name != 'error' && $route.name != 'named-error'"></div>
 	</transition>
 </template>
 <style lang="scss" scoped>

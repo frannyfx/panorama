@@ -4,7 +4,7 @@
  */
 
 // Imports
-import { FastifyRequest } from "fastify";
+import { FastifyReply, FastifyRequest } from "fastify";
 import { SocketStream } from "fastify-websocket";
 import Joi from "joi";
 
@@ -18,9 +18,10 @@ export interface Request {
 	query?: Data,
 	params?: Data,
 	body?: Data,
-	auth?: Auth
-	request?: FastifyRequest
-	connection?: SocketStream
+	auth?: Auth,
+	request?: FastifyRequest,
+	connection?: SocketStream,
+	locale?: string
 };
 
 // The interface for authentication data.
@@ -31,7 +32,7 @@ export interface Auth {
 }
 
 // The interface for the route handler function.
-export type Handler = (request: Request, response: any) => Promise<unknown>;
+export type Handler = (request: Request, reply: FastifyReply) => Promise<unknown>;
 
 // The interface for the route.
 export interface Route {

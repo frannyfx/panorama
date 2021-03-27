@@ -176,6 +176,10 @@
 		"general": {
 			"title": "Errore",
 			"description": "Qualcosa è andato storto, provare più tardi."
+		},
+		"notFound": {
+			"title": "Pagina non trovata",
+			"description": "Non è stato possibile trovare la pagina."
 		}
 	},
 	"tokens": {

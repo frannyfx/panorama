@@ -16,15 +16,11 @@ import Store from "../store";
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-// API imports
-import { clearAuthenticationData, endSession, saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
-import { Method } from "../../shared/Method";
-import { Response } from "../../shared/Response";
+// Modules
+import { endSession, saveAccessToken, waitForAuth } from "../modules/API";
 import { isResult } from '../../shared/Result';
 import { getProfile, getRedirectURI } from '../modules/GitHub';
 import { createI18NAlert } from "../modules/Notifications";
-
-// Modules
 import { i18n } from "../i18n";
 
 export default Vue.extend({

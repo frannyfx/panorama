@@ -8,6 +8,9 @@ import { promises as fs } from "fs";
 import { ObjectSchema } from "joi";
 import path from "path";
 import websocket from "fastify-websocket";
+import acceptLanguageParser from "accept-language-parser";
+import { FastifyReply, FastifyRequest, FastifyError } from "fastify";
+import { SocketStream } from "fastify-websocket";
 
 // Logger
 import createLogger from "../../utils/logger";
@@ -18,13 +21,18 @@ import { Method } from "../../../shared/Method";
 import { buildResult, Data, Result } from "../../../shared/Result";
 import { Auth, Handler, Request, Route } from "./Route";
 import { Codes, send } from "./API";
-import { SocketStream } from "fastify-websocket";
 
 // Constants
 const jsRegex = /([a-zA-Z0-9\s_\\.\-\(\):])+(.js)$/;
 
+// Interfaces
+export type ErrorHandler = (err: FastifyError, request: FastifyRequest, reply: FastifyReply) => Promise<unknown>;
+
 export interface Options {
-	directories: Array<string>,
+	directories: string[],
+	supportedLocales: string[],
+	notFoundHandler?: Handler,
+	errorHandler?: ErrorHandler,
 	verifyAuth?: (request: any) => Promise<Auth>
 };
 
@@ -120,8 +128,8 @@ function registerRoute(fastify: any, route: Route, options: Options) {
  * Wrap a route in a function that handles all verification specified.
  * @param route The route to wrap.
  */
-function wrapRoute(route : Route, options: Options) : Function {
-	return async (request : any, response : any) => {
+function wrapRoute(route: Route, options: Options) : Function {
+	return async (request: any, reply: any) => {
 		// Create a new request payload, setting the old payload as the original request.
 		let newRequest : Request = {};
 
@@ -130,23 +138,19 @@ function wrapRoute(route : Route, options: Options) : Function {
 			// Call the verify auth function specified in the options.
 			let auth = await options.verifyAuth(request);
 			if (!auth.ok) {
-				return send(response, Codes.NoAuth);
+				return send(reply, Codes.NoAuth);
 			}
 
 			// Set the auth field in the request.
 			newRequest.auth = auth;
 		}
-			
-
-		// Verify rate limiting.
-		// ...
 
 		// Verify schemas.
 		if (route.schemas) {
 			// Call the verify schemas function.
 			let schemasResult = await verifySchemas(route, request);
 			if (!schemasResult.status.ok) {
-				return send(response, Codes.BadRequest, undefined, schemasResult.status.message);
+				return send(reply, Codes.BadRequest, undefined, schemasResult.status.message);
 			}
 
 			// Set schemas in the new request to the results of the validated schemas.
@@ -161,7 +165,7 @@ function wrapRoute(route : Route, options: Options) : Function {
 			if (route.method == Method.WS) {
 				// Rename parameters.
 				let connection : SocketStream = request;
-				request = response;
+				request = reply;
 	
 				// Set parameters
 				newRequest.connection = connection;
@@ -174,15 +178,20 @@ function wrapRoute(route : Route, options: Options) : Function {
 				if (route.on?.message) connection.socket.on("message", (message : string) => route.on!.message(connection, message));
 				if (route.on?.close) connection.socket.on("close", (event: any) => route.on!.close(connection, event));
 			} else {
-				// Call regular HTTP requests.
+				// Parse Accept-Language.
+				newRequest.locale = acceptLanguageParser.pick(options.supportedLocales, request.headers["accept-languages"] ?? "en", {
+					loose: true
+				}) ?? "en";
+
+				// Set Fastify request object on the router Request object.
 				newRequest.request = request;
 				
-				// Ensure the handler is awaited if it's a promise, otherwise we won't catch exceptions.
-				await route.handler!(newRequest, response);
+				// Await the handler so exceptions are caught.
+				await route.handler!(newRequest, reply);
 			}
 		} catch (e) {
 			logger.error(`Unhandled error at route ${Method[route.method]} ${route.url} - ${e.message}.`);
-			send(response, Codes.ServerError);
+			send(reply, Codes.ServerError);
 		}
 	};
 }

@@ -77,8 +77,10 @@ export default Vue.extend({
 			// Do not overwrite specific route titles.
 			if (to.name == from.name && to.params.locale == from.params.locale) return;
 
-			// Change title depending on the route.
-			document.title = to.meta?.title ? this.$i18n.t(to.meta.title).toString() : "Panorama";
+			this.setTitle();
+		},
+		"$i18n.locale"() {
+			this.setTitle();
 		}
 	},
 	data() {
@@ -95,7 +97,11 @@ export default Vue.extend({
 					locale: this.$route.params.locale
 				}
 			});
-		}	
+		},
+		setTitle() {
+			// Change title depending on the route.
+			document.title = this.$route.meta?.title ? this.$i18n.t(this.$route.meta.title).toString() : "Panorama";
+		}
 	},
 	mounted: async function () {
 		// Load locale.

@@ -12,8 +12,8 @@ let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/auth",
 	auth: true,
-	handler: async (request: Request, response: any) => {
-		send(response, Codes.OK);
+	handler: async (request, reply) => {
+		send(reply, Codes.OK);
 	}
 }];
 

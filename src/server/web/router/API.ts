@@ -4,6 +4,7 @@
  */
 
 // Imports
+import { FastifyReply } from "fastify";
 import { Response } from "../../../shared/Response";
 import { Data } from "../../../shared/Result";
 
@@ -74,7 +75,7 @@ export const Codes : API = {
  * @param code The API code to return.
  * @param payload The optional payload to send along with the response.
  */
-export function send(reply: any, code: Code, payload: Data | undefined = undefined, errorDescription: string | undefined = undefined) {
+export function send(reply: FastifyReply, code: Code, payload: Data | undefined = undefined, errorDescription: string | undefined = undefined) {
 	let response = buildResponse(code, payload, errorDescription);
 	reply.code(code.httpCode).header("Content-Type", "application/json").send(response);
 }

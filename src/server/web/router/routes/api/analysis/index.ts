@@ -52,21 +52,21 @@ let route : Array<Route> = [{
 			repo: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Check the user can access the repo.
 		let repository = await getRepository(`${request.params!.owner}/${request.params!.repo}`, request.auth!.token!);
-		if (!repository.status.ok) return send(response, Codes.Forbidden);
+		if (!repository.status.ok) return send(reply, Codes.Forbidden);
 
 		// Get the latest ID for the repository.
 		let analysis = await DatabaseAnalysis.getLatest(request.params!.owner, request.params!.repo, DatabaseAnalysisStatus.COMPLETED);
 
 		// Return -1 as the ID if a suitable analysis was not found.
-		if (!analysis) return send(response, Codes.OK, {
+		if (!analysis) return send(reply, Codes.OK, {
 			analysisId: -1,
 		});
 		
 		// Return the analysis ID and the analysed commit.
-		send(response, Codes.OK, analysis);
+		send(reply, Codes.OK, analysis);
 	}
 }, {
 	method: Method.GET,
@@ -77,25 +77,25 @@ let route : Array<Route> = [{
 			id: Joi.number()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Get the requested analysis.
 		let analysis = await DatabaseAnalysis.get(request.params!.id);
 
 		// If the analysis does not exist, return 404. 
-		if (!analysis) return send(response, Codes.NotFound);
+		if (!analysis) return send(reply, Codes.NotFound);
 
 		// Check if the user can access the analysis.
 		let repository = await getRepository(`${analysis.owner}/${analysis.repositoryName}`, request.auth!.token!);
-		if (!repository.status.ok) return send(response, Codes.Forbidden);
+		if (!repository.status.ok) return send(reply, Codes.Forbidden);
 
 		// Get contributors.
 		let contributors = await DatabaseAnalysisContributor.getFromAnalysis(request.params!.id);
-		if (!contributors) return send(response, Codes.ServerError);
+		if (!contributors) return send(reply, Codes.ServerError);
 
 		// Create an object that maps logins to each user.
 		let contributorObject : {[key: string]: User} = {};
 		contributors.map(contributor => contributorObject[contributor.login] = contributor);
-		return send(response, Codes.OK, contributorObject);
+		return send(reply, Codes.OK, contributorObject);
 	}
 }, {
 	method: Method.GET,
@@ -106,16 +106,16 @@ let route : Array<Route> = [{
 			id: Joi.number()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Get the requested analysis.
 		let analysis = await DatabaseAnalysis.get(request.params!.id);
 
 		// If the analysis does not exist, return 404. 
-		if (!analysis) return send(response, Codes.NotFound);
+		if (!analysis) return send(reply, Codes.NotFound);
 
 		// Check if the user can access the analysis.
 		let repository = await getRepository(`${analysis.owner}/${analysis.repositoryName}`, request.auth!.token!);
-		if (!repository.status.ok) return send(response, Codes.Forbidden);
+		if (!repository.status.ok) return send(reply, Codes.Forbidden);
 
 		// Generate ticket.
 		let analysisTicket = await ticket.sign({
@@ -124,8 +124,8 @@ let route : Array<Route> = [{
 		});
 
 		// If the ticket generation failed, send server error, otherwise send ticket.
-		if (!analysisTicket) return send(response, Codes.ServerError);
-		return send(response, Codes.OK, {
+		if (!analysisTicket) return send(reply, Codes.ServerError);
+		return send(reply, Codes.OK, {
 			ticket: analysisTicket!
 		});
 	}
@@ -142,9 +142,9 @@ let route : Array<Route> = [{
 			ticket: Joi.string().required()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Verify the ticket provided.
-		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
+		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(reply, Codes.Forbidden);
 
 		// Get the files in the current folder.
 		let analysisItems = await DatabaseAnalysedItem.getItemsInFolder(request.params!.id, request.query!.path);
@@ -154,7 +154,7 @@ let route : Array<Route> = [{
 		analysisItems.map(item => analysisObject[item.path] = item);
 
 		// Return the object.
-		send(response, Codes.OK, analysisObject);
+		send(reply, Codes.OK, analysisObject);
 	}
 }, {
 	method: Method.GET,
@@ -169,14 +169,14 @@ let route : Array<Route> = [{
 			ticket: Joi.string().required()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Verify the ticket provided.
-		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
+		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(reply, Codes.Forbidden);
 
 		// Get the file's analysis chunks.
 		let fileChunks = await DatabaseAnalysedItem.getChunks(request.params!.id, request.query!.path);
-		if (!fileChunks) return send(response, Codes.BadRequest);
-		send(response, Codes.OK, fileChunks);
+		if (!fileChunks) return send(reply, Codes.BadRequest);
+		send(reply, Codes.OK, fileChunks);
 	}
 }, {
 	method: Method.GET,
@@ -191,14 +191,14 @@ let route : Array<Route> = [{
 			ticket: Joi.string().required()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Verify the ticket provided.
-		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(response, Codes.Forbidden);
+		if (!await verifyTicket(request.params!.id, request.auth!.token!, request.query!.ticket)) return send(reply, Codes.Forbidden);
 
 		// Get the file's chunk tokens.
 		let fileTokens = await DatabaseAnalysedItem.getTokens(request.params!.id, request.query!.path);
-		if (!fileTokens) return send(response, Codes.BadRequest);
-		send(response, Codes.OK, fileTokens);
+		if (!fileTokens) return send(reply, Codes.BadRequest);
+		send(reply, Codes.OK, fileTokens);
 	}
 }, {
 	method: Method.PUT,
@@ -209,31 +209,31 @@ let route : Array<Route> = [{
 			name: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Check validity of the name passed.
 		let repoName = getRepoName(request.body!.name);
-		if (!repoName) return send(response, Codes.BadRequest);
+		if (!repoName) return send(reply, Codes.BadRequest);
 
 		// Get latest analysis of repository.
 		let analysis = await DatabaseAnalysis.getLatest(repoName.owner, repoName.repo);
 
 		// Get repository information.
 		let repositoryResult = await getRepository(request.body!.name, request.auth!.token!);
-		if (!repositoryResult.status.ok) return send(response, Codes.Forbidden);
+		if (!repositoryResult.status.ok) return send(reply, Codes.Forbidden);
 
 		// Check that an analysis for that repository is not already in progress.
 		if (analysis && (analysis.status == DatabaseAnalysisStatus[DatabaseAnalysisStatus.QUEUED] || analysis.status == DatabaseAnalysisStatus[DatabaseAnalysisStatus.STARTED])) {
 			// Check that the analysis has a jobId set.
-			if (!analysis.jobId) return send(response, Codes.OK, { jobId: null, ticket: null });
+			if (!analysis.jobId) return send(reply, Codes.OK, { jobId: null, ticket: null });
 
 			// Generate ticket to listen to job events.
 			let jobTicket = await ticket.sign({ jobId: analysis.jobId, accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex") });
-			return send(response, Codes.OK, { jobId: analysis.jobId, ticket: jobTicket });
+			return send(reply, Codes.OK, { jobId: analysis.jobId, ticket: jobTicket });
 		}
 
 		// If the last analysis was performed after the repository was last updated, then return OK.
 		if (analysis && analysis.status == DatabaseAnalysisStatus[DatabaseAnalysisStatus.COMPLETED] && new Date(analysis.startedAt) >= new Date(repositoryResult.result!.pushed_at))
-			return send(response, Codes.OK, { jobId: null, ticket: null });
+			return send(reply, Codes.OK, { jobId: null, ticket: null });
 
 		// Create job.
 		try {
@@ -275,10 +275,7 @@ let route : Array<Route> = [{
 			});
 
 			// Must have database analysis.
-			if (!databaseAnalysis) throw new Error("Transaction failed.");
-
-			// If analysis insertion failed return server error.
-			if (!databaseAnalysis.analysisId) return send(response, Codes.ServerError);
+			if (!databaseAnalysis || databaseAnalysis.analysisId) throw new Error("Transaction failed.");
 
 			// Add the job to the queue.
 			let job = await queue.getRepoQueue()!.createJob({
@@ -293,14 +290,13 @@ let route : Array<Route> = [{
 
 			// Generate ticket to listen to job events.
 			let jobTicket = await ticket.sign({ jobId: job.id, accessTokenHash: crypto.createHash("sha256").update(request.auth!.token!).digest("hex") });
-			send(response, Codes.OK, {
+			send(reply, Codes.OK, {
 				jobId: job.id,
 				ticket: jobTicket
 			});
 		} catch (e) {
 			// If anything goes wrong in the process, return internal server error.
-			console.log(e);
-			return send(response, Codes.ServerError);
+			return send(reply, Codes.ServerError);
 		}
 	}
 }];

@@ -74,6 +74,13 @@ const routes = [{
 	meta: {
 		title: "routes.error.title"
 	}
+}, {
+	path: "/:locale/error/:name",
+	component: Error,
+	name: "named-error",
+	meta: {
+		title: "routes.error.title"
+	}
 }];
 
 const router = new VueRouter({

@@ -1,6 +1,6 @@
 <template>
 	<transition name="blobs">
-		<div class="background blobs" v-show="!$store.state.loading && ($route.name == 'sign-in' || $route.name == 'error')" style="background-image: url('/img/blobs.svg')"></div>
+		<div class="background blobs" v-show="!$store.state.loading && ($route.name == 'sign-in' || $route.name == 'error' || $route.name == 'named-error')" style="background-image: url('/img/blobs.svg')"></div>
 	</transition>
 </template>
 <style lang="scss" scoped>

@@ -22,18 +22,18 @@ import { getAccessToken } from "../../../../github";
 let route : Array<Route> = [{
 	method: Method.GET,
 	url: "/api/github/client-id",
-	handler: async (request: Request, response: any) => {
-		send(response, Codes.OK, {
+	handler: async (request, reply) => {
+		send(reply, Codes.OK, {
 			clientId: config.github?.clientId
 		});
 	}
 }, {
 	method: Method.GET,
 	url: "/api/github/callback",
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Create read stream for callback.html.
 		const callback = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/callback.html"));
-		response.type("text/html").send(callback);
+		reply.type("text/html").send(callback);
 	}
 }, {
 	method: Method.GET,
@@ -43,11 +43,11 @@ let route : Array<Route> = [{
 			code: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		// Get access token and return it.
 		let result = await getAccessToken(request.params!.code);
-		if (!result.status.ok) return send(response, Codes.GenericError);
-		send(response, Codes.OK, { accessToken: result.result });
+		if (!result.status.ok) return send(reply, Codes.GenericError);
+		send(reply, Codes.OK, { accessToken: result.result });
 	}
 }];
 

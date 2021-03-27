@@ -1,5 +1,5 @@
 <template>
-	<div class="scroller-wrapper" ref="scrollWrapper" :class="{ 'scroll-left': scrollLeft, 'scroll-right': scrollRight}">
+	<div class="scroller-wrapper" :class="{ 'scroll-left': scrollLeft, 'scroll-right': scrollRight}">
 		<div class="scroller-content" ref="scrollContent" @scroll="scroll">
 			<slot/>
 		</div>
@@ -25,10 +25,12 @@ export default Vue.extend({
 		};
 	},
 	methods: {
-		scroll(e: MouseEvent) {
+		scroll() {
 			this.updateValues();
 		},
 		updateValues() {
+			if (!this.$refs.scrollContent) return;
+
 			// @ts-ignore
 			this.containerWidth = this.$refs.scrollContent.clientWidth;
 

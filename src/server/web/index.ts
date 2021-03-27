@@ -5,7 +5,7 @@
 
 // Imports
 import path from "path";
-import fastify, { FastifyInstance } from "fastify";
+import fastify, { FastifyError, FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 // Logger
 import createLogger from "../utils/logger";
@@ -24,7 +24,7 @@ import { checkAuth } from "../github";
 var webServer : FastifyInstance;
 
 // Constants
-const validLocales = ["en", "it", "es"];
+const supportedLocales = ["en", "it", "es"];
 
 /**
  * Start the web server.
@@ -44,6 +44,9 @@ async function start() {
 	// Load dynamic routes.
 	await webServer.register(require("./router"), {
 		directories: config.web.router.routeDirs.map(dir => path.join(getRoot(), dir)),
+		supportedLocales,
+		notFoundHandler,
+		errorHandler,
 		verifyAuth
 	});
 
@@ -80,10 +83,30 @@ async function verifyAuth(request: any) : Promise<Auth> {
 }
 
 /**
- * Return the valid locales for the routes.
+ * The handler for when the router cannot match a request with a route.
+ * @param request The request.
+ * @param reply The reply.
  */
-export function getValidLocales() {
-	return validLocales; 
+async function notFoundHandler(request: FastifyRequest, reply: FastifyReply) {
+	reply.redirect("/error/notFound");
+}
+
+/**
+ * General route error handler.
+ * @param error The error.
+ * @param request The request.
+ * @param reply The reply.
+ */
+async function errorHandler(error: FastifyError, request: FastifyRequest, reply: FastifyReply) {
+	reply.redirect("/error/general");
+}
+
+/**
+ * Get the list of the server's supported locales.
+ * @returns The server's supported locales.
+ */
+export function getSupportedLocales() {
+	return supportedLocales;
 }
 
 /**

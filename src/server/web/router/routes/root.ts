@@ -16,31 +16,37 @@ const config = loadConfig();
 import getRoot from "../../../utils/root";
 import { Method } from "../../../../shared/Method";
 import { Request, Route } from "../Route";
-import { getValidLocales } from "../..";
+import { getSupportedLocales } from "../..";
+import { FastifyReply } from "fastify";
 
 /**
  * Return the homepage so Vue history mode works with all pages.
  * @param request The request.
- * @param response The response.
+ * @param reply The reply.
  */
-async function getIndex(request: any, response: any) {
+async function getIndex(request: Request, reply: FastifyReply, code: number = 200) {
+	// Check locale only if we're not currently loading the error page.
+	if (getSupportedLocales().indexOf(request.params?.locale) == -1) {
+		return reply.redirect(`/${request.locale!}/error/NotFound`);
+	}
+
 	// Create read stream for index.html.
 	const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/index.html"));
-	response.type("text/html").send(index);
+	reply.code(code).type("text/html").send(index);
 }
 
 let routes : Array<Route> = [{
 	method: Method.GET,
 	url: "/",
-	handler: async (request, response) => {
-		response.redirect("/en");
+	handler: async (request, reply) => {
+		reply.redirect(`/${request.locale!}`);
 	}
 }, {
 	method: Method.GET,
 	url: "/:locale",
 	schemas: {
 		params: Joi.object({
-			locale: Joi.string().valid(...getValidLocales())
+			locale: Joi.string()
 		})
 	},
 	handler: getIndex
@@ -49,7 +55,7 @@ let routes : Array<Route> = [{
 	url: "/:locale/dashboard",
 	schemas: {
 		params: Joi.object({
-			locale: Joi.string().valid(...getValidLocales())
+			locale: Joi.string()
 		})
 	},
 	handler: getIndex
@@ -58,7 +64,7 @@ let routes : Array<Route> = [{
 	url: "/:locale/repo/:owner/:repo",
 	schemas: {
 		params: Joi.object({
-			locale: Joi.string().valid(...getValidLocales()),
+			locale: Joi.string(),
 			owner: Joi.string(),
 			repo: Joi.string()
 		})
@@ -69,19 +75,40 @@ let routes : Array<Route> = [{
 	url: "/:locale/error",
 	schemas: {
 		params: Joi.object({
-			locale: Joi.string().valid(...getValidLocales())
+			locale: Joi.string()
 		})
 	},
-	handler: async (request: Request, response: any) => {
-		response.redirect(`/${request.params!.locale}`);
+	handler: async (request, reply) => {
+		reply.redirect(`/${request.params!.locale}`);
 	}
 }, {
 	method: Method.GET,
 	url: "/privacy-policy",
-	handler: async (request: Request, response: any) => {
+	handler: async (request, reply) => {
 		const index = fs.createReadStream(path.join(getRoot(), config.general.assetsDir, "/pages/privacy-policy.html"));
-		response.type("text/html").send(index);
+		reply.type("text/html").send(index);
 	}
+}, {
+	method: Method.GET,
+	url: "/error/:code",
+	schemas: {
+		params: Joi.object({
+			code: Joi.string()
+		})
+	},
+	handler: async (request, reply) => {
+		reply.redirect(`/${request.locale!}/error/${request.params!.code}`);
+	}
+}, {
+	method: Method.GET,
+	url: "/:locale/error/:code",
+	schemas: {
+		params: Joi.object({
+			locale: Joi.string(),
+			code: Joi.string()
+		})
+	},
+	handler: (request, reply) => getIndex(request, reply, 404)
 }];
 
 export default routes;
