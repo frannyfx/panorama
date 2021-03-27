@@ -89,9 +89,6 @@ const mutations : MutationTree<RootState> = {
 	},
 	setError(state: RootState, error: Error) {
 		state.error.name = error;
-	},
-	clear(state : RootState) {
-		// TODO: ...
 	}
 };
 

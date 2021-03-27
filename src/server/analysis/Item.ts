@@ -366,7 +366,6 @@ export function generateFolderEntries(items: AnalysedItem[]) : AnalysedItem[] {
 				});
 
 				// Increment the extension aggregates.
-				// TODO: Think about contributor extension aggregates.
 				if (fileExtension != "" && aggregateContributor.extensions) {
 					// Get existing object or create new line stats for the extension.
 					let extensionLineCount : AdvancedLineCount = aggregateContributor.extensions[fileExtension] || {

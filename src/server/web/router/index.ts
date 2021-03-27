@@ -192,7 +192,7 @@ function wrapRoute(route : Route, options: Options) : Function {
  * @param route The route to validate.
  */
 function isRoute(route: any): route is Route {
-	return route; // TODO: Validate the routes.
+	return route && route.url && typeof route.url == "string";
 }
 
 /**

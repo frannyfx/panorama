@@ -66,9 +66,6 @@ const mutations : MutationTree<NotificationsState> = {
 	},
 	setDataExpiry(state, data) {
 		state.object[data.id].data.expiry = data.expiry;
-	},
-	clear(state : NotificationsState) {
-		// TODO: ...
 	}
 };
 

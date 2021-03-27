@@ -115,7 +115,6 @@ export function saveAccessToken(accessToken: string) {
  * Remove saved access token.
  */
 export function clearAuthenticationData() {
-	// TODO: Clear the entire store of data.
 	Store.commit("setAccessToken", "");
 	Store.commit("setAuthStatus", false);
 

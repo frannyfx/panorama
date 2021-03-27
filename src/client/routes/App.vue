@@ -27,6 +27,8 @@
 					<span>&bull;</span>
 					<a href="https://github.com/frannyfx" rel="noreferrer" target="_blank"><font-awesome-icon :icon="['fab', 'github']"/></a>
 					<span>&bull;</span>
+					<language-switcher/>
+					<span>&bull;</span>
 					<a href="/privacy-policy" target="_blank">{{ $t("general.privacyPolicy") }}</a>
 				</p>
 			</div>
@@ -47,6 +49,7 @@ import NotificationList from "../components/NotificationList.vue";
 import ModalList from "../components/ModalList.vue";
 import BackgroundBlobs from "../components/BackgroundBlobs.vue";
 import BackgroundColour from "../components/BackgroundColour.vue";
+import LanguageSwitcher from "../components/LanguageSwitcher.vue";
 
 // Modules
 import { loadLanguageAsync } from "../i18n";
@@ -61,7 +64,8 @@ export default Vue.extend({
 		NotificationList,
 		ModalList,
 		BackgroundBlobs,
-		BackgroundColour
+		BackgroundColour,
+		LanguageSwitcher
 	},
 	computed: {
 		navbarVisible() : boolean {
@@ -96,7 +100,6 @@ export default Vue.extend({
 	mounted: async function () {
 		// Load locale.
 		let locale = window.location.pathname.split("/")[1];
-		window.localStorage.setItem("locale", locale);
 		await loadLanguageAsync(locale);
 
 		// Perform initial authentication.

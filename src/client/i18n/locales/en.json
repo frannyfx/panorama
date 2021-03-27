@@ -1,7 +1,8 @@
 {
 	"general": {
 		"title": "Panorama",
-		"privacyPolicy": "Privacy Policy"
+		"privacyPolicy": "Privacy Policy",
+		"locale": "English"
 	},
 	"routes": {
 		"callback": {

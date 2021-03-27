@@ -29,5 +29,10 @@ export async function loadLanguageAsync(lang : string) {
 	let locale = await import(/* webpackChunkName: "locales/[request]" */ `./locales/${lang}.json`);
 	i18n.setLocaleMessage(lang, locale);
 	loadedLanguages.push(lang);
+
+	// Set local storage to reflect the new locale.
+	window.localStorage.setItem("locale", lang);
+	
+	// Set the locale.
 	return setI18nLanguage(lang);
 }
