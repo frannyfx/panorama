@@ -75,7 +75,7 @@ export default Vue.extend({
 	watch: {
 		$route(to, from) {
 			// Do not overwrite specific route titles.
-			if (to.name == from.name) return;
+			if (to.name == from.name && to.params.locale == from.params.locale) return;
 
 			// Change title depending on the route.
 			document.title = to.meta?.title ? this.$i18n.t(to.meta.title).toString() : "Panorama";

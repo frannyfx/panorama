@@ -30,15 +30,15 @@ export default Vue.extend({
 			let { ...params } = this.$route.params;
 			params.locale = locale;
 
+			// Load the locale asynchronously.
+			await loadLanguageAsync(locale);
+
 			// Replace the current route.
 			this.$router.replace({
 				name: this.$route.name ?? undefined,
 				params: params,
 				query: this.$route.query
 			});
-
-			// Load the locale asynchronously.
-			await loadLanguageAsync(locale);
 		}
 	},
 	mounted() {
