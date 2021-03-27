@@ -13,7 +13,7 @@
 					</div>
 					<span class="username hide-small">{{username}}</span>
 				</a>
-				<a class="nav-link" @click="logOut">
+				<a class="nav-link" @click="signOut">
 					<font-awesome-icon icon="sign-out-alt"/>
 					{{ $t("components.navbar.signOut") }}
 				</a>
@@ -27,7 +27,7 @@ import Vue from "vue";
 
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { clearAuthenticationData } from "../modules/API";
+import { clearAuthenticationData, endSession } from "../modules/API";
 
 export default Vue.extend({
 	components: {
@@ -42,11 +42,10 @@ export default Vue.extend({
 	},
 	methods: {
 		navigateToDashboard() {
-			if (this.$route.name != "dashboard")
-				this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } });
+			if (this.$route.name != "dashboard") this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } });
 		},
-		logOut() {
-			clearAuthenticationData();
+		signOut() {
+			endSession();
 			this.$router.replace({ name: "sign-in", params: { locale: this.$i18n.locale } });
 		}
 	}

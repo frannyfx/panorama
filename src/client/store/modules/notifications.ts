@@ -45,6 +45,9 @@ const mutations : MutationTree<NotificationsState> = {
 		state.list.splice(notificationIndex, 1);
 		state.object[notification.id].removed = true;
 	},
+	removeAll(state) {
+		state.list.splice(0, state.list.length - 1);
+	},
 	updateNotificationProgress(state, data : any) {
 		// The notification does not exist, return.
 		if (!state.object[data.id] || state.object[data.id].data.type != "PROGRESS") return;
@@ -54,6 +57,9 @@ const mutations : MutationTree<NotificationsState> = {
 	},
 	deleteData(state, notification: Notification) {
 		delete state.object[notification.id];
+	},
+	deleteAllData(state) {
+		Object.keys(state.object).map(notificationId => delete state.object[notificationId]);
 	},
 	setExpiryEnabled(state, data) {
 		state.object[data.id].expiry.enabled = data.enabled;

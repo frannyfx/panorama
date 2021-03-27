@@ -201,3 +201,14 @@ function handleModalAction(modal: Modal, actionId: string, dismiss: boolean = tr
 	// Dismiss the modal if desired.
 	if (dismiss) dismissModal(modal);
 }
+
+/**
+ * Dismiss and remove all modals.
+ */
+export function dismissAll() {
+	// Remove the modal from the store.
+	Store.commit("Modals/removeAll");
+	
+	// Lazy delete the modal data.
+	setTimeout(() => Store.commit("Modals/deleteAllData"), config.store.lazyDataPurgeDelay);
+}

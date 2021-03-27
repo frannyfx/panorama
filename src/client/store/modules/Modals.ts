@@ -45,8 +45,14 @@ const mutations : MutationTree<ModalsState> = {
 		// the data about the modal is removed.
 		state.list.splice(modalIndex, 1);
 	},
+	removeAll(state : ModalsState) {
+		state.list.splice(0, state.list.length - 1);
+	},
 	deleteData(state : ModalsState, modal: Modal) {
 		delete state.object[modal.id];
+	},
+	deleteAllData(state: ModalsState) {
+		Object.keys(state.object).map(modalId => delete state.object[modalId]);
 	}
 };
 

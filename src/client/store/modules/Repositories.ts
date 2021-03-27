@@ -173,6 +173,7 @@ const mutations : MutationTree<RepositoriesState> = {
 
 		// Reset page counter.
 		state.page = -1;
+		state.canLoadMore = true;
 	}
 };
 

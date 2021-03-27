@@ -9,7 +9,8 @@ export default {
 		pageSize: 10
 	},
 	store: {
-		lazyDataPurgeDelay: 5000
+		lazyDataPurgeDelay: 5000,
+		sessionEndClearDelay: 1000
 	},
 	files: {
 		maxSize: 131072

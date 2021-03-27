@@ -118,6 +118,30 @@ export function removeNotification(notification: Notification) {
 }
 
 /**
+ * Remove all notifications from the store.
+ */
+export function removeAllNotifications() {
+	// Clear and remove timeouts.
+	Object.keys(notificationTimeouts).map(notificationId => {
+		// Get timeout.
+		let timeout = notificationTimeouts[notificationId];
+
+		// Clear timeouts.
+		if (timeout.fade) clearTimeout(timeout.fade);
+		if (timeout.expiry) clearTimeout(timeout.expiry);
+
+		// Delete key.
+		delete notificationTimeouts[notificationId];
+	});
+
+	// Remove all notifications.
+	Store.commit("Notifications/removeAll");
+
+	// Lazy delete the notification data.
+	setTimeout(() => Store.commit("Notifications/deleteAllData"), config.store.lazyDataPurgeDelay);
+}
+
+/**
  * Add an alert notification to the store.
  * @param type The type of alert.
  * @param title The title of the alert.

@@ -2,7 +2,7 @@
 	<div class="page center no-select">		
 		<div class="content">
 			<h1 class="title"><font-awesome-icon icon="eye"/>{{ $t("general.title")}}</h1>
-			<button @click="signIn" class="transparent blur" :disabled="$store.state.auth.status || $store.state.auth.clientId == ''">
+			<button @click="signIn" class="transparent blur" :disabled="$store.state.auth.status || $store.state.auth.clientId == '' || !$store.state.auth.canSignIn">
 				<font-awesome-icon :icon="['fab', 'github']"/><span>{{ $t("routes.signIn.signInWithGitHub") }}</span>
 			</button>
 		</div>
@@ -17,7 +17,7 @@ import Store from "../store";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 // API imports
-import { clearAuthenticationData, saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
+import { clearAuthenticationData, endSession, saveAccessToken, send, testAuthentication, waitForAuth } from "../modules/API";
 import { Method } from "../../shared/Method";
 import { Response } from "../../shared/Response";
 import { isResult } from '../../shared/Result';
@@ -42,7 +42,7 @@ export default Vue.extend({
 	},
 	methods: {
 		async signIn() {
-			// Navigate to dashboard.
+			// Open authentication window.
 			this.popup.window = window.open(
 				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
 				"GitHub Authentication",
@@ -51,10 +51,10 @@ export default Vue.extend({
 				`left=${((window.outerWidth - this.popup.width) / 2) + window.screenX},top=${((window.outerHeight - this.popup.height) / 2) + window.screenY}`
 			);
 		},
-		async fetchProfileData() {
-			console.log("Fetching profile data...");
-		},
 		async onReceiveMessage(event: MessageEvent) {
+			// Check origin of the message.
+			if (event.source != this.popup.window) return;
+			
 			// Perform type check on the result.
 			var result;
 			if (isResult(event.data)) result = event.data;
@@ -63,26 +63,20 @@ export default Vue.extend({
 			// If authentication was not successful, show alert.
 			if (!result.status.ok) return createI18NAlert("INFO", "signInFailed");
 
-			// If successful, save the data.
+			// If successful, save the data and set authentication to true.
 			saveAccessToken(result.result?.accessToken);
-
-			// Fetch initial data.
 			this.$store.commit("setAuthStatus", true);
 			
-			// Retrieve user data.
+			// Retrieve and save user data.
 			let profileResult = await getProfile();
-
-			// Save user data to store.
 			this.$store.commit("setUser", profileResult.result);
 
 			// If unable to retrieve user data, show error.
 			if (!profileResult.status.ok) return createI18NAlert("WARNING", "profileFetchFailed");
 
 			// Navigate to dashboard.
-			this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } }, undefined, () => {
-				clearAuthenticationData();
-				console.log("Navigation aborted because an error occurred fetching Dashboard data.");
-				Store.commit("setLoading", false);
+			this.$router.replace({ name: "dashboard", params: { locale: this.$i18n.locale } }).catch(() => {
+				endSession();
 			});
 		}
 	},

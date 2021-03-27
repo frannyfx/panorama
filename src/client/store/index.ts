@@ -31,6 +31,7 @@ export interface RootState {
 		status: boolean,
 		clientId: string,
 		accessToken: string,
+		canSignIn: boolean
 	},
 	user: {
 		id: number,
@@ -51,7 +52,8 @@ const state : RootState = {
 		loaded: false,
 		status: false,
 		clientId: "",
-		accessToken: ""
+		accessToken: "",
+		canSignIn: true
 	},
 	user: {
 		id: -1,
@@ -65,30 +67,40 @@ const state : RootState = {
 
 // Store mutations.
 const mutations : MutationTree<RootState> = {
-	setLoading(state : RootState, loading : boolean) {
+	setLoading(state, loading: boolean) {
 		state.loading = loading;
 	},
-	setAuthLoaded(state : RootState, loaded: boolean) {
+	setAuthLoaded(state, loaded: boolean) {
 		state.auth.loaded = loaded;
 	},
-	setAuthStatus(state : RootState, status : boolean) {
+	setAuthStatus(state, status: boolean) {
 		state.auth.status = status;
 	},
-	setClientId(state : RootState, clientId: string) {
+	setClientId(state, clientId: string) {
 		state.auth.clientId = clientId;
 	},
-	setAccessToken(state : RootState, accessToken: string) {
+	setAccessToken(state, accessToken: string) {
 		state.auth.accessToken = accessToken;
 	},
-	setUser(state : RootState, user: Data) {
+	setCanSignIn(state, canSignIn: boolean) {
+		state.auth.canSignIn = canSignIn;
+	},
+	setUser(state, user: Data) {
 		state.user.id = user.id;
 		state.user.login = user.login;
 		state.user.avatarUrl = user.avatar_url;
 		state.user.name = user.name;
 		state.user.email = user.email;
 	},
-	setError(state: RootState, error: Error) {
+	setError(state, error: Error) {
 		state.error.name = error;
+	},
+	clear(state) {
+		state.user.id = -1;
+		state.user.login = "";
+		state.user.avatarUrl = "";
+		state.user.name = "";
+		state.user.email = "";
 	}
 };
 

@@ -10,8 +10,11 @@ import { Data } from "../../shared/Result";
 import Store from "../store";
 import { getProfile } from "./GitHub";
 import { Repository } from "./models/Repository";
-import { createI18NAlert } from "./Notifications";
+import { createI18NAlert, removeAllNotifications } from "./Notifications";
 import { subscribeToJobProgress } from "./Queue";
+import { sleep } from "../../shared/utils";
+import { dismissAll as dismissAllModals } from "./Modal";
+import config from "../config";
 
 // Interfaces
 interface Params {
@@ -229,4 +232,37 @@ export async function analyseRepo(repository: Repository) {
 		// The repo failed to analyse.
 		Store.commit("Repositories/setAnalysisInProgress", { repository, inProgress: false});
 	});
+}
+
+/**
+ * Sign the user out and remove personal data from the Vuex store.
+ */
+export function endSession() {
+	// Set loading and canSignIn to false (we don't want the user to sign in until all data is cleared).
+	Store.commit("setLoading", true);
+	Store.commit("setCanSignIn", false);
+
+	// Remove authentication data.
+	clearAuthenticationData();
+
+	// Dismiss modals.
+	dismissAllModals();
+
+	// Dismiss notifications.
+	removeAllNotifications();
+
+	// Clear some data later to prevent the user from seeing the UI update.
+	setTimeout(() => {
+		// Remove repositories with a delay so the user does not see them disappear.
+		Store.commit("Repositories/clear");
+
+		// Clear profile data with a delay so the user does not see the navbar change.
+		Store.commit("clear");
+
+		// Set canSignIn flag.
+		Store.commit("setCanSignIn", true);
+	}, config.store.sessionEndClearDelay);
+
+	// Set loading.
+	Store.commit("setLoading", false);
 }
