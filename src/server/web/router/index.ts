@@ -179,7 +179,7 @@ function wrapRoute(route: Route, options: Options) : Function {
 				if (route.on?.close) connection.socket.on("close", (event: any) => route.on!.close(connection, event));
 			} else {
 				// Parse Accept-Language.
-				newRequest.locale = acceptLanguageParser.pick(options.supportedLocales, request.headers["accept-languages"] ?? "en", {
+				newRequest.locale = acceptLanguageParser.pick(options.supportedLocales, request.headers["accept-language"] ?? "en", {
 					loose: true
 				}) ?? "en";
 
