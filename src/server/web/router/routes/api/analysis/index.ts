@@ -275,7 +275,7 @@ let route : Array<Route> = [{
 			});
 
 			// Must have database analysis.
-			if (!databaseAnalysis || databaseAnalysis.analysisId) throw new Error("Transaction failed.");
+			if (!databaseAnalysis || !databaseAnalysis.analysisId) throw new Error("Transaction failed.");
 
 			// Add the job to the queue.
 			let job = await queue.getRepoQueue()!.createJob({
@@ -295,6 +295,7 @@ let route : Array<Route> = [{
 				ticket: jobTicket
 			});
 		} catch (e) {
+			console.log(e);
 			// If anything goes wrong in the process, return internal server error.
 			return send(reply, Codes.ServerError);
 		}

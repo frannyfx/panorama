@@ -27,7 +27,7 @@ import Vue from "vue";
 
 // Components
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { clearAuthenticationData, endSession } from "../modules/API";
+import { endSession } from "../modules/API";
 
 export default Vue.extend({
 	components: {

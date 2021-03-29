@@ -19,6 +19,7 @@ import Modals from "./modules/Modals";
 import Extensions from "./modules/Extensions";
 import Users from "./modules/Users";
 import Tokens from "./modules/Tokens";
+import Activity from "./modules/Activity";
 
 // Use plugin
 Vue.use(Vuex);
@@ -117,7 +118,8 @@ export default new Vuex.Store<RootState>({
 		Modals,
 		Extensions,
 		Users,
-		Tokens
+		Tokens,
+		Activity
 	},
 	strict: debug
 });

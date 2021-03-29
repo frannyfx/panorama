@@ -188,5 +188,11 @@
 		"Code": "Codigo",
 		"Whitespace": "Espacio en blanco",
 		"String": "Cadena de caracteres"
+	},
+	"activity": {
+		"analysis": {
+			"description": "Analizaste <b>{0}</b>.",
+			"action": "Ver repositorio"
+		}
 	}
 }

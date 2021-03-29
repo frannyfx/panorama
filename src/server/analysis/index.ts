@@ -392,6 +392,7 @@ export async function handleRepoJob(job : BeeQueue.Job<RepoJob>, done : BeeQueue
 			analysis: (await Analysis.get(analysis.analysisId!))!
 		};
 	} catch (e) {
+		console.log(e);
 		throw new Error("Database insertion failed.");
 	}
 }

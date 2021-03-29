@@ -46,7 +46,7 @@ const mutations : MutationTree<NotificationsState> = {
 		state.object[notification.id].removed = true;
 	},
 	removeAll(state) {
-		state.list.splice(0, state.list.length - 1);
+		state.list.splice(0, state.list.length);
 	},
 	updateNotificationProgress(state, data : any) {
 		// The notification does not exist, return.

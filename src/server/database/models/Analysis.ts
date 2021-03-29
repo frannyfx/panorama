@@ -178,6 +178,44 @@ async function deleteAnalysis(analysisId: number) : Promise<boolean> {
 	}
 }
 
+/**
+ * Get the most recent analyses requested by a user.
+ * @param userId The ID of the user requesting the analyses.
+ * @returns A list of recent anlyses.
+ */
+async function getRecentByUser(userId: number) : Promise<Data[]> {
+	// Get connection.
+	let connection = await getConnection();
+	if (!connection) return [];
+
+	// Get the most recent analyses by the user, grouping by repository ID and omitting
+	// previous analyses.
+	let recentAnalysisIDs = await connection("Analysis")
+		.where({ requestedBy: userId, status: DatabaseAnalysisStatus.COMPLETED })
+		.groupBy("Analysis.repositoryId")
+		.max({"analysisId": "Analysis.analysisId"})
+		.orderBy("analysisId", "desc")
+		.limit(3);
+
+	// If there are no IDs matching the criteria, return an empty array.
+	if (recentAnalysisIDs.length == 0) return [];
+
+	// Join the analysis IDs with relevant data.
+	let recentAnalyses = await connection("Analysis")
+		.whereIn("Analysis.analysisId", recentAnalysisIDs.map(row => row.analysisId))
+		.join("Repository", { "Analysis.repositoryId": "Repository.repositoryId"})
+		.join("User", { "Repository.ownerId": "User.userId"})
+		.select(
+			"Analysis.analysisId",
+			"Repository.name as repositoryName",
+			"User.login as owner",
+			"Analysis.completedAt"
+		)
+		.orderBy("Analysis.completedAt", "desc");
+		
+	return recentAnalyses;
+}
+
 export default {
-	insert, update, getLatest, get, getRawWithJobId, delete: deleteAnalysis
+	insert, update, getLatest, get, getRawWithJobId, delete: deleteAnalysis, getRecentByUser
 };

@@ -188,5 +188,12 @@
 		"Code": "Code",
 		"Whitespace": "Whitespace",
 		"String": "String"
+	},
+	"activity": {
+		"analysis": {
+			"title": "Analysis",
+			"description": "You analysed <b>{0}</b>.",
+			"action": "View repo"
+		}
 	}
 }

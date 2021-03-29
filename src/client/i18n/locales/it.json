@@ -188,5 +188,11 @@
 		"Code": "Codice",
 		"Whitespace": "Spazio in bianco",
 		"String": "Stringa di caratteri"
+	},
+	"activity": {
+		"analysis": {
+			"description": "Hai analizzato <b>{0}</b>.",
+			"action": "Mostra archivio"
+		}
 	}
 }

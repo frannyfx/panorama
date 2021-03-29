@@ -2,13 +2,7 @@
 	<div class="page nav no-select">
 		<div class="content container">
 			<h2>{{ $t("routes.dashboard.recentActivity") }}</h2>
-			<scroller>
-				<div class="activities">
-					<div class="activity"></div>
-					<div class="activity"></div>
-					<div class="activity"></div>
-				</div>
-			</scroller>
+			<activity-list/>
 			<h2>{{ $t("routes.dashboard.repositories") }}</h2>
 			<div class="repos">
 				<transition-group name="list">
@@ -34,24 +28,26 @@
 import Vue from "vue";
 import Store from "../store";
 import Repositories from "../store/modules/Repositories";
+import Activity from "../store/modules/Activity";
 
 // Modules
 import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
-import { clearAuthenticationData, waitForAuth } from "../modules/API";
+import { clearAuthenticationData, endSession, send, waitForAuth } from "../modules/API";
 import { createI18NAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
+import { Method } from "../../shared/Method";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
-import Scroller from "../components/Scroller.vue";
+import ActivityList from "../components/ActivityList.vue";
 import RepositoryListItem from "../components/RepositoryListItem.vue";
 import ContentFooter from "../components/Footer.vue";
 
 export default Vue.extend({
 	components: {
 		FontAwesomeIcon,
-		Scroller,
+		ActivityList,
 		RepositoryListItem,
 		ContentFooter
 	},
@@ -87,17 +83,31 @@ export default Vue.extend({
 		await waitForAuth();
 		if (!Store.state.auth.status) return next({ name: "sign-in", params: { locale: i18n.locale } });
 
+		// Load activity if it has not yet been loaded.
+		if (!Activity.state.loaded) {
+			// Set loading and load activity.
+			Store.commit("setLoading", true);
+			let activity = await send(Method.GET, "activity");
+			if (!activity.status.ok) {
+				createI18NAlert("WARNING", "activityFetchFailed");
+				endSession();
+				return next({ name: "sign-in", params: { locale: i18n.locale} });
+			}
+
+			// Add the loaded activity.
+			Store.commit("Activity/add", activity.result!);
+		}
+
 		// Load repos if they have not yet been loaded.
-		var repos : Repository[] | null = null;
 		if (Repositories.state.page == -1) {
 			// Set loading and load repos.
 			Store.commit("setLoading", true);
-			repos = await getRepositories();
+			let repos = await getRepositories();
 
 			// Handle repo fetch error.
 			if (!repos) {
 				createI18NAlert("WARNING", "reposFetchFailed");
-				clearAuthenticationData();
+				endSession();
 				return next({ name: "sign-in", params: { locale: i18n.locale } });
 			}
 
@@ -128,25 +138,6 @@ h2 {
 		margin-right: 10px;
 		font-size: 0.8em;
 		color: $blue;
-	}
-}
-
-.activities {
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-	justify-content: space-between;
-
-	.activity {
-		width: 290px;
-		height: 180px;
-		border-radius: 16px;
-		background-color: $grey-tinted;
-		flex-shrink: 0;
-
-		&:not(:last-child) {
-			margin-right: 20px;
-		}
 	}
 }
 

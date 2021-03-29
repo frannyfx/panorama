@@ -80,7 +80,7 @@ export default Vue.extend({
 		content: '';
 		position: absolute;
 		height: 100%;
-		width: 50px;
+		width: 20%;
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.1s;
@@ -88,12 +88,12 @@ export default Vue.extend({
 
 	&:before {
 		left: 0;
-		background: linear-gradient(to left, transparent, white);
+		background: linear-gradient(to left, rgba(white, 0), white);
 	}
 
 	&:after {
 		right: 0;
-		background: linear-gradient(to right, transparent, white);
+		background: linear-gradient(to right, rgba(white, 0), white);
 	}
 
 	.scroller-content {
