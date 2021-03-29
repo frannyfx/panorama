@@ -28,7 +28,7 @@ const getters = { };
 const actions = { };
 
 const mutations : MutationTree<ExtensionsState> = {
-	add(state: ExtensionsState, data: { map: ExtensionMap, unknown: string[] }) {
+	add(state, data: { map: ExtensionMap, unknown: string[] }) {
 		// Add to extension map.
 		Object.keys(data.map).map(extension => {
 			state.map[extension] = data.map[extension];
@@ -38,13 +38,13 @@ const mutations : MutationTree<ExtensionsState> = {
 		// Add unknown extensions.
 		state.unknown.push(...data.unknown);
 	},
-	addTypes(state: ExtensionsState, types: ExtensionMap) {
+	addTypes(state, types: ExtensionMap) {
 		// Add to type map.
 		Object.keys(types).map(type => {
 			state.typeMap[type] = types[type];
 		});
 	},
-	clear(state: ExtensionsState) {
+	clear(state) {
 		// Dynamically delete keys.
 		Object.keys(state.map).map(extension => {
 			delete state.map[extension];

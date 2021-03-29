@@ -24,13 +24,13 @@ const getters = { };
 const actions = { };
 
 const mutations : MutationTree<TokensState> = {
-	add(state: TokensState, data: { map: TokenMap }) {
+	add(state, data: { map: TokenMap }) {
 		// Add to token map.
 		Object.keys(data.map).map(token => {
 			state.map[token] = data.map[token];
 		});
 	},
-	clear(state: TokensState) {
+	clear(state) {
 		// Dynamically delete keys.
 		Object.keys(state.map).map(token => {
 			delete state.map[token];

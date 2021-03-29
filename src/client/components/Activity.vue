@@ -86,6 +86,7 @@ export default Vue.extend({
 <style lang="scss" scoped>
 @import "../stylesheets/globals.scss";
 .activity {
+	max-width: 330px;
 	min-width: 290px;
 	height: 120px;
 	border-radius: 16px;
@@ -142,6 +143,7 @@ export default Vue.extend({
 				font-size: 0.75em;
 				width: 100%;
 				box-sizing: border-box;
+				margin-top: 2px;
 
 				&:hover {
 					color: white;

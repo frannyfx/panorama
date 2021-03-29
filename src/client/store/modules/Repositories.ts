@@ -36,7 +36,7 @@ const getters = { };
 const actions = { };
 
 const mutations : MutationTree<RepositoriesState> = {
-	add(state: RepositoriesState, data: { repositories: Repository[], page: number }) {
+	add(state, data: { repositories: Repository[], page: number }) {
 		// Get IDs of repositories already in the list (need to ensure the list and the object contain the same objects).
 		let repoIds = state.list.map(repo => repo.id);
 
@@ -58,24 +58,24 @@ const mutations : MutationTree<RepositoriesState> = {
 		// We can't load more if we returned less than the configured page size or if an empty data set was returned.
 		state.canLoadMore = data.repositories.length == config.repositories.pageSize;
 	},
-	addSingle(state: RepositoriesState, repository: Repository) {
+	addSingle(state, repository: Repository) {
 		Vue.set(state.object, repository.fullName, repository);
 	},
-	setFileChildrenLoading(state: RepositoriesState, data: { file: File, loading: boolean }) {
+	setFileChildrenLoading(state, data: { file: File, loading: boolean }) {
 		data.file.children.loading = data.loading;
 	},
-	setFileContentLoading(state: RepositoriesState, data: { file: File, loading: boolean }) {
+	setFileContentLoading(state, data: { file: File, loading: boolean }) {
 		data.file.content.loading = data.loading;
 	},
-	setAnalysisInProgress(state: RepositoriesState, data: { repository: Repository, inProgress: boolean }) {
+	setAnalysisInProgress(state, data: { repository: Repository, inProgress: boolean }) {
 		data.repository.analysis.inProgress = data.inProgress;
 	},
-	setAnalysis(state: RepositoriesState, data: { repository: Repository, analysis: Data }) {
+	setAnalysis(state, data: { repository: Repository, analysis: Data }) {
 		data.repository.analysis.id = data.analysis.analysisId;
 		data.repository.analysis.commitId = data.analysis.commitId;
 		data.repository.analysis.startedAt = data.analysis.startedAt;
 	},
-	resetChildren(state: RepositoriesState, repository: Repository) {
+	resetChildren(state, repository: Repository) {
 		Object.keys(repository.content.files).map(file => {
 			// Reset children.
 			repository.content.files[file].children.loaded = false;
@@ -87,7 +87,7 @@ const mutations : MutationTree<RepositoriesState> = {
 			repository.content.files[file].content.loaded = false;
 		});
 	},
-	addFileChildren(state: RepositoriesState, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
+	addFileChildren(state, data: { repository: Repository, path: string, files: File[], analysis: AnalysisMap }) {
 		// Sort children.
 		let sortedFiles = data.files.sort((a: File, b: File) => {
 			if (a.type == "dir" && b.type != "dir") return -1;
@@ -113,7 +113,7 @@ const mutations : MutationTree<RepositoriesState> = {
 			data.repository.content.files[data.path].analysis.data = data.analysis[data.path];	
 		}
 	},
-	updateContributors(state: RepositoriesState, data: { repository: Repository, contributors: User[] }) {
+	updateContributors(state, data: { repository: Repository, contributors: User[] }) {
 		// Dedupe contributors.
 		let logins = data.repository.contributors.list.map(user => user.login);
 		data.contributors.map(contributor => {
@@ -121,16 +121,16 @@ const mutations : MutationTree<RepositoriesState> = {
 			if (logins.indexOf(contributor.login) == -1) data.repository.contributors.list.push(contributor);
 		});
 	},
-	setTicket(state: RepositoriesState, data: { repository: Repository, ticket: string }) {
+	setTicket(state, data: { repository: Repository, ticket: string }) {
 		// Set analysis data retrieval ticket for repository.
 		data.repository.analysis.ticket = data.ticket;
 	},
-	setFileContent(state: RepositoriesState, data: { file: File, content: string }) {
+	setFileContent(state, data: { file: File, content: string }) {
 		// Set the file's content.
 		data.file.content.loaded = true;
 		data.file.content.data = data.content;
 	},
-	setFileChunks(state: RepositoriesState, data: { file: File, chunks: AnalysisChunk[] }) {
+	setFileChunks(state, data: { file: File, chunks: AnalysisChunk[] }) {
 		// Set the loaded flag to true.
 		data.file.analysis.data!.chunks.loaded = true;
 
@@ -146,7 +146,7 @@ const mutations : MutationTree<RepositoriesState> = {
 		// Map the start of each chunk to the chunk itself as it allows for easier rendering.
 		chunkList.map(chunk => data.file.analysis.data!.chunks.object[chunk.start] = chunk);
 	},
-	setFileTokens(state: RepositoriesState, data: { file: File, tokens: AnalysisToken[] }) {
+	setFileTokens(state, data: { file: File, tokens: AnalysisToken[] }) {
 		// Set the loaded flag to true.
 		data.file.analysis.data!.tokens.loaded = true;
 
@@ -162,7 +162,7 @@ const mutations : MutationTree<RepositoriesState> = {
 		// Map the start of each token to the token itself as it allows for easier rendering.
 		tokenList.map(token => data.file.analysis.data!.tokens.object[token.start] = token);
 	},
-	clear(state: RepositoriesState) {
+	clear(state) {
 		// Dynamically delete keys (Vue components will react accordingly).
 		Object.keys(state.object).map(key => {
 			delete state.object[key];

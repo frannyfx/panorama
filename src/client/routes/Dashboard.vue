@@ -2,7 +2,7 @@
 	<div class="page nav no-select">
 		<div class="content container">
 			<div class="header">
-				<font-awesome-icon icon="chart-bar"/>
+				<font-awesome-icon icon="chart-pie"/>
 				<h2>{{ $t("routes.dashboard.recentActivity") }}</h2>
 				<button class="action" @click="refreshActivity">
 					<font-awesome-icon icon="sync" :spin="activity.fetching"/>
@@ -170,7 +170,7 @@ export default Vue.extend({
 .header {
 	display: flex;
 	align-items: center;
-	color: $mariana;
+	color: black;
 
 	h2 {
 		flex-grow: 1;

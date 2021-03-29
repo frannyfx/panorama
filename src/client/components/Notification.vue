@@ -13,7 +13,7 @@
 				<font-awesome-icon :icon="notification.data.icon"/>
 			</div>
 			<div class="content">
-				<div class="title" v-html="notification.data.title"></div>
+				<div class="title ellipsis" v-html="notification.data.title"></div>
 				<div class="description">
 					{{notification.data.description}}
 					<div v-if="notification.data.type == 'PROGRESS'" class="progress-container">
@@ -161,6 +161,7 @@ export default Vue.extend({
 
 	> .content {
 		flex-grow: 1;
+		overflow: hidden;
 		
 		.title {
 			font-size: .85em;

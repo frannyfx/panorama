@@ -27,11 +27,11 @@ const getters = { };
 const actions = { };
 
 const mutations : MutationTree<ModalsState> = {
-	add(state : ModalsState, modal : Modal) {
+	add(state, modal : Modal) {
 		state.list.unshift(modal);
 		state.object[modal.id] = modal;
 	},
-	remove(state : ModalsState, modal: Modal) {
+	remove(state, modal: Modal) {
 		// If it's already been deleted, return.
 		if (!state.object[modal.id]) return;
 
@@ -45,13 +45,13 @@ const mutations : MutationTree<ModalsState> = {
 		// the data about the modal is removed.
 		state.list.splice(modalIndex, 1);
 	},
-	removeAll(state : ModalsState) {
+	removeAll(state) {
 		state.list.splice(0, state.list.length);
 	},
-	deleteData(state : ModalsState, modal: Modal) {
+	deleteData(state, modal: Modal) {
 		delete state.object[modal.id];
 	},
-	deleteAllData(state: ModalsState) {
+	deleteAllData(state) {
 		Object.keys(state.object).map(modalId => delete state.object[modalId]);
 	}
 };
