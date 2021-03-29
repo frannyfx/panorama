@@ -165,6 +165,9 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 	// If the directory's children have already been loaded, return true.
 	if (parentDirectory.children.loaded) return true;
 
+	// Set loading.
+	if (!Store.state.loading) Store.commit("setLoading", true);
+
 	// Get the files.
 	let files = await getFiles(repository, path);
 
@@ -381,9 +384,6 @@ export default Vue.extend({
 		}
 	},
 	async beforeRouteEnter(to: any, from: any, next: Function) {
-		// Set loading.
-		Store.commit("setLoading", true);
-
 		// Prevent loading if auth is invalid.
 		await waitForAuth();
 		if (!Store.state.auth.status) return next({ name: "sign-in", params: { locale: i18n.locale } });
@@ -391,6 +391,9 @@ export default Vue.extend({
 		// Check if repository already exists in the Repositories state object.
 		var repository = Repositories.state.object[`${to.params.owner}/${to.params.repo}`];
 		if (!repository) {
+			// Set loading.
+			if (!Store.state.loading) Store.commit("setLoading", true);
+
 			// Fetch the requested repository.
 			let fetchedRepository = await getRepository(to.params.owner, to.params.repo);
 			if (!fetchedRepository) {
@@ -407,6 +410,9 @@ export default Vue.extend({
 
 		// Check if ticket has not yet been requested.
 		if (!repository.analysis.ticket && repository.analysis.id != -1) {
+			// Set loading.
+			if (!Store.state.loading) Store.commit("setLoading", true);
+
 			// If fetching the ticket fails, show an error and remove analysis from repository.
 			if (!await getTicket(repository)) {
 				createI18NAlert("WARNING", "ticketFetchFailed", [repository.fullName]);
@@ -416,6 +422,9 @@ export default Vue.extend({
 
 		// Check if enriched contributors have been fetched for the repository.
 		if (!repository.contributors.enriched && repository.analysis.id != -1) {
+			// Set loading.
+			if (!Store.state.loading) Store.commit("setLoading", true);
+
 			if (!await getEnrichedRepositoryContributors(repository)) {
 				createI18NAlert("WARNING", "repoFetchFailed");
 				return next({ name: "dashboard", params: { locale: i18n.locale } });
