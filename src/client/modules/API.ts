@@ -251,6 +251,9 @@ export function endSession() {
 	// Dismiss notifications.
 	removeAllNotifications();
 
+	// Clear activity.
+	Store.commit("Activity/clear");
+
 	// Clear some data later to prevent the user from seeing the UI update.
 	setTimeout(() => {
 		// Remove repositories with a delay so the user does not see them disappear.
@@ -258,6 +261,9 @@ export function endSession() {
 
 		// Clear profile data with a delay so the user does not see the navbar change.
 		Store.commit("clear");
+
+		// Delete activity data.
+		Store.commit("Activity/deleteAll");
 
 		// Set canSignIn flag.
 		Store.commit("setCanSignIn", true);

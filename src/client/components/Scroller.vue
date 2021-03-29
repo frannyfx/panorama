@@ -80,7 +80,7 @@ export default Vue.extend({
 		content: '';
 		position: absolute;
 		height: 100%;
-		width: 20%;
+		width: 10%;
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.1s;
@@ -97,6 +97,7 @@ export default Vue.extend({
 	}
 
 	.scroller-content {
+		width: 100%;
 		overflow-x: auto;
 	}
 }

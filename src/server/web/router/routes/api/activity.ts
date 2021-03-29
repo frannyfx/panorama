@@ -5,6 +5,7 @@
 
 // Imports
 import Joi from "joi";
+import { v4 as uuid } from "uuid";
 
 // Modules
 import { Method } from "../../../../../shared/Method";
@@ -23,6 +24,7 @@ let route : Array<Route> = [{
 		let activity : Activity[] = (await DatabaseAnalysis.getRecentByUser(request.auth!.payload!.id)).map((analysis) => {
 			let { completedAt, ...data } = analysis;
 			return {
+				id: uuid(),
 				type: ActivityType.ANALYSIS,
 				data,
 				date: completedAt

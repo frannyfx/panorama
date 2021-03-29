@@ -1,4 +1,7 @@
 export default {
+	activity: {
+		fetchingDelay: 790
+	},
 	repositories: {
 		extensions: {
 			icons: {
@@ -6,7 +9,7 @@ export default {
 				extension: "svg"
 			}
 		},	
-		pageSize: 10
+		pageSize: 12
 	},
 	store: {
 		lazyDataPurgeDelay: 5000,

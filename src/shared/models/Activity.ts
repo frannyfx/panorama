@@ -10,7 +10,12 @@ export enum ActivityType {
 	ANALYSIS = "analysis"
 };
 
+export interface ActivityMap {
+	[key: string]: Activity
+};
+
 export interface Activity {
+	id: string,
 	type: ActivityType,
 	data: Data,
 	date: Date

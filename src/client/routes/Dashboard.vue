@@ -1,9 +1,18 @@
 <template>
 	<div class="page nav no-select">
 		<div class="content container">
-			<h2>{{ $t("routes.dashboard.recentActivity") }}</h2>
-			<activity-list/>
-			<h2>{{ $t("routes.dashboard.repositories") }}</h2>
+			<div class="header">
+				<font-awesome-icon icon="chart-bar"/>
+				<h2>{{ $t("routes.dashboard.recentActivity") }}</h2>
+				<button class="action" @click="refreshActivity">
+					<font-awesome-icon icon="sync" :spin="activity.fetching"/>
+				</button>
+			</div>
+			<activity-list :fetching="activity.fetching"/>
+			<div class="header">
+				<font-awesome-icon icon="book"/>
+				<h2>{{ $t("routes.dashboard.repositories") }}</h2>
+			</div>
 			<div class="repos">
 				<transition-group name="list">
 					<repository-list-item @click.native="() => getRepo(repo)" v-for="(repo, index) in $store.state.Repositories.list" :key="repo.id" :repo="repo" :index="index"/>
@@ -33,10 +42,11 @@ import Activity from "../store/modules/Activity";
 // Modules
 import { getRepositories } from "../modules/GitHub";
 import { i18n } from "../i18n";
-import { clearAuthenticationData, endSession, send, waitForAuth } from "../modules/API";
+import { endSession, send, waitForAuth } from "../modules/API";
 import { createI18NAlert } from "../modules/Notifications";
 import { Repository } from "../modules/models/Repository";
 import { Method } from "../../shared/Method";
+import config from "../config";
 
 // Components
 import { FontAwesomeIcon }  from "@fortawesome/vue-fontawesome";
@@ -53,6 +63,9 @@ export default Vue.extend({
 	},
 	data() {
 		return {
+			activity: {
+				fetching: false
+			},
 			repos: {
 				fetching: false
 			}
@@ -61,6 +74,30 @@ export default Vue.extend({
 	methods: {
 		getRepo(repo: Repository) {
 			this.$router.push({ name: "repo", params: { locale: this.$i18n.locale, owner: repo.owner.login, repo: repo.name }});
+		},
+		async refreshActivity() {
+			// Prevent activity from being fetched simultaneously.
+			if (this.activity.fetching) return;
+
+			// Set fetching flag.
+			this.activity.fetching = true;
+
+			// Get IDs of current activity and schedule lazy activity deletion.
+			let activityIds = [...this.$store.state.Activity.list];
+			setTimeout(() => this.$store.commit("Activity/deleteData", activityIds), config.store.lazyDataPurgeDelay);
+
+			// Clear store.
+			this.$store.commit("Activity/clear");
+
+			// Fetch activity.
+			let activity = await send(Method.GET, "activity");
+			if (!activity.status.ok) createI18NAlert("WARNING", "activityFetchFailed");
+
+			// Add to store.
+			Store.commit("Activity/add", activity.result!);
+
+			// Remove fetching flag.
+			setTimeout(() => this.activity.fetching = false, config.activity.fetchingDelay);
 		},
 		async loadMoreRepos() {
 			// Check and set flag.
@@ -130,14 +167,17 @@ export default Vue.extend({
 	color: black;
 }
 
-h2 {
+.header {
 	display: flex;
 	align-items: center;
+	color: $mariana;
 
-	svg {
-		margin-right: 10px;
-		font-size: 0.8em;
-		color: $blue;
+	h2 {
+		flex-grow: 1;
+	}
+
+	> svg {
+		margin-right: 15px;
 	}
 }
 

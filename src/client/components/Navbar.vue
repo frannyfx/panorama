@@ -63,9 +63,7 @@ export default Vue.extend({
 	z-index: 100;
 
 	/* Appearance */
-	background-color: rgba($deep, .95);
-	-webkit-backdrop-filter: blur(5px) saturate(150%);
-	backdrop-filter: blur(5px) saturate(150%);
+	background-color: $deep;
 	color: white;
 
 	.nav-inner {
