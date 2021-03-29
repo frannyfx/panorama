@@ -167,12 +167,12 @@ export default Vue.extend({
 
 		@include sm {
 			height: auto !important;
-			justify-content: space-evenly;
+			justify-content: center;
 			flex-wrap: wrap;
 
 			> .label {
 				flex-grow: 0 !important;
-				margin: 5px;
+				margin: 10px;
 
 				.dot-indicator {
 					margin-left: 0px !important;

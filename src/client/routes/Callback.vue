@@ -79,7 +79,7 @@ export default Vue.extend({
 		await sleep(2000);
 
 		// Post the result and close.
-		window.opener.postMessage(accessToken);
+		window.opener.postMessage(accessToken, "*");
 		window.close();
 	}
 });

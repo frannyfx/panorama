@@ -48,6 +48,8 @@ export default Vue.extend({
 			);
 		},
 		async onReceiveMessage(event: MessageEvent) {
+			console.log(event);
+			
 			// Check origin of the message.
 			if (event.source != this.popup.window) return;
 			
