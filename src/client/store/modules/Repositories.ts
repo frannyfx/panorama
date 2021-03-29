@@ -120,6 +120,9 @@ const mutations : MutationTree<RepositoriesState> = {
 			// Add contributor.
 			if (logins.indexOf(contributor.login) == -1) data.repository.contributors.list.push(contributor);
 		});
+
+		// Set enriched to true.
+		data.repository.contributors.enriched = true;
 	},
 	setTicket(state, data: { repository: Repository, ticket: string }) {
 		// Set analysis data retrieval ticket for repository.
