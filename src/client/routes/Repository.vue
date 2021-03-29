@@ -165,9 +165,6 @@ async function addFileChildren(owner: string, repo: string, path: string) : Prom
 	// If the directory's children have already been loaded, return true.
 	if (parentDirectory.children.loaded) return true;
 
-	// Set loading.
-	if (!Store.state.loading) Store.commit("setLoading", true);
-
 	// Get the files.
 	let files = await getFiles(repository, path);
 
