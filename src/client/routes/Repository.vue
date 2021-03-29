@@ -1,5 +1,5 @@
 <template>
-	<div class="page nav">
+	<div class="page nav no-select">
 		<div class="content container">
 			<div class="header">
 				<div class="title">

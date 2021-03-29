@@ -341,6 +341,7 @@ export default Vue.extend({
 	
 	.file-viewer {
 		margin: 0 !important;
+		user-select: text;
 	}
 }
 
