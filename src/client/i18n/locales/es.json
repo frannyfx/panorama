@@ -52,6 +52,10 @@
 			"title": "No ha sido posible encontrar tu perfil.",
 			"description": "Algo ha fallado. Por favor intentar otra vez."
 		},
+		"activityFetchFailed": {
+			"title": "No ha sido posible encotrar las actividades.",
+			"description": "Algo ha fallado. Por favor intentar otra vez."
+		},
 		"repoFetchFailed": {
 			"title": "No ha sido posible encontrar el repositorio.",
 			"description": "Algo ha fallado. Por favor intentar otra vez."

@@ -52,6 +52,10 @@
 			"title": "Unable to fetch your profile.",
 			"description": "Something went wrong. Please try again later."
 		},
+		"activityFetchFailed": {
+			"title": "Unable to fetch activity.",
+			"description": "Something went wrong. Please try again later."
+		},
 		"repoFetchFailed": {
 			"title": "Unable to fetch repository.",
 			"description": "Something went wrong. Please try again later."
@@ -191,9 +195,8 @@
 	},
 	"activity": {
 		"analysis": {
-			"title": "Analysis",
 			"description": "You analysed <b>{0}</b>.",
-			"action": "View repo"
+			"action": "View repository"
 		}
 	}
 }

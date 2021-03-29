@@ -52,6 +52,10 @@
 			"title": "Caricamento del profilo fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."
 		},
+		"activityFetchFailed": {
+			"title": "Caricamento delle attività fallito.",
+			"description": "Qualcosa è andato storto, provare più tardi."
+		},
 		"repoFetchFailed": {
 			"title": "Caricamento dell'archivio fallito.",
 			"description": "Qualcosa è andato storto, provare più tardi."

@@ -136,6 +136,11 @@ export default Vue.extend({
 	top: 0; left: 0;
 	width: 100vw;
 	height: 100vh;
+
+	&.zoom-leave-active {
+		border-radius: 10px;
+		overflow: hidden;
+	}
 }
 
 .credits {
