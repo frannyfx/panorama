@@ -84,7 +84,7 @@ export async function getRepositories(page: number = 1) : Promise<Repository[] |
 		page,
 		per_page: config.repositories.pageSize,
 		affiliation: "owner,collaborator",
-		sort: "updated",
+		sort: "pushed",
 		direction: "desc"
 	});
 
