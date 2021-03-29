@@ -12,9 +12,10 @@
 		},
 		"purge": {
 			"analysisThreshold": "7d",
+			"analysisGlitchThreshold": "2h",
 			"repositoryThreshold": "7d",
 			"userThreshold": "7d",
-			"periodLength": "3h"
+			"periodLength": "1h"
 		}
 	},
 	"web": {

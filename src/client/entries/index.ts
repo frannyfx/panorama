@@ -22,7 +22,6 @@ Icons;
 // Routes - loaded asynchronously.
 const SignIn = () => import(/* webpackChunkName: "sign-in" */ /* webpackMode: "lazy" */ "../routes/SignIn.vue");
 const Dashboard = () => import(/* webpackChunkName: "dashboard" */ /* webpackMode: "lazy" */  "../routes/Dashboard.vue");
-const Test = () => import(/* webpackChunkName: "test" */ /* webpackMode: "lazy" */  "../routes/Test.vue");
 const Repository = () => import(/* webpackChunkName: "repository" */ /* webpackMode: "lazy" */ "../routes/Repository.vue");
 const Error = () => import(/* webpackChunkName: "error" */ /* webpackMode: "lazy" */ "../routes/Error.vue");
 
@@ -57,10 +56,6 @@ const routes = [{
 	meta: {
 		title: "routes.dashboard.title"
 	}
-}, {
-	path: "/test",
-	component: Test,
-	name: "test"
 }, {
 	path: "/:locale/repo/:owner/:repo/",
 	component: Repository,

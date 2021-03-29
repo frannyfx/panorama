@@ -36,6 +36,7 @@ export interface Config {
 		},
 		purge: {
 			analysisThreshold: string,	// The time interval that must pass since its completion date for an analysis to be evicted from the DB.
+			analysisGlitchThreshold: string, // The time interval that must pass for a non-completed analysis since its queue date for it to be considered "glitched".
 			repositoryThreshold: string,// The time interval that must pass since its last analysis for a repository to be evicted from the DB.
 			userThreshold: string,		// The time interval a user must remain untouched for it to be evicted from the DB.
 			periodLength: string		// The time interval between each DB purge.

@@ -16,6 +16,7 @@ const config = loadConfig();
 
 // Modules
 import { humanTimeIntervalToMillis } from "../utils";
+import { DatabaseAnalysisStatus } from "./models/Analysis";
 
 // Variables
 var databaseConnection : knex | null = null;
@@ -101,6 +102,7 @@ async function performPurge() {
 
 	// Get thresholds & convert them.
 	const analysisThreshold = humanTimeIntervalToMillis(config.database.purge.analysisThreshold);
+	const analysisGlitchThreshold = humanTimeIntervalToMillis(config.database.purge.analysisGlitchThreshold);
 	const repositoryThreshold = humanTimeIntervalToMillis(config.database.purge.repositoryThreshold);
 	const userThreshold = humanTimeIntervalToMillis(config.database.purge.userThreshold);
 
@@ -111,6 +113,11 @@ async function performPurge() {
 		// - Analysis.
 		let analysisDeletionCount = await connection("Analysis")
 			.where("completedAt", "<", new Date(new Date().getTime() - analysisThreshold))
+			.del();
+
+		let analysisGlitchDeletionCount = await connection("Analysis")
+			.whereNotIn("status", [DatabaseAnalysisStatus.COMPLETED, DatabaseAnalysisStatus.FAILED])
+			.andWhere("queuedAt", "<", new Date(new Date().getTime() - analysisGlitchThreshold))
 			.del();
 
 		// - Repository.
@@ -143,8 +150,8 @@ async function performPurge() {
 		}
 
 		// If anything was evicted, log the results.
-		if (analysisDeletionCount + repositoryDeletionCount + userDeletionCount > 0)
-			logger.info(`Purged ${analysisDeletionCount} analyses, ${repositoryDeletionCount}/${repositoriesToDelete.length} repositories and ${userDeletionCount}/${usersToDelete.length} users.`);
+		if (analysisDeletionCount + analysisGlitchDeletionCount + repositoryDeletionCount + userDeletionCount > 0)
+			logger.info(`Purged ${analysisDeletionCount + analysisGlitchDeletionCount} analyses, ${repositoryDeletionCount}/${repositoriesToDelete.length} repositories and ${userDeletionCount}/${usersToDelete.length} users.`);
 	} catch (e) {
 		logger.warn(`Error during purge. ${e}`);
 	}
