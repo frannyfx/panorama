@@ -84,16 +84,17 @@ export default Vue.extend({
 		opacity: 0;
 		pointer-events: none;
 		transition: opacity 0.1s;
+		z-index: 10;
 	}
 
 	&:before {
-		left: 0;
-		background: linear-gradient(to left, rgba(white, 0), white);
+		left: -5px;
+		background: linear-gradient(to left, rgba(white, 0), white 95%, white);
 	}
 
 	&:after {
-		right: 0;
-		background: linear-gradient(to right, rgba(white, 0), white);
+		right: -5px;
+		background: linear-gradient(to right, rgba(white, 0), white 95%, white);
 	}
 
 	.scroller-content {

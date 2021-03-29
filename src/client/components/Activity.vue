@@ -93,6 +93,9 @@ export default Vue.extend({
 	background-color: $grey-tinted;
 	overflow: hidden;
 
+	/* Safari border radius fix */
+	-webkit-mask-image: -webkit-radial-gradient(white, black);
+
 	/* Animation delay */
 	@for $i from 1 through 3{
 		&:nth-child(#{$i}) > .activity-content {
@@ -112,7 +115,7 @@ export default Vue.extend({
 		align-items: center;
 
 		&.invisible {
-			opacity: 0;
+			opacity: 0 !important;
 		}
 
 		.activity-icon {
