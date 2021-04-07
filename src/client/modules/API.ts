@@ -12,7 +12,6 @@ import { getProfile } from "./GitHub";
 import { Repository } from "./models/Repository";
 import { createI18NAlert, removeAllNotifications } from "./Notifications";
 import { subscribeToJobProgress } from "./Queue";
-import { sleep } from "../../shared/utils";
 import { dismissAll as dismissAllModals } from "./Modal";
 import config from "../config";
 
@@ -246,7 +245,7 @@ export function endSession() {
 	clearAuthenticationData();
 
 	// Dismiss modals.
-	dismissAllModals();
+	Store.commit("Modals/removeAll");
 
 	// Dismiss notifications.
 	removeAllNotifications();
@@ -264,6 +263,9 @@ export function endSession() {
 
 		// Delete activity data.
 		Store.commit("Activity/deleteAll");
+
+		// Delete modal data.
+		Store.commit("Modals/deleteAllData");
 
 		// Set canSignIn flag.
 		Store.commit("setCanSignIn", true);
