@@ -7,8 +7,7 @@
 import { promises as fs } from "fs";
 import path from "path";
 import BeeQueue from "bee-queue";
-import Git, { Branch } from "nodegit";
-import util from "util";
+import Git from "nodegit";
 import GitIgnoreParser from "gitignore-parser";
 
 // Logger
@@ -69,7 +68,7 @@ export async function stop() {
  */
 function reportJobProgress(job: BeeQueue.Job<RepoJob>, stage: AnalysisStage, subProgress: number = 0) {
 	// Create progress object.
-	let progress : RepoJobProgress | null= null;
+	let progress : RepoJobProgress | null = null;
 
 	// Switch stage.
 	switch (stage) {
@@ -214,6 +213,11 @@ async function getJobRepository(job: BeeQueue.Job<RepoJob>) : Promise<Git.Reposi
 	return cloneResult.result!.repository;
 }
 
+/**
+ * Get a repository's latest commit.
+ * @param repository The repository to get the commit from.
+ * @returns The commit object.
+ */
 async function getLatestCommit(repository: Git.Repository) : Promise<Git.Commit> {
 	let branch = (await repository.getCurrentBranch()).shorthand();
 	let masterCommit = await repository.getBranchCommit(branch);

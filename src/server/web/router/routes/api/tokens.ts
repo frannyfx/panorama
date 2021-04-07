@@ -8,13 +8,13 @@ import Joi from "joi";
 
 // Modules
 import { Method } from "../../../../../shared/Method";
-import { Request, Route } from "../../Route";
+import { Route } from "../../Route";
 import { Codes, send } from "../../API";
 
 // Models
 import DatabaseToken from "../../../../database/models/Token";
 
-let route : Array<Route> = [{
+let route : Route[] = [{
 	method: Method.GET,
 	url: "/api/tokens",
 	schemas: {

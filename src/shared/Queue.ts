@@ -1,3 +1,8 @@
+/**
+ * @file Enums and interfaces for the queueing system.
+ * @author Francesco Compagnoni
+ */
+
 export enum AnalysisStage {
 	Starting,
 	Cloning,

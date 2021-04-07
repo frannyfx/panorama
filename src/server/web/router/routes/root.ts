@@ -1,5 +1,5 @@
 /**
- * @file Route handling homepage requests.
+ * @file Routes handling requests to client pages.
  * @author Francesco Compagnoni
  */
 
@@ -16,7 +16,6 @@ const config = loadConfig();
 import getRoot from "../../../utils/root";
 import { Method } from "../../../../shared/Method";
 import { Request, Route } from "../Route";
-import { getSupportedLocales } from "../..";
 import { FastifyReply } from "fastify";
 
 /**
@@ -26,7 +25,7 @@ import { FastifyReply } from "fastify";
  */
 async function getIndex(request: Request, reply: FastifyReply, code: number = 200) {
 	// Check locale only if we're not currently loading the error page.
-	if (getSupportedLocales().indexOf(request.params?.locale) == -1) {
+	if (config.web.supportedLocales.indexOf(request.params?.locale) == -1) {
 		return reply.redirect(`/${request.locale!}/error/notFound`);
 	}
 
@@ -35,7 +34,7 @@ async function getIndex(request: Request, reply: FastifyReply, code: number = 20
 	reply.code(code).type("text/html").send(index);
 }
 
-let routes : Array<Route> = [{
+let routes : Route[] = [{
 	method: Method.GET,
 	url: "/",
 	handler: async (request, reply) => {

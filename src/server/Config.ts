@@ -1,5 +1,5 @@
 /**
- * @file Defines the structure of the config file loaded by the server.
+ * @file Defines the structure of the config file loaded by the server and handles loading config files.
  * @author Francesco Compagnoni
  */
 
@@ -49,8 +49,9 @@ export interface Config {
 	web: {
 		enabled: boolean,				// Whether to enable the web-server.
 		router: {
-			routeDirs: Array<string>	// Directories to scan to find routes.
+			routeDirs: string[]	// Directories to scan to find routes.
 		},
+		supportedLocales: string[],		// The list of locales supported by the server.
 		publicDir: string,				// Static assets folder.
 		address: string,				// Address to bind to.
 		port: number					// Port to run the HTTP server on.
@@ -67,7 +68,7 @@ export interface Config {
 			purgePeriodLength: string	// The time interval between each cache purge.
 		},
 		lexing: {
-			langDirs: Array<string>			// Directories to scan to find languages.
+			langDirs: string[]			// Directories to scan to find languages.
 		},
 	},
 	crypto: {

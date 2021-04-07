@@ -5,7 +5,6 @@
  */
 
 // Modules
-import { areSetsEqual } from "../utils";
 import { BlameGroup, ContributorMap } from "./blame";
 import { TokenGroup } from "./lexing/Lexer";
 

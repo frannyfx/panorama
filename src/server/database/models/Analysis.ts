@@ -37,6 +37,7 @@ export interface DatabaseAnalysis {
 /**
  * Inserts an analysis in the Analysis table.
  * @param analysis The analysis data to insert.
+ * @param transaction An optional transaction to use to perform the insertion.
  * @returns The database analysis with the new analysisId set.
  */
 async function insert(analysis: DatabaseAnalysis, transaction: Knex.Transaction | undefined = undefined) : Promise<DatabaseAnalysis> {

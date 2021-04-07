@@ -5,15 +5,13 @@
 
 // Imports
 import { Octokit } from "@octokit/rest";
-import { createTokenAuth }from "@octokit/auth-token";
-import { AuthInterface, GetResponseDataTypeFromEndpointMethod } from "@octokit/types";
-import { paths, components } from "@octokit/openapi-types";
+import { components } from "@octokit/openapi-types";
 
 // Modules
 import Store from "../store";
 import Users from "../store/modules/Users";
 import config from "../config";
-import { buildResult, Data, Result } from "../../shared/Result";
+import { Data, Result } from "../../shared/Result";
 import { Repository, toRepository } from "./models/Repository";
 import { toUser, User } from "./models/User";
 import { File, toFile } from "./models/File";

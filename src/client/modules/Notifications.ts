@@ -56,10 +56,6 @@ export interface NotificationTimeoutsObject {
 	[key: string]: NotificationTimeouts
 };
 
-// Constants
-const NOTIFICATION_DURATION = 8000;
-const NOTIFICATION_FADE_BEGIN = 6000;
-
 // - Icons
 const INFO_ICON = ["fas", "info-circle"];
 const WARNING_ICON = ["fas", "exclamation-circle"];
@@ -191,8 +187,8 @@ export function toggleNotificationExpiry(notification: Notification, enabled: bo
 
 	// Re-enable the timeouts.
 	if (enabled) {
-		timeouts.fade = setTimeout(() => Store.commit("Notifications/setExpiryStatus", { id: notification.id, status: "FADING" }), NOTIFICATION_FADE_BEGIN);
-		timeouts.expiry = setTimeout(() => removeNotification(notification), NOTIFICATION_DURATION);
+		timeouts.fade = setTimeout(() => Store.commit("Notifications/setExpiryStatus", { id: notification.id, status: "FADING" }), config.notifications.fadeStart);
+		timeouts.expiry = setTimeout(() => removeNotification(notification), config.notifications.duration);
 	} else Store.commit("Notifications/setExpiryStatus", { id: notification.id, status: "NORMAL" });
 
 	// Update the notification in the store.

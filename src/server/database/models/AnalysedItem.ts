@@ -1,5 +1,5 @@
 /**
- * @file Database operations for the AnalysisItem model as well as all its children.
+ * @file Database operations for the AnalysedItem model as well as all its children.
  */
 
 // Imports
@@ -97,6 +97,7 @@ export interface DatabaseAnalysedItemAggregateFileType {
  * Convert a list of AnalysedItems to their database representation and insert them.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
+ * @param transaction The transaction to use to perform the insertion.
  * @returns Whether the query was successful.
  */
 async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], transaction: Knex.Transaction) : Promise<void> {
@@ -129,6 +130,7 @@ async function convertAndInsertAnalysedItems(analysis: DatabaseAnalysis, analyse
  * Convert a list of AggregateStats to their database representation and insert them.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
+ * @param transaction The transaction to use to perform the insertion.
  * @returns Whether the query was successful.
  */
 async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], transaction: Knex.Transaction) : Promise<void> {
@@ -159,6 +161,7 @@ async function convertAndInsertAggregateStats(analysis: DatabaseAnalysis, analys
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @param contributorMap Maps commit emails to contributors.
+ * @param transaction The transaction to use to perform the insertion.
  * @returns Whether the query was successful.
  */
 async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap, transaction: Knex.Transaction) : Promise<void> {
@@ -203,6 +206,7 @@ async function convertAndInsertAnalysedItemChunks(analysis: DatabaseAnalysis, an
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @param contributorMap Maps commit emails to contributors.
+ * @param transaction The transaction to use to perform the insertion.
  * @returns Whether the query was successful.
  */
 async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap, transaction: Knex.Transaction) : Promise<void> {
@@ -258,6 +262,7 @@ async function convertAndInsertAnalysedItemContributors(analysis: DatabaseAnalys
  * Convert the extension map in the analysed items to its database representation and insert the results.
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
+ * @param transaction The transaction to use to perform the insertion.
  * @returns Whether the query was successful.
  */
 async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], transaction: Knex.Transaction) : Promise<void> {
@@ -303,6 +308,7 @@ async function convertAndInsertAnalysedItemAggregateFileType(analysis: DatabaseA
  * @param analysis Parent analysis data.
  * @param analysedItems The analysed items from the repository to convert.
  * @param contributorMap Maps commit emails to contributors.
+ * @param transaction The transaction to use to perform the insertion.
  * @returns Whether the query was successful.
  */
 async function convertAndInsert(analysis: DatabaseAnalysis, analysedItems: AnalysedItem[], contributorMap: ContributorMap, transaction: Knex.Transaction) : Promise<void> {

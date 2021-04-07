@@ -5,7 +5,6 @@
 
 // Modules
 import { Data } from "../../shared/Result";
-import { i18n } from "../i18n";
 import Store from "../store";
 
 export enum Error {

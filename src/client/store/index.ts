@@ -7,7 +7,6 @@
 import Vue from "vue";
 import Vuex, { MutationTree } from "vuex";
 import { Data } from "../../shared/Result";
-import { Repository } from "../modules/models/Repository";
 
 // Modules
 import { Error } from "../modules/Error";

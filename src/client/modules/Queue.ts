@@ -4,7 +4,7 @@
  */
 
 // Modules
-import { addNotification, createI18NAlert, Notification, NotificationData, toggleNotificationExpiry } from "./Notifications";
+import { addNotification, createI18NAlert, toggleNotificationExpiry } from "./Notifications";
 import { i18n } from "../i18n";
 import { Response } from "../../shared/Response";
 import Store from "../store";
@@ -39,7 +39,7 @@ let subscribedJobs : JobMap = {};
  * Get the URL of the socket depending on the current protocol used to load the page.
  */
 function getSocketURL() : string {
-	return `${window.location.protocol == "https:" ? "wss:" : "ws:"}//${window.location.host}/api/queue/updates`;
+	return `${window.location.protocol == "https:" ? "wss:" : "ws:"}//${window.location.host}/api/analysis/updates`;
 }
 
 /**

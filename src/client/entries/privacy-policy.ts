@@ -1,5 +1,5 @@
 /**
- * @file Callback pop-up entry point.
+ * @file Privacy policy entry point.
  * @author Francesco Compagnoni
  */
 

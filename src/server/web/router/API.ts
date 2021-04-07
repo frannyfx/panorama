@@ -67,8 +67,6 @@ export const Codes : API = {
 	}
 };
 
-//export default Codes;
-
 /**
  * Send a formatted API response.
  * @param reply The Fastify reply object to send it with.

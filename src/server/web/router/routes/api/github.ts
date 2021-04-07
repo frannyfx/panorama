@@ -15,11 +15,11 @@ const config = loadConfig();
 // Modules
 import getRoot from "../../../../utils/root";
 import { Method } from "../../../../../shared/Method";
-import { Request, Route } from "../../Route";
+import { Route } from "../../Route";
 import { Codes, send } from "../../API";
 import { getAccessToken } from "../../../../github";
 
-let route : Array<Route> = [{
+let route : Route[] = [{
 	method: Method.GET,
 	url: "/api/github/client-id",
 	handler: async (request, reply) => {

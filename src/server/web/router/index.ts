@@ -33,7 +33,7 @@ export interface Options {
 	supportedLocales: string[],
 	notFoundHandler?: Handler,
 	errorHandler?: ErrorHandler,
-	verifyAuth?: (request: any) => Promise<Auth>
+	verifyAuth?: (request: FastifyRequest) => Promise<Auth>
 };
 
 async function verifySchema(schema: ObjectSchema, payload: Data) : Promise<Result> {

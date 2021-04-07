@@ -3,10 +3,6 @@
  * @author Francesco Compagnoni
  */
 
-// Logger
-import createLogger from "../../utils/logger";
-const logger = createLogger("lexer");
-
 // Enums
 /**
  * The type of code that a token has matched.

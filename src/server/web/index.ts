@@ -17,14 +17,11 @@ const config = loadConfig();
 
 // Modules
 import getRoot from "../utils/root";
-import { Auth, Request } from "./router/Route";
+import { Auth } from "./router/Route";
 import { checkAuth } from "../github";
 
 // Web-server
 var webServer : FastifyInstance;
-
-// Constants
-const supportedLocales = ["en", "it", "es"];
 
 /**
  * Start the web server.
@@ -44,7 +41,7 @@ async function start() {
 	// Load dynamic routes.
 	await webServer.register(require("./router"), {
 		directories: config.web.router.routeDirs.map(dir => path.join(getRoot(), dir)),
-		supportedLocales,
+		supportedLocales: config.web.supportedLocales,
 		notFoundHandler,
 		errorHandler,
 		verifyAuth
@@ -58,7 +55,7 @@ async function start() {
  * Validate the authentication of a user with a request.
  * @param request The request containing the authentication details to be validated.
  */
-async function verifyAuth(request: any) : Promise<Auth> {
+async function verifyAuth(request: FastifyRequest) : Promise<Auth> {
 	// Get the Authorization header and check it is formatted properly.
 	let header = request.headers.authorization;
 	if (!header || typeof header != "string" || header.trim().length == 0)
@@ -99,14 +96,6 @@ async function notFoundHandler(request: FastifyRequest, reply: FastifyReply) {
  */
 async function errorHandler(error: FastifyError, request: FastifyRequest, reply: FastifyReply) {
 	reply.redirect("/error/general");
-}
-
-/**
- * Get the list of the server's supported locales.
- * @returns The server's supported locales.
- */
-export function getSupportedLocales() {
-	return supportedLocales;
 }
 
 /**

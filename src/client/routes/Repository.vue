@@ -133,7 +133,8 @@ async function getAnalysisData(repository: Repository, path: string) : Promise<A
 }
 
 /**
- * 
+ * Retrieve a ticket to access a repository's contents.
+ * @param repository The repository to generate the ticket for.
  */
 async function getTicket(repository: Repository) : Promise<boolean> {
 	// Request analysis ticket for repository.

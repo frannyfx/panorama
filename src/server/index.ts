@@ -20,6 +20,9 @@ import analysis from "./analysis";
 import queue from "./analysis/queue";
 import database from "./database";
 
+// Variables
+let isProcessExiting = false;
+
 /**
  * Initialise the backend with the selected sub-modules.
  */
@@ -65,11 +68,14 @@ function writeHeader() {
 	}) + "\n\n");
 }
 
-// Initialise the backend.
-start();
+/**
+ * Handle the signal sent to the process by CTRL+C, shutdown the submodules and exit cleanly.
+ */
+async function handleSIGINT() {
+	// Ensure the function is only called once.
+	if (isProcessExiting) return;
+	isProcessExiting = true;
 
-// Catch SIGINT (CTRL+C).
-process.on("SIGINT", async () => {
 	// Print out the log on the next line.
 	console.log("");
 	logger.info("Received CTRL+C. Exiting...");
@@ -80,16 +86,23 @@ process.on("SIGINT", async () => {
 	// Exit.
 	logger.info("Bye!");
 	process.exit();
-});
+}
 
-// Catch uncaught exceptions.
+// Event listeners.
+// - Catch SIGINT (CTRL+C).
+process.on("SIGINT", handleSIGINT);
+
+// - Catch uncaught exceptions.
 process.on("uncaughtException", (err : Error) => {
 	logger.error(`Uncaught exception: ${err.stack}\nExiting.`);
 	process.exit(0);
 });
 
-// Catch unhandled promise rejections.
+// - Catch unhandled promise rejections.
 process.on("unhandledRejection", (err) => {
 	logger.error(`Unhandled promise rejection: ${err}\nExiting.`);
 	process.exit(0);
 });
+
+// Initialise the backend.
+start();

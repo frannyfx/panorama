@@ -5,10 +5,10 @@
 
 // Modules
 import { Method } from "../../../../../shared/Method";
-import { Request, Route } from "../../Route";
+import { Route } from "../../Route";
 import { Codes, send } from "../../API";
 
-let route : Array<Route> = [{
+let route : Route[] = [{
 	method: Method.GET,
 	url: "/api/auth",
 	auth: true,

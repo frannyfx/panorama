@@ -2,7 +2,6 @@
 	<div class="page center">
 		<div class="content">
 			<h1 class="title"><font-awesome-icon icon="eye"/>Panorama</h1>
-			<!-- Spinner -->
 			<transition name="height">
 				<div class="animate-height" v-show="status == null">
 					<spinner/>

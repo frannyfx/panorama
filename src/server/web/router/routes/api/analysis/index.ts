@@ -42,7 +42,7 @@ async function verifyTicket(analysisId: number, accessToken: string, userTicket:
 	return ticketValidation.decoded!.analysisId == analysisId && ticketValidation.decoded!.accessTokenHash == crypto.createHash("sha256").update(accessToken).digest("hex");
 }
 
-let route : Array<Route> = [{
+let route : Route[] = [{
 	method: Method.GET,
 	url: "/api/repo/:owner/:repo/analysis",
 	auth: true,

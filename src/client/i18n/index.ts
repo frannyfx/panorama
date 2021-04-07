@@ -1,3 +1,8 @@
+/**
+ * @file Module handling internationalisation (loading language files asynchronously).
+ * @author Francesco Compagnoni
+ */
+
 // Imports
 import Vue from "vue";
 import VueI18n from "vue-i18n";

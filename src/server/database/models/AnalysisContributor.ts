@@ -23,6 +23,7 @@ export interface DatabaseAnalysisContributor {
 /**
  * Insert an AnalysisContributor and potentially insert a user into the database.
  * @param analysisId The parent analysis of the contributor.
+ * @param transaction An optional transaction to use to perform the insertion.
  * @param user The user model.
  */
 export async function insertOrUpdate(analysisId: number, user: DatabaseUser, transaction: Knex.Transaction | undefined = undefined) : Promise<boolean> {

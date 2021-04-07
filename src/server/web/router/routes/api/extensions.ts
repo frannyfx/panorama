@@ -14,7 +14,7 @@ import { Codes, send } from "../../API";
 // Models
 import DatabaseFileType from "../../../../database/models/FileType";
 
-let route : Array<Route> = [{
+let route : Route[] = [{
 	method: Method.GET,
 	url: "/api/files/extensions",
 	schemas: {

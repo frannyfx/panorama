@@ -48,11 +48,9 @@ function sendJobProgress(connection: SocketStream, jobId: number, status: string
 
 let route : Route = {
 	method: Method.WS,
-	url: "/api/queue/updates",
+	url: "/api/analysis/updates",
 	on: {
-		open(connection: SocketStream, request: Request) {
-			// ...
-		},
+		open(connection: SocketStream, request: Request) {},
 		async message(connection: SocketStream, message: string) {
 			// Parse JSON.
 			var payload : Data | null = null;
@@ -95,9 +93,7 @@ let route : Route = {
 			job.on("retrying", () => sendJobProgress(connection, jobId, "retrying", job!.progress));
 			logger.success(`Subscribed to updates on job ${job.id}.`);
 		},
-		close(connection: SocketStream, event: any) {
-			// ...
-		}
+		close(connection: SocketStream, event: any) {}
 	}
 };
 

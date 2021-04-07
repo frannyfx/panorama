@@ -1,3 +1,8 @@
+/**
+ * @file Client configuration file.
+ * @author Francesco Compagnoni
+ */
+
 export default {
 	activity: {
 		fetchingDelay: 790
@@ -10,6 +15,10 @@ export default {
 			}
 		},	
 		pageSize: 12
+	},
+	notifications: {
+		duration: 8000,
+		fadeStart: 6000
 	},
 	store: {
 		lazyDataPurgeDelay: 5000,
