@@ -122,6 +122,10 @@
 					"analyseRepo": "Analizar repositorio",
 					"cancel": "Anular"
 				}
+			},
+			"privacyPolicyNotice": {
+				"title": "Normas de privacidad",
+				"description": "El uso de nuestros servicios está sujeto a nuestras <a class=\"styled\" target=\"_blank\" href=\"/privacy-policy\">normas de privacidad</a>. Asegúrese de haber leído y entendido las normas de privacidad antes de continuar."
 			}
 		}
 	},

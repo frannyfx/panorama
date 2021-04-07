@@ -122,6 +122,10 @@
 					"analyseRepo": "Analyse repo",
 					"cancel": "Cancel"
 				}
+			},
+			"privacyPolicyNotice": {
+				"title": "Privacy Notice",
+				"description": "Usage of our services is subject to our <a class=\"styled\" target=\"_blank\" href=\"/privacy-policy\">privacy policy</a>. Please make sure you have read and understood the privacy policy before you continue."
 			}
 		}
 	},

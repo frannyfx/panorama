@@ -22,6 +22,7 @@ import { isResult } from '../../shared/Result';
 import { getProfile, getRedirectURI } from '../modules/GitHub';
 import { createI18NAlert } from "../modules/Notifications";
 import { i18n } from "../i18n";
+import { createModal, OK_CANCEL } from "../modules/Modal";
 
 export default Vue.extend({
 	components: {
@@ -37,7 +38,7 @@ export default Vue.extend({
 		};
 	},
 	methods: {
-		async signIn() {
+		createAuthPopUp() {
 			// Open authentication window.
 			this.popup.window = window.open(
 				`https://github.com/login/oauth/authorize?client_id=${this.$store.state.auth.clientId}&redirect_uri=${getRedirectURI()}&scope=repo`,
@@ -46,6 +47,27 @@ export default Vue.extend({
 				`width=${this.popup.width},height=${this.popup.height},` +
 				`left=${((window.outerWidth - this.popup.width) / 2) + window.screenX},top=${((window.outerHeight - this.popup.height) / 2) + window.screenY}`
 			);
+		},
+		async signIn() {
+			// Get whether the privacy policy notice was shown to the user from local storage.
+			let privacyPolicyNoticeShown = window.localStorage.getItem("privacyPolicyNoticeShown");
+
+			// If pop-up not shown, create modal, otherwise show authentication window.
+			if (!privacyPolicyNoticeShown || parseInt(privacyPolicyNoticeShown) == 0) {
+				createModal(
+					OK_CANCEL,
+					this.$i18n.t("modals.custom.privacyPolicyNotice.title").toString(),
+					this.$i18n.t("modals.custom.privacyPolicyNotice.description").toString(),
+					undefined, (modal: any, actionId: string) => {
+						// If user has agreed, shown pop-up.
+						if (actionId == "OK") {
+							// Set privacy policy read value.
+							window.localStorage.setItem("privacyPolicyNoticeShown", "1");
+							this.createAuthPopUp();
+						} 
+					}
+				);
+			} else this.createAuthPopUp();
 		},
 		async onReceiveMessage(event: MessageEvent) {
 			console.log(event);

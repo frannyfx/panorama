@@ -10,10 +10,12 @@
 					</button>-->
 				</div>
 				<h1>Privacy Policy</h1>
-				<p><i>Last updated March 25<sup>th</sup> 2021.</i></p>
+				<p><i>Last updated April 7<sup>th</sup> 2021.</i></p>
 				<p>
 					<b>Panorama</b> ("Panorama", "we", or "us") is committed to protecting your privacy.
-					This Privacy Policy explains the methods and reasons we collect, use, disclose, transfer and store your information.
+					This Privacy Policy explains the methods and reasons we collect, use, disclose, transfer and store your information.<br>
+					By using Panorama and its features you agree to have read and understood the contents of this policy, give us permission to collect, use, disclose, transfer and store your information as described
+					and agree to follow the guidelines described in this policy.<br>
 					If you have any questions about the contents of this policy, please contact us.<br>
 				</p>
 				<p>This policy may be subject to changes as the requirements, features and capabilities of our service evolve.</p>
@@ -31,8 +33,9 @@
 				</ul>
 				<p>
 					It's important to note that the personal information of people who either own or have contributed to GitHub repositories that you have analysed using Panorama will also be collected in the same way.<br>
+					Before analysing a repository, you must ensure to have permission from all the repository's contributors to perform the analysis.<br>
 					Additionally, during analysis, Panorama will temporarily process the email addresses and Git commit information of all repository contributors, though this data 
-					is never specifically stored or saved.
+					is never stored.
 				</p>
 				<h3>Information about repositories</h3>
 				<p>

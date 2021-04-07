@@ -122,6 +122,10 @@
 					"analyseRepo": "Analizza archivio",
 					"cancel": "Annulla"
 				}
+			},
+			"privacyPolicyNotice": {
+				"title": "Norme sulla privacy",
+				"description": "L'uso dei nostri servizi è soggetto alle nostre <a class=\"styled\" target=\"_blank\" href=\"/privacy-policy\">norme sulla privacy</a>. Si prega di aver letto e compreso le norme sulla privacy prima di continuare."
 			}
 		}
 	},
