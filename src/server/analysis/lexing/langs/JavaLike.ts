@@ -1,5 +1,5 @@
 /**
- * @file Lexer definitions for langauges that have Java-like comments.
+ * @file Lexer definitions for languages that have Java-like comments.
  * - Java
  * - JavaScript
  * - TypeScript

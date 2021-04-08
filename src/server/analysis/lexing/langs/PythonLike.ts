@@ -1,5 +1,5 @@
 /**
- * @file Lexer definitions for langauges that have Python-like comments.
+ * @file Lexer definitions for languages that have Python-like comments.
  * - Python
  */
 

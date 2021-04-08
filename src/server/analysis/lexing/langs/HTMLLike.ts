@@ -1,5 +1,5 @@
 /**
- * @file Lexer definitions for langauges that have HTML-like comments.
+ * @file Lexer definitions for languages that have HTML-like comments.
  * - HTML
  * - XML
  * - Handlebars

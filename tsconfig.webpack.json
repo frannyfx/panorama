@@ -17,4 +17,4 @@
 	"files": [
 		"src/client/definitions/vue-shim.d.ts"
 	],
-  }
+}
